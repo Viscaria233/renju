@@ -1,13 +1,13 @@
 //package com.haochen.renju.form;
 //
-//import java.com.haochen.renju.util.ArrayList;
+//import java.com.haochen.renju.draw.ArrayList;
 //
 //import com.haochen.renju.common.GetChessObject;
 //import com.haochen.renju.common.OperateStorage;
 //import com.haochen.renju.common.Piece;
-//import com.haochen.renju.util.ChessMap;
-//import com.haochen.renju.util.ChessTree;
-//import com.haochen.renju.util.TreeNode;
+//import com.haochen.renju.draw.ChessMap;
+//import com.haochen.renju.draw.ChessTree;
+//import com.haochen.renju.draw.TreeNode;
 //
 //public class ChessForm implements GetChessObject, OperateStorage{
 //	private ChessTree chessTree;

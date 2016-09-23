@@ -23,8 +23,8 @@ import com.haochen.renju.common.Controller;
 import com.haochen.renju.common.Piece;
 import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.form.Point;
-import com.haochen.renju.ui.util.Layer;
-import com.haochen.renju.ui.util.LayerManager;
+import com.haochen.renju.draw.Layer;
+import com.haochen.renju.draw.LayerManager;
 
 public class BoardPanel extends JPanel {
 

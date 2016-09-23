@@ -3,7 +3,7 @@ package com.haochen.renju.util;
 import java.awt.Color;
 
 import com.haochen.renju.common.Cell;
-import com.haochen.renju.common.HandCut;
+import com.haochen.renju.common.ForbiddenMove;
 import com.haochen.renju.common.RealPiece;
 import com.haochen.renju.form.Point;
 
@@ -44,11 +44,11 @@ public class PieceMap implements Cloneable {
     }
     
     public void addHandCut(Point boardLocation) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = new HandCut(boardLocation);
+        map[boardLocation.x - 1][boardLocation.y - 1] = new ForbiddenMove(boardLocation);
     }
     
     public void addHandCut(int x, int y) {
-        map[x - 1][y - 1] = new HandCut(x, y);
+        map[x - 1][y - 1] = new ForbiddenMove(x, y);
     }
     
     public void removeCell(Point boardLocation) {

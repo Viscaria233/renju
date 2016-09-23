@@ -4,15 +4,15 @@ import java.awt.Color;
 
 import com.haochen.renju.form.Point;
 
-public class HandCut extends Cell {
+public class ForbiddenMove extends Cell {
 
     private Point location;
     
-    public HandCut(Point location) {
+    public ForbiddenMove(Point location) {
         this.location = location;
     }
     
-    public HandCut(int x, int y) {
+    public ForbiddenMove(int x, int y) {
         this.location = new Point(x, y);
     }
     

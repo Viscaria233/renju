@@ -1,4 +1,4 @@
-package com.haochen.renju.ui.util;
+package com.haochen.renju.draw;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;

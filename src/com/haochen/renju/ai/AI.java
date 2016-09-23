@@ -13,7 +13,7 @@ import com.haochen.renju.util.PieceMap;
 
 public class AI {
 
-    private boolean handCut = true;
+    private boolean forbiddenMove = true;
     private Controller controller;
     
     public void setController(Controller controller) {
@@ -24,7 +24,7 @@ public class AI {
         Point location = piece.getLocation();
         Color color = piece.getColor();
         if (color.equals(Color.black)) {
-            if (handCut && map.getCell(location).isHandCut()) {
+            if (forbiddenMove && map.getCell(location).isHandCut()) {
                 return Color.white;
             }
         }
@@ -160,7 +160,7 @@ public class AI {
         }
         
         SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
-        if (handCut) {
+        if (forbiddenMove) {
             if (color.equals(Color.black)) {
                 if (single.getLength() == 5) {
                     fiveDirection.add(direction);

@@ -1,6 +1,6 @@
 //package com.haochen.renju.util;
 //
-//import java.com.haochen.renju.util.ArrayList;
+//import java.com.haochen.renju.draw.ArrayList;
 //
 //import com.haochen.renju.common.GetChessAttribute;
 //import com.haochen.renju.common.OperateStorage;
