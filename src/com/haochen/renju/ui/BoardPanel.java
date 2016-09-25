@@ -19,12 +19,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import com.haochen.renju.common.Mediator;
-import com.haochen.renju.common.Piece;
+import com.haochen.renju.control.Mediator;
+import com.haochen.renju.bean.Piece;
 import com.haochen.renju.exception.ReadFileException;
-import com.haochen.renju.form.Point;
-import com.haochen.renju.draw.Layer;
-import com.haochen.renju.draw.LayerManager;
+import com.haochen.renju.storage.Point;
+import com.haochen.renju.ui.draw.Layer;
+import com.haochen.renju.ui.draw.LayerManager;
 
 public class BoardPanel extends JPanel implements Mediator.Display {
 
@@ -182,6 +182,11 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     public void removeRecord(Point location) {
         Point absolutely = absolutelyLocation(location);
         recordLayer.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
+    }
+
+    @Override
+    public void removeRecord() {
+        recordLayer.erase();
     }
 
     @Override

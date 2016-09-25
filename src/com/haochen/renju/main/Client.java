@@ -2,6 +2,7 @@ package com.haochen.renju.main;
 
 import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.ui.Dialogs;
+import com.haochen.renju.ui.TestFrame;
 
 public class Client {
 
