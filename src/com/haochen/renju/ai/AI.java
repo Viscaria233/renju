@@ -3,7 +3,7 @@ package com.haochen.renju.ai;
 import java.awt.Color;
 
 import com.haochen.renju.common.Cell;
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 import com.haochen.renju.common.Piece;
 import com.haochen.renju.form.ContinueAttribute;
 import com.haochen.renju.form.Direction;
@@ -14,10 +14,10 @@ import com.haochen.renju.util.PieceMap;
 public class AI {
 
     private boolean forbiddenMove = true;
-    private Controller controller;
+    private Mediator mediator;
     
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
     
     public Color findWinner(PieceMap map, Piece piece) {

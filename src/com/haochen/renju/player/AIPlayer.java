@@ -10,7 +10,7 @@ public class AIPlayer extends Player {
 
     @Override
     public void move() {
-        controller.response("ai moving", null);
+        mediator.response("ai moving", null);
     }
 
 }

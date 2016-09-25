@@ -9,7 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 
 public class TestMenuBar extends JMenuBar {
 
@@ -52,7 +52,7 @@ public class TestMenuBar extends JMenuBar {
     private JCheckBoxMenuItem lvNormal;
     private JCheckBoxMenuItem lvHigh;
     
-    private Controller controller;
+    private Mediator mediator;
     
     public TestMenuBar(TestFrame frame) {
         this.mainFrame = frame;
@@ -163,8 +163,8 @@ public class TestMenuBar extends JMenuBar {
         eventPerform();
     }
     
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
 
     private void eventPerform() {
@@ -223,15 +223,15 @@ public class TestMenuBar extends JMenuBar {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-//                        controller.response("show five", null);
-//                        controller.response("show alive four", null);
-//                        controller.response("show asleep four", null);
-//                        controller.response("show alive three", null);
-//                        controller.response("show asleep three", null);
-//                        controller.response("show long continue", null);
-//                        controller.response("is it double four", null);
-//                        controller.response("is it double three", null);
-                        controller.response("launch", null);
+//                        mediator.response("show five", null);
+//                        mediator.response("show alive four", null);
+//                        mediator.response("show asleep four", null);
+//                        mediator.response("show alive three", null);
+//                        mediator.response("show asleep three", null);
+//                        mediator.response("show long continue", null);
+//                        mediator.response("is it double four", null);
+//                        mediator.response("is it double three", null);
+                        mediator.response("launch", null);
                     }
                 }).start();
             }
@@ -247,7 +247,7 @@ public class TestMenuBar extends JMenuBar {
 //                        mainFrame.chessForm.getLastChess().getLocation(), Direction.horizontal).getContinue(Direction.horizontal).getBreakPoint();
 //                System.out.println("side[0] = " + side[0]);
 //                System.out.println("side[1] = " + side[1]);
-                controller.response("show break point", null);
+                mediator.response("show break point", null);
             }
         });
 

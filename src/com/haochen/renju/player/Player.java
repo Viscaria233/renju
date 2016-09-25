@@ -2,13 +2,13 @@ package com.haochen.renju.player;
 
 import java.awt.Color;
 
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 
 public abstract class Player {
     
     protected String name;
     protected Color color;
-    protected Controller controller;
+    protected Mediator mediator;
     
     public Player(String name, Color color) {
         this.name = name;
@@ -31,8 +31,8 @@ public abstract class Player {
         }
     }
     
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
     
     public abstract void move();

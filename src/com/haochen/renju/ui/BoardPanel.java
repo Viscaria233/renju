@@ -19,14 +19,14 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 import com.haochen.renju.common.Piece;
 import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.form.Point;
 import com.haochen.renju.draw.Layer;
 import com.haochen.renju.draw.LayerManager;
 
-public class BoardPanel extends JPanel {
+public class BoardPanel extends JPanel implements Mediator.Display {
 
     /**  
      * @Fields serialVersionUID :  
@@ -53,13 +53,13 @@ public class BoardPanel extends JPanel {
     
     private LayerManager lm;
 
-    private HandCutLayer handCutLayer;
+    private ForbiddenMarkLayer forbiddenMarkLayer;
     private RecordLayer recordLayer;
     private PieceLayer pieceLayer;
     private HighlightLayer highlightLayer;
     private IndexLayer indexLayer;
     
-    private Controller controller;
+    private Mediator mediator;
     
     public BoardPanel() throws ReadFileException {
         super();
@@ -68,15 +68,6 @@ public class BoardPanel extends JPanel {
         eventPerform();
     }
 
-    public void setController(Controller controller) {
-        this.controller = controller;
-    }
-    
-    public void commit() {
-        repaint();
-        lm.commit();
-    }
-    
     /**  
      * @Title: initial  
      * @Description: TODO   
@@ -112,12 +103,12 @@ public class BoardPanel extends JPanel {
         gridBag.setConstraints(vAxes, new GBC(0, 0, 1, 2));
 
         lm = new LayerManager(net);
-        handCutLayer = new HandCutLayer(pieceFieldWidth, pieceFieldWidth);
+        forbiddenMarkLayer = new ForbiddenMarkLayer(pieceFieldWidth, pieceFieldWidth);
         recordLayer = new RecordLayer(pieceFieldWidth, pieceFieldWidth);
         pieceLayer = new PieceLayer(pieceFieldWidth, pieceFieldWidth);
         highlightLayer = new HighlightLayer(pieceFieldWidth, pieceFieldWidth);
         indexLayer = new IndexLayer(pieceFieldWidth, pieceFieldWidth);
-        lm.add(handCutLayer);
+        lm.add(forbiddenMarkLayer);
         lm.add(recordLayer);
         lm.add(pieceLayer);
         lm.add(highlightLayer);
@@ -131,17 +122,17 @@ public class BoardPanel extends JPanel {
                 switch (e.getButton()) {
                 case MouseEvent.BUTTON1: {
                     Point point = boardLocation(new Point(e.getX(), e.getY()));
-                    controller.response("move", point);
+                    mediator.response("move", point);
                 }
                     break;
                 case MouseEvent.BUTTON2: {
 //                    Point point = boardLocation(new Point(e.getX(), e.getY()));
-//                    controller.response("is it hand cut", point);
-                    controller.response("draw hand cut", null);
+//                    mediator.response("is it hand cut", point);
+                    mediator.response("draw hand cut", null);
                 }
                     break;
                 case MouseEvent.BUTTON3: {
-                    controller.response("withdraw", null);
+                    mediator.response("withdraw", null);
                 }
                     break;
                 }
@@ -152,34 +143,75 @@ public class BoardPanel extends JPanel {
         });
     }
 
-    public void drawPiece(Piece piece) {
-        drawPiece(piece.getIndex(), piece.getLocation(), piece.getColor());
+    @Override
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
-    
-    public void drawPiece(int index, Point boardLocation, Color color) {
-        pieceLayer.draw(boardLocation, color);
-        highlightLayer.draw(boardLocation);
+
+    @Override
+    public void drawPiece(Piece piece) {
+        int index = piece.getIndex();
+        Point location = piece.getLocation();
+        Color color = piece.getColor();
+
+        pieceLayer.draw(location, color);
+        highlightLayer.draw(location);
         if (color.equals(Color.black)) {
             color = Color.white;
         } else {
             color = Color.black;
         }
-        indexLayer.draw(index, boardLocation, color);
-    }
-    
-    public void drawHandCut(Point boardLocation) {
-//        Point absolutelyLocation = absolutelyLocation(boardLocation);
-        handCutLayer.draw(boardLocation);
+        indexLayer.draw(index, location, color);
     }
 
-    public void clearHandCut() {
-        handCutLayer.erase();
+    @Override
+    public void removePiece(Point currentLocation, Point lastLocation) {
+        fixBoard(currentLocation);
+        if (lastLocation != null) {
+            drawHighlight(lastLocation);
+        }
     }
+
+    @Override
     public void drawRecord(Point boardLocation, Color color) {
 //        Point absolutelyLocation = absolutelyLocation(boardLocation);
         recordLayer.draw(boardLocation, color);
     }
-    
+
+    @Override
+    public void removeRecord(Point location) {
+        Point absolutely = absolutelyLocation(location);
+        recordLayer.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
+    }
+
+    @Override
+    public void drawForbiddenMark(Point boardLocation) {
+//        Point absolutelyLocation = absolutelyLocation(boardLocation);
+        forbiddenMarkLayer.draw(boardLocation);
+    }
+
+    @Override
+    public void clearForbiddenMark() {
+        forbiddenMarkLayer.erase();
+    }
+
+    @Override
+    public void clear(Point location) {
+        Point absolutely = absolutelyLocation(location);
+        lm.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
+    }
+
+    @Override
+    public void clear() {
+        lm.erase();
+    }
+
+    @Override
+    public void commit() {
+        repaint();
+        lm.commit();
+    }
+
     public void drawHighlight(Point boardLocation) {
         highlightLayer.draw(boardLocation);
     }
@@ -193,10 +225,6 @@ public class BoardPanel extends JPanel {
         lm.erase(x, y, cellWidth, cellWidth);
     }
     
-    public void erase() {
-        lm.erase();
-    }
-
 //    private void removeAllForbiddenMarks() {
 //        ArrayList<Location> bannedPoint = map.getForbiddenPoint();
 //        for (int i = 0; i < bannedPoint.size(); i++) {
@@ -221,7 +249,12 @@ public class BoardPanel extends JPanel {
                 15 - y  / cellWidth);
         return point;
     }
-    
+
+    /**
+     *
+     * @param boardLocation
+     * @return  这个格子左上角的绝对坐标
+     */
      private Point absolutelyLocation(Point boardLocation) {
         int x = boardLocation.x;
         int y = boardLocation.y;
@@ -383,15 +416,15 @@ public class BoardPanel extends JPanel {
     }
     
     /**  
-     * @ClassName: HandCutLayer  
+     * @ClassName: ForbiddenMarkLayer
      * @Description: TODO   显示禁手标记的图层
      * @author HaoChen  
      * @date 2016年4月17日 上午10:02:46  
      *    
      */
-    private class HandCutLayer extends Layer {
+    private class ForbiddenMarkLayer extends Layer {
         private final double ratio = 0.5;
-        public HandCutLayer(int width, int height) {
+        public ForbiddenMarkLayer(int width, int height) {
             super(width, height);
         }
         public void draw(Point boardLocation) {
@@ -538,7 +571,7 @@ public class BoardPanel extends JPanel {
 
     public void output() {
         try {
-            ImageIO.write(handCutLayer, "png", new File("handcut.png"));
+            ImageIO.write(forbiddenMarkLayer, "png", new File("handcut.png"));
             ImageIO.write(highlightLayer, "png", new File("highlight.png"));
         } catch (IOException e) {
             e.printStackTrace();

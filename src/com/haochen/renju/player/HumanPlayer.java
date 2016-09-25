@@ -10,7 +10,7 @@ public class HumanPlayer extends Player {
 
     @Override
     public void move() {
-        controller.response("human moving", null);
+        mediator.response("human moving", null);
     }
 
 }

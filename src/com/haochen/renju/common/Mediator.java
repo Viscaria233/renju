@@ -8,7 +8,6 @@ import com.haochen.renju.form.Board;
 import com.haochen.renju.form.ContinueAttribute;
 import com.haochen.renju.form.Direction;
 import com.haochen.renju.form.Point;
-import com.haochen.renju.main.TestMenuBar;
 import com.haochen.renju.player.AIPlayer;
 import com.haochen.renju.player.HumanPlayer;
 import com.haochen.renju.player.Player;
@@ -16,53 +15,72 @@ import com.haochen.renju.player.PlayerSet;
 import com.haochen.renju.ui.BoardPanel;
 import com.haochen.renju.util.PieceMap;
 
-public class Controller {
+public class Mediator {
     private AI ai;
-    private BoardPanel display;
-    private Board situation;
-    private TestMenuBar menuBar;
-    
+    private Display display;
+    private Board board;
+//    protected TestMenuBar menuBar;
+
     private PlayerSet playerSet = new PlayerSet();
-    
-    public Controller(AI ai, BoardPanel display, Board situation, TestMenuBar menuBar) {
-        ai.setController(this);
-        display.setController(this);
-        situation.setController(this);
-        menuBar.setController(this);
-        this.ai = ai;
+
+    public Mediator(Display display) {
+        ai = new AI();
+        board = new Board();
         this.display = display;
-        this.situation = situation;
-        this.menuBar = menuBar;
-        
-        Player player = new AIPlayer("You", Color.black);
-        player.setController(this);
+        ai.setMediator(this);
+        board.setMediator(this);
+        display.setMediator(this);
+
+        Player player = new HumanPlayer("You", Color.black);
+        player.setMediator(this);
         playerSet.addPlayer(player);
-        
+
         player = new AIPlayer("Computer", Color.white);
-        player.setController(this);
+        player.setMediator(this);
         playerSet.addPlayer(player);
     }
-    
+
+    public AI getAi() {
+        return ai;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public interface Display {
+        void setMediator(Mediator mediator);
+        void drawPiece(Piece piece);
+        void removePiece(Point currentLocation, Point lastLocation);
+        void drawRecord(Point location, Color color);
+        void removeRecord(Point location);
+        void drawForbiddenMark(Point location);
+        void clearForbiddenMark();
+        void clear(Point location);
+        void clear();
+        void commit();
+    }
+
     public void response(String key, Object value) {
         switch (key) {
         case "move": {
             Point point = (Point) value;
-            if (!point.isValid() || !situation.avaliable(point)) {
+            if (!point.isValid() || !board.avaliable(point)) {
                 break;
             }
-            int index = situation.getNumber() + 1;
+            int index = board.getNumber() + 1;
             Color color = playerSet.getMovingPlayer().getColor();
             Piece piece = new RealPiece(index, point, color);
             //先判断这个棋子是否能使某一方胜利
             PieceMap map = null;
             try {
-                map = situation.createPieceMap();
+                map = board.createPieceMap();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
             Color winner = ai.findWinner(map, piece);
             //然后落子
-            situation.addPiece(piece);
+            board.addPiece(piece);
             display.drawPiece(piece);
             display.commit();
             if (winner != null) {
@@ -75,7 +93,7 @@ public class Controller {
                 }
                 response("show win message", player);
             } else {
-                if (situation.getNumber() < 225) {
+                if (board.getNumber() < 225) {
                     playerSet.exchangePlayer();
                     playerSet.move();
                 } else {
@@ -85,16 +103,13 @@ public class Controller {
         }
             break;
         case "withdraw": {
-            Piece piece = situation.getLastPiece();
-            if (piece == null) {
+            Piece current = board.getLastPiece();
+            if (current == null) {
                 break;
             }
-            situation.removeLastPiece();
-            display.fixBoard(piece.getLocation());
-            piece = situation.getLastPiece();
-            if (piece != null) {
-                display.drawHighlight(piece.getLocation());
-            }
+            board.removeLastPiece();
+            Piece last = board.getLastPiece();
+            display.removePiece(current.getLocation(), last == null ? null : last.getLocation());
             display.commit();
         }
             break;
@@ -103,17 +118,17 @@ public class Controller {
             if (!point.isValid()) {
                 break;
             }
-            situation.display();
+            board.display();
         }
             break;
         case "show break point": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
                 ContinueAttribute c = ai.getContinueAttribute(
-                        situation.createPieceMap(), piece.color, piece.location, Direction.all);
+                        board.createPieceMap(), piece.color, piece.location, Direction.all);
                 Point[][] p = new Point[4][];
                 Direction[] d = Direction.createDirectionArray();
                 for (int i = 0; i < 4; ++i) {
@@ -127,12 +142,12 @@ public class Controller {
         }
             break;
         case "show five": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                Direction d = ai.findFive(situation.createPieceMap(), piece.color, piece.location, Direction.all);
+                Direction d = ai.findFive(board.createPieceMap(), piece.color, piece.location, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -140,12 +155,12 @@ public class Controller {
         }
             break;
         case "show alive four": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                Direction d = ai.findAliveFour(situation.createPieceMap(), piece.color, piece.location, Direction.all);
+                Direction d = ai.findAliveFour(board.createPieceMap(), piece.color, piece.location, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -153,12 +168,12 @@ public class Controller {
         }
             break;
         case "show asleep four": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                Direction d = ai.findAsleepFour(situation.createPieceMap(), piece.color, piece.location, Direction.all);
+                Direction d = ai.findAsleepFour(board.createPieceMap(), piece.color, piece.location, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -166,12 +181,12 @@ public class Controller {
         }
             break;
         case "show alive three": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                Direction d = ai.findAliveThree(situation.createPieceMap(), piece.color, piece.location, Direction.all);
+                Direction d = ai.findAliveThree(board.createPieceMap(), piece.color, piece.location, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -179,12 +194,12 @@ public class Controller {
         }
             break;
         case "show long continue": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                Direction d = ai.findLongContinue(situation.createPieceMap(), piece.location, Direction.all);
+                Direction d = ai.findLongContinue(board.createPieceMap(), piece.location, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -192,12 +207,12 @@ public class Controller {
         }
             break;
         case "is it double four": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                boolean n = ai.isDoubleFour(situation.createPieceMap(), piece.location);
+                boolean n = ai.isDoubleFour(board.createPieceMap(), piece.location);
                 System.out.println(n);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -205,12 +220,12 @@ public class Controller {
         }
             break;
         case "is it double three": {
-            Piece piece = situation.getLastPiece();
+            Piece piece = board.getLastPiece();
             if (piece == null) {
                 break;
             }
             try {
-                boolean n = ai.isDoubleThree(situation.createPieceMap(), piece.location);
+                boolean n = ai.isDoubleThree(board.createPieceMap(), piece.location);
                 System.out.println(n);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -222,12 +237,12 @@ public class Controller {
             if (!point.isValid()) {
                 break;
             }
-            if (!situation.avaliable(point)) {
+            if (!board.avaliable(point)) {
                 break;
             }
             try {
-                boolean n = ai.isHandCut(situation.createPieceMap(), point, Direction.all);
-//                boolean n = com.haochen.renju.ai.isHandCut(situation.createPieceMap(), point, Direction.all.remove(Direction.horizontal));
+                boolean n = ai.isHandCut(board.createPieceMap(), point, Direction.all);
+//                boolean n = com.haochen.renju.ai.isHandCut(board.createPieceMap(), point, Direction.all.remove(Direction.horizontal));
                 System.out.println(n);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -236,17 +251,17 @@ public class Controller {
             break;
         case "draw hand cut": {
             try {
-                situation.clearHandCut();
-                display.clearHandCut();
-                PieceMap map = situation.createPieceMap();
+                board.clearHandCut();
+                display.clearForbiddenMark();
+                PieceMap map = board.createPieceMap();
                 Point point;
                 for (int i = 1; i <= 15; ++i) {
                     for (int j = 1; j <= 15; ++j) {
                         point = new Point(i, j);
                         boolean n = ai.isHandCut(map, point, Direction.all);
                         if (n) {
-                            situation.addHandCut(point);
-                            display.drawHandCut(point);
+                            board.addHandCut(point);
+                            display.drawForbiddenMark(point);
                         }
                     }
                 }
@@ -269,12 +284,12 @@ public class Controller {
             System.out.println("AI is thinking......");
             long start = new Date().getTime();
             try {
-                PieceMap map = situation.createPieceMap();
+                PieceMap map = board.createPieceMap();
                 Color color = playerSet.getMovingPlayer().getColor();
 //                Point point = ai.getRandomMove(map, color);
-                Point point = ai.getCloseMove(map, color, situation.getLastPiece());
-//                int index = situation.getNumber() + 1;
-//                situation.addPiece(index, point, color);
+                Point point = ai.getCloseMove(map, color, board.getLastPiece());
+//                int index = board.getNumber() + 1;
+//                board.addPiece(index, point, color);
 //                display.drawPiece(index, point, color);
 //                display.commit();
                 String s = playerSet.getMovingPlayer().getColorString();

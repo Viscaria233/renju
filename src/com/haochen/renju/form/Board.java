@@ -2,7 +2,7 @@ package com.haochen.renju.form;
 
 import java.awt.Color;
 
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 import com.haochen.renju.common.Piece;
 import com.haochen.renju.common.RealPiece;
 import com.haochen.renju.util.PieceMap;
@@ -14,7 +14,7 @@ public class Board {
     private PieceTree tree;
     private int number;
     
-    private Controller controller;
+    private Mediator mediator;
     
     public Board() {
         map = new PieceMap();
@@ -22,8 +22,8 @@ public class Board {
         number = 0;
     }
     
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
     
     public int getNumber() {

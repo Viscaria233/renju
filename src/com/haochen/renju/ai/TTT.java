@@ -3,7 +3,7 @@ package com.haochen.renju.ai;
 import java.util.Date;
 import java.util.Scanner;
 
-import com.haochen.renju.common.Controller;
+import com.haochen.renju.common.Mediator;
 import com.haochen.renju.form.Point;
 
 public class TTT {
@@ -15,10 +15,10 @@ public class TTT {
     private int flex2 = 1;          //活二
     private int Ntype = 7;      //棋型数
     
-    private Controller controller;
+    private Mediator mediator;
     
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
     }
 
     private class point
