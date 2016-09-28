@@ -95,7 +95,7 @@ public class ContinueAttribute {
 	}
 	
 	public void append(ContinueAttribute attribute) {
-		if (location.equals(attribute.location) == false) {
+		if (!location.equals(attribute.location)) {
 			return;
 		}
 		

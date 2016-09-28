@@ -41,8 +41,8 @@ public class TestFrame extends JFrame {
         pack();
     }
     
-    public void luanch() {
-        mediator.response("launch", null);
+    public void launch() {
+        mediator.getOperator().launch();
     }
     
 }

@@ -10,8 +10,10 @@ import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 
 import java.awt.*;
+import java.awt.image.ColorConvertOp;
+import java.awt.image.renderable.ContextualRenderedImageFactory;
 
-public class AI {
+public class  AI {
 
     private boolean forbiddenMove = true;
     private Mediator mediator;
@@ -36,8 +38,9 @@ public class AI {
             map.addPiece(-1, location, color);
             isImaginary = true;
         }
-        
-        if (findFive(map, color, location, Direction.all).getQuantity() > 0) {
+
+        ContinueAttribute attribute = getContinueAttribute(map, color, location, Direction.all);
+        if (findFive(attribute, Direction.all).getQuantity() > 0) {
             winner = color;
         }
         
@@ -53,9 +56,12 @@ public class AI {
         if (!location.isValid() || map.available(location)) {
             return null;
         }
-        
+        if (!map.getCell(location).getColor().equals(color)) {
+            return new ContinueAttribute(color, location, direction);
+        }
+
         ContinueAttribute attribute = new ContinueAttribute(color, location, Direction.empty);
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
@@ -143,60 +149,61 @@ public class AI {
         return attribute;
     }
 
-    public Direction findFive(PieceMap map, Color color, Point location, Direction direction) {
-        Direction fiveDirection = new Direction();
-        if (!location.isValid() || map.available(location) || !map.getCell(location).getColor().equals(color)) {
-            return fiveDirection;
+    public Direction findFive(ContinueAttribute attribute, Direction direction) {
+        Direction result = new Direction();
+        if (attribute == null) {
+            return result;
         }
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    fiveDirection.append(findFive(map, color, location, d));
+                    result.append(findFive(attribute, d));
                 }
             }
-            return fiveDirection;
+            return result;
         }
-        
-        SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
+
+        SingleContinue single = attribute.getContinue(direction);
         if (forbiddenMove) {
-            if (color.equals(Color.black)) {
+            if (attribute.getColor().equals(Color.black)) {
                 if (single.getLength() == 5) {
-                    fiveDirection.add(direction);
+                    result.add(direction);
                 }
             } else {
                 if (single.getLength() >= 5) {
-                    fiveDirection.add(direction);
+                    result.add(direction);
                 }
             }
         } else {
             if (single.getLength() >= 5) {
-                fiveDirection.add(direction);
+                result.add(direction);
             } 
         }
-        return fiveDirection;
+        return result;
     }
 
-    public Direction findAliveFour(PieceMap map, Color color, Point location, Direction direction) {
-        Direction fourDirection = new Direction();
-        if (!location.isValid() || map.available(location) || !map.getCell(location).getColor().equals(color)) {
-            return fourDirection;
+    public Direction findAliveFour(PieceMap map, ContinueAttribute attribute, Direction direction) {
+        Direction result = new Direction();
+        if (attribute == null) {
+            return result;
         }
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    fourDirection.append(findAliveFour(map, color, location, d));
+                    result.append(findAliveFour(map, attribute, d));
                 }
             }
-            return fourDirection;
+            return result;
         }
-        
-        SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
+
+        Color color = attribute.getColor();
+        SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() != 4) {
-            return fourDirection;
+            return result;
         }
         Point[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
@@ -209,7 +216,8 @@ public class AI {
                     isImaginary = true;
                 }
 
-                if (findFive(map, color, p, direction).getQuantity() > 0) {
+                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                if (findFive(breakAttr, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
 
@@ -220,30 +228,31 @@ public class AI {
             }
         }
         if (fivePoint == 2) {
-            fourDirection.add(direction);
+            result.add(direction);
         }
-        return fourDirection;
+        return result;
     }
 
-    public Direction findAsleepFour(PieceMap map, Color color, Point location, Direction direction) {
-        Direction fourDirection = new Direction();
-        if (!location.isValid() || map.available(location) || !map.getCell(location).getColor().equals(color)) {
-            return fourDirection;
+    public Direction findAsleepFour(PieceMap map, ContinueAttribute attribute, Direction direction) {
+        Direction result = new Direction();
+        if (attribute == null) {
+            return result;
         }
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    fourDirection.append(findAsleepFour(map, color, location, d));
+                    result.append(findAsleepFour(map, attribute, d));
                 }
             }
-            return fourDirection;
+            return result;
         }
-        
-        SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
+
+        Color color = attribute.getColor();
+        SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 4) {
-            return fourDirection;
+            return result;
         }
         Point[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
@@ -256,7 +265,8 @@ public class AI {
                     isImaginary = true;
                 }
 
-                if (findFive(map, color, p, direction).getQuantity() > 0) {
+                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                if (findFive(breakAttr, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
 
@@ -267,32 +277,33 @@ public class AI {
             }
         }
         if (fivePoint == 1) {
-            fourDirection.add(direction);
+            result.add(direction);
         } else if (fivePoint == 2 && single.getLength() != 4) {
-            fourDirection.doubleAdd(direction);
+            result.doubleAdd(direction);
         }
-        return fourDirection;
+        return result;
     }
     
-    public Direction findAliveThree(PieceMap map, Color color, Point location, Direction direction) {
-        Direction threeDirection = new Direction();
-        if (!location.isValid() || map.available(location) || !map.getCell(location).getColor().equals(color)) {
-            return threeDirection;
+    public Direction findAliveThree(PieceMap map, ContinueAttribute attribute, Direction direction) {
+        Direction result = new Direction();
+        if (attribute == null) {
+            return result;
         }
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    threeDirection.append(findAliveThree(map, color, location, d));
+                    result.append(findAliveThree(map, attribute, d));
                 }
             }
-            return threeDirection;
+            return result;
         }
-        
-        SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
+
+        Color color = attribute.getColor();
+        SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
-            return threeDirection;
+            return result;
         }
         Point[] breakPoint = single.getBreakPoint();
         int aliveFourPoint = 0;
@@ -309,7 +320,8 @@ public class AI {
                     isImaginary = true;
                 }
 
-                if (findAliveFour(map, color, p, direction).getQuantity() > 0) {
+                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                if (findAliveFour(map, breakAttr, direction).getQuantity() > 0) {
                     aliveFourPoint++;
                 }
 
@@ -320,30 +332,31 @@ public class AI {
             }
         }
         if (aliveFourPoint > 0) {
-            threeDirection.add(direction);
+            result.add(direction);
         }
-        return threeDirection;
+        return result;
     }
     
-    public Direction findAsleepThree(PieceMap map, Color color, Point location, Direction direction) {
-        Direction threeDirection = new Direction();
-        if (!location.isValid() || map.available(location) || !map.getCell(location).getColor().equals(color)) {
-            return threeDirection;
+    public Direction findAsleepThree(PieceMap map, ContinueAttribute attribute, Direction direction) {
+        Direction result = new Direction();
+        if (attribute == null) {
+            return result;
         }
-        
+
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    threeDirection.append(findAsleepThree(map, color, location, d));
+                    result.append(findAsleepThree(map, attribute, d));
                 }
             }
-            return threeDirection;
+            return result;
         }
-        
-        SingleContinue single = getContinueAttribute(map, color, location, direction).getContinue(direction);
+
+        Color color = attribute.getColor();
+        SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
-            return threeDirection;
+            return result;
         }
         Point[] breakPoint = single.getBreakPoint();
         int asleepFourPoint = 0;
@@ -360,10 +373,11 @@ public class AI {
                     isImaginary = true;
                 }
 
-                if (findAsleepFour(map, color, p, direction).getQuantity() > 0) {
+                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                if (findAsleepFour(map, breakAttr, direction).getQuantity() > 0) {
                     asleepFourPoint++;
                 }
-                if (findAliveFour(map, color, p, direction).getQuantity() > 0) {
+                if (findAliveFour(map, breakAttr, direction).getQuantity() > 0) {
                     asleepFourPoint = 0;
                 }
 
@@ -374,32 +388,32 @@ public class AI {
             }
         }
         if (asleepFourPoint > 0) {
-            threeDirection.add(direction);
+            result.add(direction);
         }
-        return threeDirection;
+        return result;
     }
 
     public Direction findLongContinue(PieceMap map, Point location, Direction direction) {
-        Direction longContinueDirection = new Direction();
+        Direction result = new Direction();
         if (!location.isValid() || map.available(location)) {
-            return longContinueDirection;
+            return result;
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    longContinueDirection.append(findLongContinue(map, location, d));
+                    result.append(findLongContinue(map, location, d));
                 }
             }
-            return longContinueDirection;
+            return result;
         }
-        
+
         SingleContinue single = getContinueAttribute(map, Color.black, location, direction).getContinue(direction);
         if (single.getLength() > 5) {
-            longContinueDirection.add(direction);
+            result.add(direction);
         }
-        return longContinueDirection;
+        return result;
     }
 
     public boolean isDoubleFour(PieceMap map, Point location) {
@@ -409,9 +423,10 @@ public class AI {
             map.addPiece(-1, location, Color.black);
             isImaginary = true;
         }
-        
-        int four = findAliveFour(map, Color.black, location, Direction.all).getQuantity()
-                + findAsleepFour(map, Color.black, location, Direction.all).getQuantity();
+
+        ContinueAttribute attribute = getContinueAttribute(map, Color.black, location, Direction.all);
+        int four = findAliveFour(map, attribute, Direction.all).getQuantity()
+                + findAsleepFour(map, attribute, Direction.all).getQuantity();
 
         //É¾³ý¼ÙÏëÆå×Ó
         if(isImaginary) {
@@ -428,7 +443,8 @@ public class AI {
             isImaginary = true;
         }
 
-        int three = findAliveThree(map, Color.black, location, Direction.all).getQuantity();
+        ContinueAttribute attribute = getContinueAttribute(map, Color.black, location, Direction.all);
+        int three = findAliveThree(map, attribute, Direction.all).getQuantity();
         
         //É¾³ý¼ÙÏëÆå×Ó
         if(isImaginary) {
@@ -446,22 +462,23 @@ public class AI {
             map.addPiece(-1, location, color);
             isImaginary = true;
         }
-        
-        if (findFive(map, color, location, direction).getQuantity() > 0) {
+
+        ContinueAttribute allDirection = getContinueAttribute(map, Color.black, location, direction);
+        if (findFive(allDirection, direction).getQuantity() > 0) {
             forbidden = false;
-        } else if (findAliveFour(map, color, location, direction).getQuantity()
-                + findAsleepFour(map, color, location, direction).getQuantity() >= 2
+        } else if (findAliveFour(map, allDirection, direction).getQuantity()
+                + findAsleepFour(map, allDirection, direction).getQuantity() >= 2
                 || findLongContinue(map, location, direction).getQuantity() > 0) {
             forbidden = true;
         } else {
-            Direction aliveThree = findAliveThree(map, color, location, direction);
+            Direction aliveThree = findAliveThree(map, allDirection, direction);
             if (aliveThree.getQuantity() >= 2) {
-                ContinueAttribute attribute = getContinueAttribute(map, color, location, aliveThree);
+                ContinueAttribute aliveThreeAttr = getContinueAttribute(map, color, location, aliveThree);
                 Direction[] directionArray = Direction.createDirectionArray();
                 int valid = 0;
                 for (Direction d : directionArray) {
                     if (aliveThree.contains(d)) {
-                        SingleContinue single = attribute.getContinue(d);
+                        SingleContinue single = aliveThreeAttr.getContinue(d);
                         Point[] breakPoint = single.getBreakPoint();
                         Point[] aliveFourPoint = new Point[2];
                         for (int j = 0; j < breakPoint.length; j++) {
@@ -472,7 +489,8 @@ public class AI {
                                     map.addPiece(-1, breakPoint[j], color);
                                     isImaginary1 = true;
                                 }
-                                if (findAliveFour(map, color, breakPoint[j], d).getQuantity() > 0) {
+                                ContinueAttribute breakAttr = getContinueAttribute(map, color, breakPoint[j], d);
+                                if (findAliveFour(map, breakAttr, d).getQuantity() > 0) {
                                     aliveFourPoint[j] = breakPoint[j];
                                 }
                                 //É¾³ý¼ÙÏëÆå×Ó
@@ -489,7 +507,10 @@ public class AI {
                                     map.addPiece(-1, p, color);
                                     isImaginary1 = true;
                                 }
-                                if (findFive(map, color, p, direction.remove(d)).getQuantity() > 0) {
+
+                                Direction dire = direction.remove(d);
+                                ContinueAttribute aliveFour = getContinueAttribute(map, color, p, dire);
+                                if (findFive(aliveFour, dire).getQuantity() > 0) {
                                     //É¾³ý¼ÙÏëÆå×Ó
                                     if (isImaginary1) {
                                         map.removeCell(p);

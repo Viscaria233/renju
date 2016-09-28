@@ -10,7 +10,12 @@ public class AIPlayer extends Player {
 
     @Override
     public void move() {
-        mediator.response("ai moving", null);
+        try {
+            Thread.sleep(1000);
+            mediator.getOperator().aiMove();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

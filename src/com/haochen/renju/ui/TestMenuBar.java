@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.main.Config;
 
 public class TestMenuBar extends JMenuBar {
 
@@ -126,7 +127,7 @@ public class TestMenuBar extends JMenuBar {
 //                mainFrame.updateForbiddenMarks();
 //            }
 //        });
-        usingForbidden.setState(true);
+        usingForbidden.setState(Config.usingForbiddenMove);
 //        mainFrame.setUsingForbidden(true);
 //        mainFrame.chessForm.setUsingForbidden(true);
         uiBlack = new JCheckBoxMenuItem("UI Uses Black");
@@ -231,7 +232,7 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.response("show long continue", null);
 //                        mediator.response("is it double four", null);
 //                        mediator.response("is it double three", null);
-                        mediator.response("launch", null);
+                        mediator.getOperator().launch();
                     }
                 }).start();
             }
@@ -247,7 +248,7 @@ public class TestMenuBar extends JMenuBar {
 //                        mainFrame.chessForm.getLastChess().getLocation(), Direction.horizontal).getContinue(Direction.horizontal).getBreakPoint();
 //                System.out.println("side[0] = " + side[0]);
 //                System.out.println("side[1] = " + side[1]);
-                mediator.response("show break point", null);
+                mediator.getOperator().showBreakPoint();
             }
         });
 
@@ -290,7 +291,7 @@ public class TestMenuBar extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Test------Find Alive Three");
-                mediator.response("show alive three", null);
+                mediator.getOperator().showAliveThree();
             }
         });
 
@@ -298,7 +299,15 @@ public class TestMenuBar extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Test------Find Asleep Three");
-                mediator.response("show asleep three", null);
+                mediator.getOperator().showAsleepThree();
+            }
+        });
+
+        usingForbidden.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Config.usingForbiddenMove = usingForbidden.getState();
+                mediator.getOperator().updateConfig();
             }
         });
     }

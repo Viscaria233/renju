@@ -10,7 +10,7 @@ public class HumanPlayer extends Player {
 
     @Override
     public void move() {
-        mediator.response("human moving", null);
+        mediator.getOperator().humanMove();
     }
 
 }

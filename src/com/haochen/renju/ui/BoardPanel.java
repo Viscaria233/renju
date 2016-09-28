@@ -122,17 +122,17 @@ public class BoardPanel extends JPanel implements Mediator.Display {
                 switch (e.getButton()) {
                 case MouseEvent.BUTTON1: {
                     Point point = boardLocation(new Point(e.getX(), e.getY()));
-                    mediator.response("move", point);
+                    mediator.getOperator().move(point);
                 }
                     break;
                 case MouseEvent.BUTTON2: {
 //                    Point point = boardLocation(new Point(e.getX(), e.getY()));
 //                    mediator.response("is it hand cut", point);
-                    mediator.response("draw hand cut", null);
+                    mediator.getOperator().drawForbiddenMark();
                 }
                     break;
                 case MouseEvent.BUTTON3: {
-                    mediator.response("withdraw", null);
+                    mediator.getOperator().withdraw();
                 }
                     break;
                 }
