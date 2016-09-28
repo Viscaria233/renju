@@ -1,5 +1,6 @@
 package com.haochen.renju.ui;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,6 +11,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.control.player.AIPlayer;
+import com.haochen.renju.control.player.HumanPlayer;
+import com.haochen.renju.control.player.Player;
+import com.haochen.renju.control.player.PlayerSet;
 import com.haochen.renju.main.Config;
 
 public class TestMenuBar extends JMenuBar {
@@ -45,10 +50,10 @@ public class TestMenuBar extends JMenuBar {
 
     private JCheckBoxMenuItem usingForbidden;
     
-    private JCheckBoxMenuItem uiBlack;
-    private JCheckBoxMenuItem uiWhite;
+    private JCheckBoxMenuItem aiBlack;
+    private JCheckBoxMenuItem aiWhite;
     
-    private JCheckBoxMenuItem uiNoUsed;
+    private JCheckBoxMenuItem aiNoUsed;
     private JCheckBoxMenuItem lvNoob;
     private JCheckBoxMenuItem lvNormal;
     private JCheckBoxMenuItem lvHigh;
@@ -63,9 +68,9 @@ public class TestMenuBar extends JMenuBar {
         JMenu help = new JMenu("Help");
         JMenu test = new JMenu("Test");
         JMenu setting = new JMenu("Setting");
-        JMenu uiColor = new JMenu("UI Color");
+        JMenu aiColor = new JMenu("AI Color");
 //        ButtonGroup colorGroup = new ButtonGroup();
-        JMenu uiLevel = new JMenu("UI Level");
+        JMenu aiLevel = new JMenu("AI Level");
         ButtonGroup levelGroup = new ButtonGroup();
 
         newFile = new JMenuItem("New");
@@ -130,30 +135,30 @@ public class TestMenuBar extends JMenuBar {
         usingForbidden.setState(Config.usingForbiddenMove);
 //        mainFrame.setUsingForbidden(true);
 //        mainFrame.chessForm.setUsingForbidden(true);
-        uiBlack = new JCheckBoxMenuItem("UI Uses Black");
-        uiWhite = new JCheckBoxMenuItem("UI Uses White");
-        uiNoUsed = new JCheckBoxMenuItem("No UI");
+        aiBlack = new JCheckBoxMenuItem("AI Uses Black");
+        aiWhite = new JCheckBoxMenuItem("AI Uses White");
+        aiNoUsed = new JCheckBoxMenuItem("No AI");
         lvNoob = new JCheckBoxMenuItem("Noob");
         lvNormal = new JCheckBoxMenuItem("Normal");
         lvHigh = new JCheckBoxMenuItem("High");
         
-        uiColor.add(uiBlack);
-        uiColor.add(uiWhite);
-//        colorGroup.add(uiBlack);
-//        colorGroup.add(uiWhite);
+        aiColor.add(aiBlack);
+        aiColor.add(aiWhite);
+//        colorGroup.add(aiBlack);
+//        colorGroup.add(aiWhite);
 
-        uiLevel.add(uiNoUsed);
-        uiLevel.add(lvNoob);
-        uiLevel.add(lvNormal);
-        uiLevel.add(lvHigh);
-        levelGroup.add(uiNoUsed);
+        aiLevel.add(aiNoUsed);
+        aiLevel.add(lvNoob);
+        aiLevel.add(lvNormal);
+        aiLevel.add(lvHigh);
+        levelGroup.add(aiNoUsed);
         levelGroup.add(lvNoob);
         levelGroup.add(lvNormal);
         levelGroup.add(lvHigh);
         
         setting.add(usingForbidden);
-        setting.add(uiColor);
-        setting.add(uiLevel);
+        setting.add(aiColor);
+        setting.add(aiLevel);
 
         this.add(file);
         this.add(edit);
@@ -308,6 +313,52 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Config.usingForbiddenMove = usingForbidden.getState();
                 mediator.getOperator().updateConfig();
+            }
+        });
+
+        aiBlack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Player player;
+                if (aiBlack.getState()) {
+                    player = new AIPlayer("Computer_01", Color.black);
+                } else {
+                    player = new HumanPlayer("Human_01", Color.black);
+                }
+                player.setMediator(mediator);
+                final PlayerSet set = mediator.getPlayerSet();
+                set.addPlayer(player);
+                if (set.getMovingPlayer().getColor().equals(Color.black)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            set.move();
+                        }
+                    }).start();
+                }
+            }
+        });
+
+        aiWhite.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Player player;
+                if (aiWhite.getState()) {
+                    player = new AIPlayer("Computer_02", Color.white);
+                } else {
+                    player = new HumanPlayer("Human_02", Color.white);
+                }
+                player.setMediator(mediator);
+                final PlayerSet set = mediator.getPlayerSet();
+                set.addPlayer(player);
+                if (set.getMovingPlayer().getColor().equals(Color.white)) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            set.move();
+                        }
+                    }).start();
+                }
             }
         });
     }

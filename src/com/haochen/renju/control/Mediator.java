@@ -36,11 +36,13 @@ public class Mediator {
         board.setMediator(this);
         display.setMediator(this);
 
-        Player player = new HumanPlayer("You", Color.black);
+        Player player = new HumanPlayer("Human_01", Color.black);
+//        Player player = new AIPlayer("Computer_01", Color.black);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
-        player = new HumanPlayer("Computer", Color.white);
+        player = new HumanPlayer("Human_02", Color.white);
+//        player = new AIPlayer("Computer_02", Color.white);
         player.setMediator(this);
         playerSet.addPlayer(player);
     }
@@ -51,6 +53,10 @@ public class Mediator {
 
     public Board getBoard() {
         return board;
+    }
+
+    public PlayerSet getPlayerSet() {
+        return playerSet;
     }
 
     public Operator getOperator() {
@@ -325,13 +331,14 @@ public class Mediator {
         }
 
         public void humanMove() {
-            System.out.println("Please Move");
+            System.out.println("Please move");
         }
 
         public void aiMove() {
             System.out.println("AI is thinking......");
             long start = new Date().getTime();
             try {
+                Thread.sleep(800 + (int) (Math.random() * 400));
                 PieceMap map = board.createPieceMap();
                 Color color = playerSet.getMovingPlayer().getColor();
                 Point point = ai.getCloseMove(map, color, board.getCurrentPiece());
@@ -341,7 +348,7 @@ public class Mediator {
                         + point);
                 move(point);
 
-            } catch (CloneNotSupportedException e) {
+            } catch (CloneNotSupportedException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
