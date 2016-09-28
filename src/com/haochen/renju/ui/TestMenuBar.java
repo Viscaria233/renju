@@ -285,6 +285,22 @@ public class TestMenuBar extends JMenuBar {
 //                        mainFrame.chessForm.getLastChess().getLocation(), Direction.all));
 //            }
 //        });
+
+        findAliveThree.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Test------Find Alive Three");
+                mediator.response("show alive three", null);
+            }
+        });
+
+        findAsleepThree.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Test------Find Asleep Three");
+                mediator.response("show asleep three", null);
+            }
+        });
     }
 }
 

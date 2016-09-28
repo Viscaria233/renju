@@ -1,15 +1,15 @@
 package com.haochen.renju.control.ai;
 
-import java.awt.Color;
-
 import com.haochen.renju.bean.Cell;
-import com.haochen.renju.control.Mediator;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.calculate.ContinueAttribute;
-import com.haochen.renju.storage.Direction;
-import com.haochen.renju.storage.Point;
 import com.haochen.renju.calculate.SingleContinue;
+import com.haochen.renju.control.Mediator;
+import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.PieceMap;
+import com.haochen.renju.storage.Point;
+
+import java.awt.*;
 
 public class AI {
 
@@ -57,10 +57,10 @@ public class AI {
         ContinueAttribute attribute = new ContinueAttribute(color, location, Direction.empty);
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    attribute.append(getContinueAttribute(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    attribute.append(getContinueAttribute(map, color, location, d));
                 }
             }
             return attribute;
@@ -82,7 +82,7 @@ public class AI {
         Point[] breakPoint = new Point[2];
         
         for (int i = 1; i < 15; i++) {
-            if (isValid[0] == false && isValid[1] == false) {
+            if (!isValid[0] && !isValid[1]) {
                 break;
             }
             if (isValid[0]) {
@@ -150,10 +150,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    fiveDirection.append(findFive(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    fiveDirection.append(findFive(map, color, location, d));
                 }
             }
             return fiveDirection;
@@ -185,10 +185,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    fourDirection.append(findAliveFour(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    fourDirection.append(findAliveFour(map, color, location, d));
                 }
             }
             return fourDirection;
@@ -200,22 +200,22 @@ public class AI {
         }
         Point[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
-        for (int i = 0; i < breakPoint.length; i++) {
-            if (breakPoint[i] != null) {
+        for (Point p : breakPoint) {
+            if (p != null) {
                 boolean isImaginary = false;
-                if (map.available(breakPoint[i])) {
+                if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, breakPoint[i], color);
+                    map.addPiece(-1, p, color);
                     isImaginary = true;
                 }
 
-                if (findFive(map, color, breakPoint[i], direction).getQuantity() > 0) {
+                if (findFive(map, color, p, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
 
                 //删除假想棋子
                 if (isImaginary) {
-                    map.removeCell(breakPoint[i]);
+                    map.removeCell(p);
                 }
             }
         }
@@ -232,10 +232,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    fourDirection.append(findAsleepFour(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    fourDirection.append(findAsleepFour(map, color, location, d));
                 }
             }
             return fourDirection;
@@ -247,22 +247,22 @@ public class AI {
         }
         Point[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
-        for (int i = 0; i < breakPoint.length; i++) {
-            if (breakPoint[i] != null) {
+        for (Point p :breakPoint) {
+            if (p != null) {
                 boolean isImaginary = false;
-                if (map.available(breakPoint[i])) {
+                if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, breakPoint[i], color);
+                    map.addPiece(-1, p, color);
                     isImaginary = true;
                 }
 
-                if (findFive(map, color, breakPoint[i], direction).getQuantity() > 0) {
+                if (findFive(map, color, p, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
 
                 //删除假想棋子
                 if (isImaginary) {
-                    map.removeCell(breakPoint[i]);
+                    map.removeCell(p);
                 }
             }
         }
@@ -281,10 +281,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    threeDirection.append(findAliveThree(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    threeDirection.append(findAliveThree(map, color, location, d));
                 }
             }
             return threeDirection;
@@ -296,26 +296,26 @@ public class AI {
         }
         Point[] breakPoint = single.getBreakPoint();
         int aliveFourPoint = 0;
-        for (int i = 0; i < breakPoint.length; i++) {
-            if (breakPoint[i] != null) {
+        for (Point p : breakPoint) {
+            if (p != null) {
                 //先判断此处是不是禁手
-                if (map.getCell(breakPoint[i]).isForbiddenMove()) {
+                if (map.getCell(p).isForbiddenMove()) {
                     continue;
                 }
                 boolean isImaginary = false;
-                if (map.available(breakPoint[i])) {
+                if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, breakPoint[i], color);
+                    map.addPiece(-1, p, color);
                     isImaginary = true;
                 }
 
-                if (findAliveFour(map, color, breakPoint[i], direction).getQuantity() > 0) {
+                if (findAliveFour(map, color, p, direction).getQuantity() > 0) {
                     aliveFourPoint++;
                 }
 
                 //删除假想棋子
                 if (isImaginary) {
-                    map.removeCell(breakPoint[i]);
+                    map.removeCell(p);
                 }
             }
         }
@@ -332,10 +332,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    threeDirection.append(findAsleepThree(map, color, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    threeDirection.append(findAsleepThree(map, color, location, d));
                 }
             }
             return threeDirection;
@@ -347,26 +347,29 @@ public class AI {
         }
         Point[] breakPoint = single.getBreakPoint();
         int asleepFourPoint = 0;
-        for (int i = 0; i < breakPoint.length; i++) {
-            if (breakPoint[i] != null) {
+        for (Point p : breakPoint) {
+            if (p != null) {
                 //先判断此处是不是禁手
-                if (map.getCell(breakPoint[i]).isForbiddenMove()) {
+                if (map.getCell(p).isForbiddenMove()) {
                     continue;
                 }
                 boolean isImaginary = false;
-                if (map.available(breakPoint[i])) {
+                if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, breakPoint[i], color);
+                    map.addPiece(-1, p, color);
                     isImaginary = true;
                 }
 
-                if (findAliveFour(map, color, breakPoint[i], direction).getQuantity() > 0) {
+                if (findAsleepFour(map, color, p, direction).getQuantity() > 0) {
                     asleepFourPoint++;
+                }
+                if (findAliveFour(map, color, p, direction).getQuantity() > 0) {
+                    asleepFourPoint = 0;
                 }
 
                 //删除假想棋子
                 if (isImaginary) {
-                    map.removeCell(breakPoint[i]);
+                    map.removeCell(p);
                 }
             }
         }
@@ -383,10 +386,10 @@ public class AI {
         }
         
         Direction[] directionArray = Direction.createDirectionArray();
-        if (direction.isSingle() == false) {
-            for (int i = 0; i < directionArray.length; i++) {
-                if (direction.contains(directionArray[i])) {
-                    longContinueDirection.append(findLongContinue(map, location, directionArray[i]));
+        if (!direction.isSingle()) {
+            for (Direction d : directionArray) {
+                if (direction.contains(d)) {
+                    longContinueDirection.append(findLongContinue(map, location, d));
                 }
             }
             return longContinueDirection;
@@ -434,8 +437,8 @@ public class AI {
         return three >= 2;
     }
     
-    public boolean isHandCut(PieceMap map, Point location, Direction direction) {
-        boolean handCut = false;
+    public boolean isForbiddenMove(PieceMap map, Point location, Direction direction) {
+        boolean forbidden = false;
         boolean isImaginary = false;
         Color color = Color.black;
         //插入假想棋子
@@ -444,28 +447,21 @@ public class AI {
             isImaginary = true;
         }
         
-        boolean isChanged = false;
         if (findFive(map, color, location, direction).getQuantity() > 0) {
-            handCut = false;
-            isChanged = true;
-        }
-        if (isChanged == false) {
-            if (findAliveFour(map, color, location, direction).getQuantity()
-                    + findAsleepFour(map, color, location, direction).getQuantity() >= 2
-                    || findLongContinue(map, location, direction).getQuantity() > 0) {
-                handCut = true;
-                isChanged = true;
-            }
-        }
-        if (isChanged == false) {
+            forbidden = false;
+        } else if (findAliveFour(map, color, location, direction).getQuantity()
+                + findAsleepFour(map, color, location, direction).getQuantity() >= 2
+                || findLongContinue(map, location, direction).getQuantity() > 0) {
+            forbidden = true;
+        } else {
             Direction aliveThree = findAliveThree(map, color, location, direction);
             if (aliveThree.getQuantity() >= 2) {
                 ContinueAttribute attribute = getContinueAttribute(map, color, location, aliveThree);
                 Direction[] directionArray = Direction.createDirectionArray();
                 int valid = 0;
-                for (int i = 0; i < directionArray.length; i++) {
-                    if (aliveThree.contains(directionArray[i])) {
-                        SingleContinue single = attribute.getContinue(directionArray[i]);
+                for (Direction d : directionArray) {
+                    if (aliveThree.contains(d)) {
+                        SingleContinue single = attribute.getContinue(d);
                         Point[] breakPoint = single.getBreakPoint();
                         Point[] aliveFourPoint = new Point[2];
                         for (int j = 0; j < breakPoint.length; j++) {
@@ -476,7 +472,7 @@ public class AI {
                                     map.addPiece(-1, breakPoint[j], color);
                                     isImaginary1 = true;
                                 }
-                                if (findAliveFour(map, color, breakPoint[j], directionArray[i]).getQuantity() > 0) {
+                                if (findAliveFour(map, color, breakPoint[j], d).getQuantity() > 0) {
                                     aliveFourPoint[j] = breakPoint[j];
                                 }
                                 //删除假想棋子
@@ -485,31 +481,31 @@ public class AI {
                                 }
                             }
                         }
-                        for (int j = 0; j < aliveFourPoint.length; j++) {
-                            if (aliveFourPoint[j] != null) {
+                        for (Point p : aliveFourPoint) {
+                            if (p != null) {
                                 boolean isImaginary1 = false;
                                 //插入假想棋子
-                                if (map.available(aliveFourPoint[j])) {
-                                    map.addPiece(-1, aliveFourPoint[j], color);
+                                if (map.available(p)) {
+                                    map.addPiece(-1, p, color);
                                     isImaginary1 = true;
                                 }
-                                if (findFive(map, color, aliveFourPoint[j], direction.remove(directionArray[i])).getQuantity() > 0) {
+                                if (findFive(map, color, p, direction.remove(d)).getQuantity() > 0) {
                                     //删除假想棋子
                                     if (isImaginary1) {
-                                        map.removeCell(aliveFourPoint[j]);
+                                        map.removeCell(p);
                                     }
                                     continue;
                                 }
-                                if (isHandCut(map, aliveFourPoint[j], Direction.all)) {
+                                if (isForbiddenMove(map, p, Direction.all)) {
                                     //删除假想棋子
                                     if (isImaginary1) {
-                                        map.removeCell(aliveFourPoint[j]);
+                                        map.removeCell(p);
                                     }
                                     continue;
                                 }
                                 //删除假想棋子
                                 if (isImaginary1) {
-                                    map.removeCell(aliveFourPoint[j]);
+                                    map.removeCell(p);
                                 }
                                 valid++;
                                 break;
@@ -518,8 +514,7 @@ public class AI {
                     }
                 }
                 if (valid >= 2) {
-                    handCut = true;
-                    isChanged = true;
+                    forbidden = true;
                 }
             }
         }
@@ -527,7 +522,7 @@ public class AI {
         if (isImaginary) {
             map.removeCell(location);
         }
-        return handCut;
+        return forbidden;
     }
     
     public Point getRandomMove(PieceMap map, Color color) {
