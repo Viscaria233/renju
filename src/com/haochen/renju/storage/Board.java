@@ -1,6 +1,5 @@
 package com.haochen.renju.storage;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class Board {
         return map.available(boardLocation);
     }
     
-    public void addPiece(int index, Point boardLocation, Color color) {
+    public void addPiece(int index, Point boardLocation, PieceColor color) {
         addPiece(new RealPiece(index, boardLocation, color));
     }
     

@@ -1,10 +1,12 @@
 package com.haochen.renju.control.player;
 
-import java.awt.Color;
+import com.haochen.renju.bean.Piece;
+import com.haochen.renju.storage.PieceColor;
+
 
 public class HumanPlayer extends Player {
 
-    public HumanPlayer(String name, Color color) {
+    public HumanPlayer(String name, PieceColor color) {
         super(name, color);
     }
 

@@ -1,6 +1,5 @@
 package com.haochen.renju.control;
 
-import java.awt.Color;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,15 +10,11 @@ import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.bean.RealPiece;
 import com.haochen.renju.main.Config;
-import com.haochen.renju.storage.Board;
+import com.haochen.renju.storage.*;
 import com.haochen.renju.calculate.ContinueAttribute;
-import com.haochen.renju.storage.Direction;
-import com.haochen.renju.storage.Point;
-import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
-import com.haochen.renju.storage.PieceMap;
 
 public class Mediator {
     private AI ai;
@@ -39,13 +34,13 @@ public class Mediator {
         board.setMediator(this);
         display.setMediator(this);
 
-        Player player = new HumanPlayer("Human_01", Color.black);
-//        Player player = new AIPlayer("Computer_01", Color.black);
+        Player player = new HumanPlayer("Human_01", PieceColor.BLACK);
+//        Player player = new AIPlayer("Computer_01", PieceColor.BLACK);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
-        player = new HumanPlayer("Human_02", Color.white);
-//        player = new AIPlayer("Computer_02", Color.white);
+        player = new HumanPlayer("Human_02", PieceColor.WHITE);
+//        player = new AIPlayer("Computer_02", PieceColor.WHITE);
         player.setMediator(this);
         playerSet.addPlayer(player);
     }
@@ -73,7 +68,7 @@ public class Mediator {
 
         void removePiece(Point currentLocation, Point lastLocation);
 
-        void drawRecord(Point location, Color color);
+        void drawRecord(Point location, PieceColor color);
 
         void removeRecord(Point location);
 
@@ -96,7 +91,7 @@ public class Mediator {
                 return;
             }
             int index = board.getNumber() + 1;
-            Color color = playerSet.getMovingPlayer().getColor();
+            PieceColor color = playerSet.getMovingPlayer().getColor();
             Piece piece = new RealPiece(index, point, color);
             //先判断这个棋子是否能使某一方胜利
             PieceMap map = null;
@@ -105,7 +100,7 @@ public class Mediator {
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
-            Color winner = ai.findWinner(map, piece);
+            PieceColor winner = ai.findWinner(map, piece);
             //然后落子
             board.addPiece(piece);
             display.drawPiece(piece);
@@ -343,8 +338,9 @@ public class Mediator {
             try {
                 Thread.sleep(800 + (int) (Math.random() * 400));
                 PieceMap map = board.createPieceMap();
-                Color color = playerSet.getMovingPlayer().getColor();
-                Point point = ai.getCloseMove(map, color, board.getCurrentPiece());
+                PieceColor color = playerSet.getMovingPlayer().getColor();
+//                Point point = ai.getCloseMove(map, color, board.getCurrentPiece());
+                Point point = ai.getMove(map, color);
                 String s = playerSet.getMovingPlayer().getColorString();
                 System.out.println(s + " AI moved. Think time = "
                         + (new Date().getTime() - start) + " ms.  "
@@ -370,7 +366,7 @@ public class Mediator {
             }
         }
 
-        public void test() {
+        public void getContinueTypes() {
             try {
                 PieceMap pieceMap = board.createPieceMap();
                 Piece piece = board.getCurrentPiece();

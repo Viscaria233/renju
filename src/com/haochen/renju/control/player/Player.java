@@ -1,16 +1,15 @@
 package com.haochen.renju.control.player;
 
-import java.awt.Color;
-
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.storage.PieceColor;
 
 public abstract class Player {
     
     protected String name;
-    protected Color color;
+    protected PieceColor color;
     protected Mediator mediator;
     
-    public Player(String name, Color color) {
+    public Player(String name, PieceColor color) {
         this.name = name;
         this.color = color;
     }
@@ -19,12 +18,12 @@ public abstract class Player {
         return name;
     }
     
-    public Color getColor() {
+    public PieceColor getColor() {
         return color;
     }
     
     public String getColorString() {
-        if (color.equals(Color.black)) {
+        if (color.equals(PieceColor.BLACK)) {
             return "black";
         } else {
             return "white";

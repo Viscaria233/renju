@@ -1,7 +1,6 @@
 package com.haochen.renju.bean;
 
-import java.awt.Color;
-
+import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
 public class ForbiddenMove extends Cell {
@@ -27,7 +26,7 @@ public class ForbiddenMove extends Cell {
     }
 
     @Override
-    public Color getColor() {
+    public PieceColor getColor() {
         return null;
     }
     

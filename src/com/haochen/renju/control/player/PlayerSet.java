@@ -1,6 +1,6 @@
 package com.haochen.renju.control.player;
 
-import java.awt.Color;
+import com.haochen.renju.storage.PieceColor;
 
 public class PlayerSet {
     
@@ -10,10 +10,10 @@ public class PlayerSet {
     private int moving = BLACK;
 
     public void addPlayer(Player player) {
-        Color color = player.getColor();
-        if (color.equals(Color.black)) {
+        PieceColor color = player.getColor();
+        if (color.equals(PieceColor.BLACK)) {
             players[BLACK] = player;
-        } else if (color.equals(Color.white)) {
+        } else if (color.equals(PieceColor.WHITE)) {
             players[WHITE] = player;
         }
     }

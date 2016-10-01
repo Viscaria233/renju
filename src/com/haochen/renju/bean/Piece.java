@@ -1,25 +1,24 @@
 package com.haochen.renju.bean;
 
-import java.awt.Color;
-
+import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
 public abstract class Piece extends Cell {
     
 	protected int index;
 	protected Point location;
-	protected Color color;
+	protected PieceColor color;
 	
 	public Piece() {
 	}
 
-	public Piece(int index, Point location, Color color) {
+	public Piece(int index, Point location, PieceColor color) {
 		this.index = index;
 		this.location = location;
 		this.color = color;
 	}
 	
-	public Piece(int index, int x, int y, Color color) {
+	public Piece(int index, int x, int y, PieceColor color) {
         this.index = index;
         this.location = new Point(x, y);
         this.color = color;
@@ -36,7 +35,7 @@ public abstract class Piece extends Cell {
 	}
 	
 	@Override
-	public Color getColor() {
+	public PieceColor getColor() {
 	    return color;
 	}
 	

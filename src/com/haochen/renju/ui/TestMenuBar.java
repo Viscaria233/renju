@@ -16,6 +16,7 @@ import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
 import com.haochen.renju.main.Config;
+import com.haochen.renju.storage.PieceColor;
 
 public class TestMenuBar extends JMenuBar {
 
@@ -54,7 +55,7 @@ public class TestMenuBar extends JMenuBar {
     private JCheckBoxMenuItem aiWhite;
     
     private JCheckBoxMenuItem aiNoUsed;
-    private JCheckBoxMenuItem lvNoob;
+    private JCheckBoxMenuItem lvLow;
     private JCheckBoxMenuItem lvNormal;
     private JCheckBoxMenuItem lvHigh;
     
@@ -68,7 +69,7 @@ public class TestMenuBar extends JMenuBar {
         JMenu help = new JMenu("Help");
         JMenu test = new JMenu("Test");
         JMenu setting = new JMenu("Setting");
-        JMenu aiColor = new JMenu("AI Color");
+        JMenu aiColor = new JMenu("AI PieceColor");
 //        ButtonGroup colorGroup = new ButtonGroup();
         JMenu aiLevel = new JMenu("AI Level");
         ButtonGroup levelGroup = new ButtonGroup();
@@ -138,7 +139,7 @@ public class TestMenuBar extends JMenuBar {
         aiBlack = new JCheckBoxMenuItem("AI Uses Black");
         aiWhite = new JCheckBoxMenuItem("AI Uses White");
         aiNoUsed = new JCheckBoxMenuItem("No AI");
-        lvNoob = new JCheckBoxMenuItem("Noob");
+        lvLow = new JCheckBoxMenuItem("Low");
         lvNormal = new JCheckBoxMenuItem("Normal");
         lvHigh = new JCheckBoxMenuItem("High");
         
@@ -148,11 +149,11 @@ public class TestMenuBar extends JMenuBar {
 //        colorGroup.add(aiWhite);
 
         aiLevel.add(aiNoUsed);
-        aiLevel.add(lvNoob);
+        aiLevel.add(lvLow);
         aiLevel.add(lvNormal);
         aiLevel.add(lvHigh);
         levelGroup.add(aiNoUsed);
-        levelGroup.add(lvNoob);
+        levelGroup.add(lvLow);
         levelGroup.add(lvNormal);
         levelGroup.add(lvHigh);
         
@@ -182,38 +183,29 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
-//        findAliveFour.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Find Alive Four");
-//                System.out.println(mainFrame.chessForm.findAliveFour(
-//                        mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.all));
-//            }
-//        });
+        findAliveFour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Test------Find Alive Four");
+                mediator.getOperator().showAliveFour();
+            }
+        });
 
-//        findAsleepFour.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Find Asleep Four");
-//                System.out.println(mainFrame.chessForm.findAsleepFour(
-//                        mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.all));
-//            }
-//        });
+        findAsleepFour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Test------Find Asleep Four");
+                mediator.getOperator().showAsleepFour();
+            }
+        });
 
-//        findFour.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
+        findFour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 //                System.out.println("Test------Find Four");
-//                System.out.println(mainFrame.chessForm.getFourQuantity(
-//                        mainFrame.chessForm.getChess(mainFrame.chessForm.getChessNumber()).getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.all));
-//            }
-//        });
+
+            }
+        });
 
         separator.addActionListener(new ActionListener() {
 
@@ -238,7 +230,7 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.response("is it double four", null);
 //                        mediator.response("is it double three", null);
 //                        mediator.getOperator().launch();
-                        mediator.getOperator().test();
+                        mediator.getOperator().getContinueTypes();
                     }
                 }).start();
             }
@@ -258,41 +250,20 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
-//        continueEnd.addActionListener(new ActionListener() {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Continue End");
-//                Point[] side = new Point[2];
-//                side = mainFrame.chessForm.getContinueAttribute(mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.horizontal).getContinue(Direction.horizontal).getContinueEnd();
-//                System.out.println("side[0] = " + side[0]);
-//                System.out.println("side[1] = " + side[1]);
-//            }
-//        });
+        continueEnd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-//        continueLength.addActionListener(new ActionListener() {
-//            
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Continue Length");
-//                int length = mainFrame.chessForm.getContinueAttribute(mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.horizontal).getContinue(Direction.horizontal).getLength();
-//                System.out.println(length);
-//            }
-//        });
+            }
+        });
+
+        continueLength.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         
-//        findAliveThree.addActionListener(new ActionListener() {
-//            
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Find Alive Three");
-//                System.out.println(mainFrame.chessForm.findAliveThree(
-//                        mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.all));
-//            }
-//        });
-
         findAliveThree.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -322,14 +293,14 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Player player;
                 if (aiBlack.getState()) {
-                    player = new AIPlayer("Computer_01", Color.black);
+                    player = new AIPlayer("Computer_01", PieceColor.BLACK);
                 } else {
-                    player = new HumanPlayer("Human_01", Color.black);
+                    player = new HumanPlayer("Human_01", PieceColor.BLACK);
                 }
                 player.setMediator(mediator);
                 final PlayerSet set = mediator.getPlayerSet();
                 set.addPlayer(player);
-                if (set.getMovingPlayer().getColor().equals(Color.black)) {
+                if (set.getMovingPlayer().getColor().equals(PieceColor.BLACK)) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -345,14 +316,14 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Player player;
                 if (aiWhite.getState()) {
-                    player = new AIPlayer("Computer_02", Color.white);
+                    player = new AIPlayer("Computer_02", PieceColor.WHITE);
                 } else {
-                    player = new HumanPlayer("Human_02", Color.white);
+                    player = new HumanPlayer("Human_02", PieceColor.WHITE);
                 }
                 player.setMediator(mediator);
                 final PlayerSet set = mediator.getPlayerSet();
                 set.addPlayer(player);
-                if (set.getMovingPlayer().getColor().equals(Color.white)) {
+                if (set.getMovingPlayer().getColor().equals(PieceColor.WHITE)) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

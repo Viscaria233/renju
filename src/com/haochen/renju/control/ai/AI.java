@@ -7,15 +7,15 @@ import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.main.Config;
+import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 
-import java.awt.*;
-import java.awt.image.ColorConvertOp;
-import java.awt.image.renderable.ContextualRenderedImageFactory;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class  AI {
 
@@ -26,16 +26,16 @@ public class  AI {
         this.mediator = mediator;
     }
     
-    public Color findWinner(PieceMap map, Piece piece) {
+    public PieceColor findWinner(PieceMap map, Piece piece) {
         Point location = piece.getLocation();
-        Color color = piece.getColor();
-        if (color.equals(Color.black)) {
+        PieceColor color = piece.getColor();
+        if (color.equals(PieceColor.BLACK)) {
             if (forbiddenMove && map.getCell(location).isForbiddenMove()) {
-                return Color.white;
+                return PieceColor.WHITE;
             }
         }
         
-        Color winner = null;
+        PieceColor winner = null;
         boolean isImaginary = false;
         //插入假想棋子
         if (map.available(location)) {
@@ -55,7 +55,7 @@ public class  AI {
         return winner;
     }
     
-    public ContinueAttribute getContinueAttribute(PieceMap map, Color color, Point location, Direction direction) {
+    public ContinueAttribute getContinueAttribute(PieceMap map, PieceColor color, Point location, Direction direction) {
         //坐标不合法，或坐标处没有棋子
         if (!location.isValid() || map.available(location)) {
             return null;
@@ -171,7 +171,7 @@ public class  AI {
 
         SingleContinue single = attribute.getContinue(direction);
         if (forbiddenMove) {
-            if (attribute.getColor().equals(Color.black)) {
+            if (attribute.getColor().equals(PieceColor.BLACK)) {
                 if (single.getLength() == 5) {
                     result.add(direction);
                 }
@@ -204,7 +204,7 @@ public class  AI {
             return result;
         }
 
-        Color color = attribute.getColor();
+        PieceColor color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() != 4) {
             return result;
@@ -253,7 +253,7 @@ public class  AI {
             return result;
         }
 
-        Color color = attribute.getColor();
+        PieceColor color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 4) {
             return result;
@@ -304,7 +304,7 @@ public class  AI {
             return result;
         }
 
-        Color color = attribute.getColor();
+        PieceColor color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
             return result;
@@ -357,7 +357,7 @@ public class  AI {
             return result;
         }
 
-        Color color = attribute.getColor();
+        PieceColor color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
             return result;
@@ -413,7 +413,7 @@ public class  AI {
             return result;
         }
 
-        SingleContinue single = getContinueAttribute(map, Color.black, location, direction).getContinue(direction);
+        SingleContinue single = getContinueAttribute(map, PieceColor.BLACK, location, direction).getContinue(direction);
         if (single.getLength() > 5) {
             result.add(direction);
         }
@@ -424,11 +424,11 @@ public class  AI {
         boolean isImaginary = false;
         //插入假想棋子
         if (map.available(location)) {
-            map.addPiece(-1, location, Color.black);
+            map.addPiece(-1, location, PieceColor.BLACK);
             isImaginary = true;
         }
 
-        ContinueAttribute attribute = getContinueAttribute(map, Color.black, location, Direction.all);
+        ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, location, Direction.all);
         int four = findAliveFour(map, attribute, Direction.all).getQuantity()
                 + findAsleepFour(map, attribute, Direction.all).getQuantity();
 
@@ -443,11 +443,11 @@ public class  AI {
         boolean isImaginary = false;
         //插入假想棋子
         if (map.available(location)) {
-            map.addPiece(-1, location, Color.black);
+            map.addPiece(-1, location, PieceColor.BLACK);
             isImaginary = true;
         }
 
-        ContinueAttribute attribute = getContinueAttribute(map, Color.black, location, Direction.all);
+        ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, location, Direction.all);
         int three = findAliveThree(map, attribute, Direction.all).getQuantity();
         
         //删除假想棋子
@@ -460,14 +460,14 @@ public class  AI {
     public boolean isForbiddenMove(PieceMap map, Point location, Direction direction) {
         boolean forbidden = false;
         boolean isImaginary = false;
-        Color color = Color.black;
+        PieceColor color = PieceColor.BLACK;
         //插入假想棋子
         if (map.available(location)) {
             map.addPiece(-1, location, color);
             isImaginary = true;
         }
 
-        ContinueAttribute allDirection = getContinueAttribute(map, Color.black, location, direction);
+        ContinueAttribute allDirection = getContinueAttribute(map, PieceColor.BLACK, location, direction);
         if (findFive(allDirection, direction).getQuantity() > 0) {
             forbidden = false;
         } else if (findAliveFour(map, allDirection, direction).getQuantity()
@@ -571,37 +571,28 @@ public class  AI {
             return null;
         }
         if (Config.usingForbiddenMove
-                && attribute.getColor().equals(Color.black)
+                && attribute.getColor().equals(PieceColor.BLACK)
                 && isForbiddenMove(map, attribute.getLocation(), direction)) {
             return ContinueType.FORBIDDEN_MOVE;
         }
         if (single.getLength() >= 5) {
             return ContinueType.FIVE;
         }
-        switch (single.getLength()) {
-            case 4:
-                if (findAliveFour(map, attribute, direction).contains(direction)) {
-                    return ContinueType.ALIVE_FOUR;
-                } else if (findAsleepFour(map, attribute, direction).contains(direction)) {
-                    return ContinueType.ASLEEP_FOUR;
-                } else {
-                    return ContinueType.EMPTY;
-                }
-            case 3:
-                if (findAliveThree(map, attribute, direction).contains(direction)) {
-                    return ContinueType.ALIVE_THREE;
-                } else if (findAsleepThree(map, attribute, direction).contains(direction)) {
-                    return ContinueType.ASLEEP_THREE;
-                } else {
-                    return ContinueType.EMPTY;
-                }
-            default:
-                return ContinueType.EMPTY;
+        if (findAliveFour(map, attribute, direction).contains(direction)) {
+            return ContinueType.ALIVE_FOUR;
+        } else if (findAsleepFour(map, attribute, direction).contains(direction)) {
+            return ContinueType.ASLEEP_FOUR;
+        } else if (findAliveThree(map, attribute, direction).contains(direction)) {
+            return ContinueType.ALIVE_THREE;
+        } else if (findAsleepThree(map, attribute, direction).contains(direction)) {
+            return ContinueType.ASLEEP_THREE;
+        } else {
+            return ContinueType.EMPTY;
         }
     }
 
 
-    public Point getRandomMove(PieceMap map, Color color) {
+    public Point getRandomMove(PieceMap map, PieceColor color) {
         Point point = new Point((int) (Math.random() * 16), (int) (Math.random() * 16));
         while (!map.available(point)) {
             point = new Point((int) (Math.random() * 16), (int) (Math.random() * 16));
@@ -609,7 +600,7 @@ public class  AI {
         return point;
     }
     
-    public Point getCloseMove(PieceMap map, Color color, Piece lastPiece) {
+    public Point getCloseMove(PieceMap map, PieceColor color, Piece lastPiece) {
         if (lastPiece == null) {
             return new Point(8, 8);
         }
@@ -622,9 +613,59 @@ public class  AI {
         return point;
     }
     
-    public Point getMove(PieceMap map, Color color) {
-        Point point = null;
-        return point;
+    public Point getMove(PieceMap map, PieceColor color) {
+        Map<Point, Integer> scores = getAllScore(map, color);
+        Set<Map.Entry<Point, Integer>> set = scores.entrySet();
+
+        Map.Entry<Point, Integer>[] entries = set.toArray(new Map.Entry[1]);
+        Point[] highScore = getHighScorePoints(entries, 1);
+
+        return highScore[0];
+    }
+
+    private Point[] getHighScorePoints(Map.Entry<Point, Integer>[] entries, int size) {
+        if (size > entries.length) {
+            size = entries.length;
+        }
+
+        Point[] highScore = new Point[size];
+        for (int i = 0; i < size; ++i) {
+            int max = i;
+            for (int j = i; j < entries.length; ++j){
+                if (entries[j].getValue() > entries[i].getValue()) {
+                    max = j;
+                }
+            }
+            if (max != i) {
+                Map.Entry<Point, Integer> t = entries[max];
+                entries[max] = entries[i];
+                entries[i] = t;
+                highScore[i] = t.getKey();
+            }
+        }
+        return highScore;
+    }
+
+    private Map<Point, Integer> getAllScore(PieceMap map, PieceColor color) {
+        Map<Point, Integer> result = new HashMap<>();
+        Point point;
+        ContinueAttribute current;
+        ContinueAttribute other;
+        for (int i = 1; i <= 15; ++i) {
+            for (int j = 1; j<= 15; ++j) {
+                point = new Point(i, j);
+                if (map.available(point)) {
+                    current = getContinueAttribute(map, color, point, Direction.all);
+                    other = getContinueAttribute(map, color.foeColor(), point, Direction.all);
+                    result.put(point, getScore(map, current, other));
+                }
+            }
+        }
+        return result;
+    }
+
+    private int getScore(PieceMap map, ContinueAttribute currentPlayer, ContinueAttribute otherPlayer) {
+        return new Random().nextInt();
     }
     
 }

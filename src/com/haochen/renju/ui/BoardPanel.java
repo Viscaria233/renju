@@ -1,16 +1,6 @@
 package com.haochen.renju.ui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -22,6 +12,7 @@ import javax.swing.JPanel;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.exception.ReadFileException;
+import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.draw.Layer;
 import com.haochen.renju.ui.draw.LayerManager;
@@ -41,7 +32,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     private Image blackPiece;
     private Image whitePiece;
     private final Color axesColor = new Color(0xbbbbbb);
-    private final Color handCutColor = Color.red;
+    private final Color forbiddenMarkColor = Color.red;
 
     private final Color highlightColor = Color.red;
     private GridBagLayout gridBag = new GridBagLayout();
@@ -152,14 +143,14 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     public void drawPiece(Piece piece) {
         int index = piece.getIndex();
         Point location = piece.getLocation();
-        Color color = piece.getColor();
+        PieceColor color = piece.getColor();
 
         pieceLayer.draw(location, color);
         highlightLayer.draw(location);
-        if (color.equals(Color.black)) {
-            color = Color.white;
+        if (color.equals(PieceColor.BLACK)) {
+            color = PieceColor.WHITE;
         } else {
-            color = Color.black;
+            color = PieceColor.BLACK;
         }
         indexLayer.draw(index, location, color);
     }
@@ -173,7 +164,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     }
 
     @Override
-    public void drawRecord(Point boardLocation, Color color) {
+    public void drawRecord(Point boardLocation, PieceColor color) {
 //        Point absolutelyLocation = absolutelyLocation(boardLocation);
         recordLayer.draw(boardLocation, color);
     }
@@ -442,7 +433,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             }
             x -= w / 2;
             y -= w / 2;
-            g2d.setColor(handCutColor);
+            g2d.setColor(forbiddenMarkColor);
             g2d.setStroke(new BasicStroke(4.0f));
             g2d.drawLine(x, y, x + w, y + w);
             g2d.drawLine(x + w, y, x, y + w);
@@ -461,7 +452,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         public RecordLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation, Color color) {
+        public void draw(Point boardLocation, PieceColor color) {
             Point point= absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -471,7 +462,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             }
             x -= w / 2;
             y -= w / 2;
-            g2d.setColor(color);
+            g2d.setColor(color.getAwtColor());
             g2d.fillOval(x, y, w, w);
         }
     }
@@ -488,7 +479,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         public PieceLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation, Color color) {
+        public void draw(Point boardLocation, PieceColor color) {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -501,7 +492,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
 //            g2d.setColor(color);
 //            g2d.fillOval(x, y, w, w);
             Image image = null;
-            if (color.equals(Color.black)) {
+            if (color.equals(PieceColor.BLACK)) {
                 image = blackPiece;
             } else {
                 image = whitePiece;
@@ -557,7 +548,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         public IndexLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(int index, Point boardLocation, Color color) {
+        public void draw(int index, Point boardLocation, PieceColor color) {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -569,7 +560,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             int height = fm.getHeight();
             x -= width / 2;
             y += height / 4;
-            g2d.setColor(color);
+            g2d.setColor(color.getAwtColor());
             g2d.drawString(str, x, y);
         }
     }

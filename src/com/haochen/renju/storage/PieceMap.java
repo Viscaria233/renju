@@ -1,7 +1,5 @@
 package com.haochen.renju.storage;
 
-import java.awt.Color;
-
 import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.ForbiddenMove;
 import com.haochen.renju.bean.RealPiece;
@@ -34,11 +32,11 @@ public class PieceMap implements Cloneable {
         map[point.x - 1][point.y - 1] = cell;
     }
     
-    public void addPiece(int index, Point boardLocation, Color color) {
+    public void addPiece(int index, Point boardLocation, PieceColor color) {
         map[boardLocation.x - 1][boardLocation.y - 1] = new RealPiece(index, boardLocation, color);
     }
     
-    public void addPiece(int index, int x, int y, Color color) {
+    public void addPiece(int index, int x, int y, PieceColor color) {
         map[x - 1][y - 1] = new RealPiece(index, x, y, color);
     }
     

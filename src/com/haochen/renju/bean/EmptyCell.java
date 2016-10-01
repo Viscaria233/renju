@@ -1,7 +1,6 @@
 package com.haochen.renju.bean;
 
-import java.awt.Color;
-
+import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
 public class EmptyCell extends Cell {
@@ -17,7 +16,7 @@ public class EmptyCell extends Cell {
     }
 
     @Override
-    public Color getColor() {
+    public PieceColor getColor() {
         return null;
     }
 

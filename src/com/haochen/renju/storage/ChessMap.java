@@ -2,7 +2,7 @@
 //
 //import com.haochen.renju.storage.Point;
 //
-//import java.awt.Color;
+//import java.awt.PieceColor;
 //
 //import com.haochen.renju.bean.GetChessObject;
 //import com.haochen.renju.bean.ImaginaryPiece;
@@ -79,7 +79,7 @@
 //    	}
 //    	
 //    	chessNumber++;
-//    	chessMap[boardLocation.x][boardLocation.y] = new RealPiece(chessNumber, boardLocation, Color.red);
+//    	chessMap[boardLocation.x][boardLocation.y] = new RealPiece(chessNumber, boardLocation, PieceColor.red);
 //        return true;
 //    }
 //    
@@ -97,9 +97,9 @@
 //    
 //    public void imaginaryChess(int color,  Point boardLocation) {
 //    	if (color == Piece.BLACK) {
-//    		chessMap[boardLocation.x][boardLocation.y] = new ImaginaryPiece(1, boardLocation, Color.black);
+//    		chessMap[boardLocation.x][boardLocation.y] = new ImaginaryPiece(1, boardLocation, PieceColor.black);
 //    	} else {
-//    		chessMap[boardLocation.x][boardLocation.y] = new ImaginaryPiece(2, boardLocation, Color.white);
+//    		chessMap[boardLocation.x][boardLocation.y] = new ImaginaryPiece(2, boardLocation, PieceColor.white);
 //    	}
 //    }
 //    

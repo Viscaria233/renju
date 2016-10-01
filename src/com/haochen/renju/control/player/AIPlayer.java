@@ -1,10 +1,10 @@
 package com.haochen.renju.control.player;
 
-import java.awt.Color;
+import com.haochen.renju.storage.PieceColor;
 
 public class AIPlayer extends Player {
 
-    public AIPlayer(String name, Color color) {
+    public AIPlayer(String name, PieceColor color) {
         super(name, color);
     }
 

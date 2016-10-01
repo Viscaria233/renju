@@ -5,4 +5,12 @@ package com.haochen.renju.main;
  */
 public class Config {
     public static boolean usingForbiddenMove;
+
+    public static class AILevel {
+        public static int level;
+        public static final int NONE = -1;
+        public static final int LOW = 1;
+        public static final int NORMAL = 2;
+        public static final int HIGH = 3;
+    }
 }

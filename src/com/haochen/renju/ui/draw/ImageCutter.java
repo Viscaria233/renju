@@ -10,9 +10,9 @@ public class ImageCutter {
 //            int x, int y, int width,int height) {
 //        BufferedImage cutter = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 //        Graphics g = cutter.createGraphics();
-//        g.setColor(Color.white);
+//        g.setColor(PieceColor.white);
 //        g.fillRect(0, 0, cutter.getWidth(), cutter.getHeight());
-//        g.setColor(Color.black);
+//        g.setColor(PieceColor.black);
 //        g.fillRect(x, y, width, height);
 //        
 //        try {
@@ -43,7 +43,7 @@ public class ImageCutter {
 //                G = (rgb & 0xff00) >> 8;
 //                B = (rgb & 0xff);
 //                A = cutter.getRGB(i, j) & 0xff;
-//                g.setColor(new Color(R, G, B, A));
+//                g.setColor(new PieceColor(R, G, B, A));
 //                g.fillRect(i, j, 1, 1);
 //            }
 //        }
