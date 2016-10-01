@@ -3,7 +3,10 @@ package com.haochen.renju.control;
 import java.awt.Color;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.bean.RealPiece;
@@ -364,6 +367,22 @@ public class Mediator {
                 board.clearForbiddenMark();
                 display.clearForbiddenMark();
                 display.commit();
+            }
+        }
+
+        public void test() {
+            try {
+                PieceMap pieceMap = board.createPieceMap();
+                Piece piece = board.getCurrentPiece();
+                ContinueAttribute attribute = ai.getContinueAttribute(
+                        pieceMap, piece.getColor(), piece.getLocation(), Direction.all);
+                Map<Direction, ContinueType> map = ai.getContinueTypes(pieceMap, attribute);
+                Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
+                for (Map.Entry<Direction, ContinueType> entry : set) {
+                    System.out.println(entry.getKey() + "    " + entry.getValue());
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
             }
         }
     }

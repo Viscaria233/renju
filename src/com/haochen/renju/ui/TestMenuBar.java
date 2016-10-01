@@ -237,7 +237,8 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.response("show long continue", null);
 //                        mediator.response("is it double four", null);
 //                        mediator.response("is it double three", null);
-                        mediator.getOperator().launch();
+//                        mediator.getOperator().launch();
+                        mediator.getOperator().test();
                     }
                 }).start();
             }

@@ -3,8 +3,10 @@ package com.haochen.renju.control.ai;
 import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.calculate.ContinueAttribute;
+import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
@@ -12,6 +14,8 @@ import com.haochen.renju.storage.Point;
 import java.awt.*;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.renderable.ContextualRenderedImageFactory;
+import java.util.*;
+import java.util.List;
 
 public class  AI {
 
@@ -545,7 +549,58 @@ public class  AI {
         }
         return forbidden;
     }
-    
+
+
+
+
+    public Map<Direction, ContinueType> getContinueTypes(PieceMap map, ContinueAttribute attribute) {
+        Map<Direction, ContinueType> result = new HashMap<>();
+        Direction[] directions = Direction.createDirectionArray();
+        for (Direction direction : directions) {
+            ContinueType type = getContinueType(map, attribute, direction);
+            if (type != null) {
+                result.put(direction, type);
+            }
+        }
+        return result;
+    }
+
+    private ContinueType getContinueType(PieceMap map, ContinueAttribute attribute, Direction direction) {
+        SingleContinue single = attribute.getContinue(direction);
+        if (single == null) {
+            return null;
+        }
+        if (Config.usingForbiddenMove
+                && attribute.getColor().equals(Color.black)
+                && isForbiddenMove(map, attribute.getLocation(), direction)) {
+            return ContinueType.FORBIDDEN_MOVE;
+        }
+        if (single.getLength() >= 5) {
+            return ContinueType.FIVE;
+        }
+        switch (single.getLength()) {
+            case 4:
+                if (findAliveFour(map, attribute, direction).contains(direction)) {
+                    return ContinueType.ALIVE_FOUR;
+                } else if (findAsleepFour(map, attribute, direction).contains(direction)) {
+                    return ContinueType.ASLEEP_FOUR;
+                } else {
+                    return ContinueType.EMPTY;
+                }
+            case 3:
+                if (findAliveThree(map, attribute, direction).contains(direction)) {
+                    return ContinueType.ALIVE_THREE;
+                } else if (findAsleepThree(map, attribute, direction).contains(direction)) {
+                    return ContinueType.ASLEEP_THREE;
+                } else {
+                    return ContinueType.EMPTY;
+                }
+            default:
+                return ContinueType.EMPTY;
+        }
+    }
+
+
     public Point getRandomMove(PieceMap map, Color color) {
         Point point = new Point((int) (Math.random() * 16), (int) (Math.random() * 16));
         while (!map.available(point)) {
