@@ -11,6 +11,9 @@ import javax.swing.JPanel;
 
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.bean.Piece;
+import com.haochen.renju.control.player.HumanPlayer;
+import com.haochen.renju.control.player.Player;
+import com.haochen.renju.control.player.PlayerSet;
 import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
@@ -112,18 +115,24 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             public void mouseReleased(MouseEvent e) {
                 switch (e.getButton()) {
                 case MouseEvent.BUTTON1: {
-                    Point point = boardLocation(new Point(e.getX(), e.getY()));
-                    mediator.getOperator().move(point);
+                    if (mediator.getPlayerSet().getMovingPlayer() instanceof HumanPlayer) {
+                        Point point = boardLocation(new Point(e.getX(), e.getY()));
+                        mediator.getOperator().move(point);
+                    }
                 }
                     break;
                 case MouseEvent.BUTTON2: {
-//                    Point point = boardLocation(new Point(e.getX(), e.getY()));
+                    Point point = boardLocation(new Point(e.getX(), e.getY()));
 //                    mediator.response("is it hand cut", point);
-                    mediator.getOperator().drawForbiddenMark();
+//                    mediator.getOperator().drawForbiddenMark();
+                    System.out.println(point);
+                    mediator.getOperator().getContinueTypes();
                 }
                     break;
                 case MouseEvent.BUTTON3: {
-                    mediator.getOperator().withdraw();
+                    if (mediator.getPlayerSet().getMovingPlayer() instanceof HumanPlayer) {
+                        mediator.getOperator().withdraw();
+                    }
                 }
                     break;
                 }

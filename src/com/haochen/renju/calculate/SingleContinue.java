@@ -8,12 +8,12 @@ public class SingleContinue {
 	private Point[] continueEnd;
 	private Point[] breakPoint;
 	private Direction direction;
-	
+
 	public SingleContinue() {
 		continueEnd = new Point[2];
 		breakPoint = new Point[2];
 	}
-	
+
 	public void generateLength() {
 		if (continueEnd[0] == null || continueEnd[1] == null) {
 			return;
@@ -24,17 +24,17 @@ public class SingleContinue {
 			length = Math.abs(continueEnd[1].y - continueEnd[0].y) + 1;
 		}
 	}
-	
+
 	public void setEnd(Point end0, Point end1) {
 		continueEnd[0] = end0;
 		continueEnd[1] = end1;
 	}
-	
+
 	public void setSide(Point side0, Point side1) {
 		breakPoint[0] = side0;
 		breakPoint[1] = side1;
 	}
-	
+
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}

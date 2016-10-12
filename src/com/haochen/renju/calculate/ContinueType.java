@@ -5,7 +5,7 @@ package com.haochen.renju.calculate;
  */
 public class ContinueType {
 
-    public static final ContinueType EMPTY = new ContinueType(-1);
+    public static final ContinueType NONE = new ContinueType(-1);
     public static final ContinueType FORBIDDEN_MOVE = new ContinueType(1);
     public static final ContinueType FIVE = new ContinueType(2);
     public static final ContinueType ALIVE_FOUR = new ContinueType(3);
@@ -39,7 +39,7 @@ public class ContinueType {
         String str = "ContinueType  ";
         switch (type) {
             case -1:
-                str += "[empty]";
+                str += "[none]";
                 break;
             case 1:
                 str += "[forbidden move]";

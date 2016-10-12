@@ -2,28 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ee7e2f26-0368-4a36-a8ec-c322ef4baa26" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$3$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$8$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$9$1.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/Cell.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/Cell.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/EmptyCell.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/EmptyCell.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/ForbiddenMove.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/ForbiddenMove.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/ImaginaryPiece.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/ImaginaryPiece.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/Piece.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/Piece.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/RealPiece.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/bean/RealPiece.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/calculate/ContinueAttribute.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/calculate/ContinueAttribute.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator$Display.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator$Display.class" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$13$1.class" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$14$1.class" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$6$1.class" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/calculate/ContinueType.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/calculate/ContinueType.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator$Operator.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator$Operator.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/Mediator.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/ai/AI.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/ai/AI.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/AIPlayer.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/AIPlayer.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/HumanPlayer.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/HumanPlayer.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/Player.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/Player.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/PlayerSet.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/control/player/PlayerSet.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/main/Config.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/main/Config.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/Board.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/Board.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/PieceMap.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/PieceMap.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/PieceTree.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/storage/PieceTree.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$1.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$1.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$ForbiddenMarkLayer.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$ForbiddenMarkLayer.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$GlassPanel.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$GlassPanel.class" />
@@ -35,38 +21,25 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$RecordLayer.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$RecordLayer.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$VerticalAxesPanel.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel$VerticalAxesPanel.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/BoardPanel.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$1.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$2.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$3.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$4.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$4.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$5.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$5.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$10.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$10.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$11.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$11.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$12.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$12.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$13.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$13.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$14.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$14.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$6.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$6.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$7.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$7.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$8.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$8.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$9.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar$9.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar.class" afterPath="$PROJECT_DIR$/out/production/renju/com/haochen/renju/ui/TestMenuBar.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/Cell.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/Cell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/EmptyCell.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/EmptyCell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/ForbiddenMove.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/ForbiddenMove.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/ImaginaryPiece.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/ImaginaryPiece.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/Piece.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/Piece.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/bean/RealPiece.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/bean/RealPiece.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueAttribute.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueAttribute.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/calculate/SingleContinue.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/calculate/SingleContinue.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/player/AIPlayer.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/player/AIPlayer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/player/HumanPlayer.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/player/HumanPlayer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/control/player/PlayerSet.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/control/player/PlayerSet.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/main/Config.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/main/Config.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/storage/Board.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/storage/Board.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/storage/ChessMap.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/storage/ChessMap.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceTree.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceTree.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/haochen/renju/ui/draw/ImageCutter.java" afterPath="$PROJECT_DIR$/src/com/haochen/renju/ui/draw/ImageCutter.java" />
     </list>
     <ignored path="renju.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -95,39 +68,10 @@
       <file leaf-file-name="Mediator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="222">
-              <caret line="342" column="53" selection-start-line="342" selection-start-column="53" selection-end-line="342" selection-end-column="53" />
+            <state relative-caret-position="83">
+              <caret line="379" column="20" selection-start-line="379" selection-start-column="20" selection-end-line="379" selection-end-column="20" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AIPlayer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/AIPlayer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="8" column="5" selection-start-line="8" selection-start-column="5" selection-end-line="8" selection-end-column="5" />
-              <folding>
-                <element signature="e#180#181#0" expanded="true" />
-                <element signature="e#214#215#0" expanded="true" />
-                <element signature="e#254#255#0" expanded="true" />
-                <element signature="e#301#302#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HumanPlayer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/HumanPlayer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="132">
-              <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#224#225#0" expanded="true" />
-                <element signature="e#258#259#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -136,11 +80,21 @@
       <file leaf-file-name="Player.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="264">
-              <caret line="36" column="32" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
+            <state relative-caret-position="81">
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#504#505#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PieceMap.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="22">
+              <caret line="110" column="33" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -148,8 +102,8 @@
       <file leaf-file-name="BoardPanel.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="154" column="48" selection-start-line="154" selection-start-column="48" selection-end-line="154" selection-end-column="48" />
+            <state relative-caret-position="176">
+              <caret line="128" column="55" selection-start-line="128" selection-start-column="55" selection-end-line="128" selection-end-column="55" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -160,33 +114,46 @@
       <file leaf-file-name="AI.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="663" column="22" selection-start-line="663" selection-start-column="22" selection-end-line="663" selection-end-column="22" />
+            <state relative-caret-position="215">
+              <caret line="704" column="65" selection-start-line="704" selection-start-column="65" selection-end-line="704" selection-end-column="65" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#24894#24895#0" expanded="true" />
-                <element signature="e#24939#24940#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestFrame.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/TestFrame.java">
+      <file leaf-file-name="Config.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/main/Config.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="26" column="56" selection-start-line="26" selection-start-column="56" selection-end-line="26" selection-end-column="56" />
+            <state relative-caret-position="359">
+              <caret line="18" column="30" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestMenuBar.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java">
+      <file leaf-file-name="PieceColor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceColor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="904">
-              <caret line="324" column="38" selection-start-line="324" selection-start-column="38" selection-end-line="324" selection-end-column="38" />
+            <state relative-caret-position="440">
+              <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ContinueType.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="880">
+              <caret line="44" column="42" selection-start-line="44" selection-start-column="42" selection-end-line="44" selection-end-column="42" />
+              <folding>
+                <element signature="e#663#664#0" expanded="false" />
+                <element signature="e#695#696#0" expanded="false" />
+                <element signature="e#983#984#0" expanded="false" />
+                <element signature="e#1010#1011#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -194,20 +161,30 @@
       <file leaf-file-name="PlayerSet.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/PlayerSet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="249">
-              <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
-              <folding />
+            <state relative-caret-position="81">
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <folding>
+                <element signature="e#635#636#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PieceTree.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceTree.java">
+      <file leaf-file-name="TestMenuBar.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+            <state relative-caret-position="114">
+              <caret line="235" column="54" selection-start-line="235" selection-start-column="54" selection-end-line="235" selection-end-column="54" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#7611#7612#0" expanded="true" />
+                <element signature="e#7678#8035#0" expanded="true" />
+                <element signature="e#7807#8001#0" expanded="true" />
+                <element signature="e#8000#8001#0" expanded="true" />
+                <element signature="e#8034#8035#0" expanded="true" />
+                <element signature="e#8071#8428#0" expanded="true" />
+                <element signature="e#8200#8394#0" expanded="true" />
+                <element signature="e#8393#8394#0" expanded="true" />
+                <element signature="e#8427#8428#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -256,9 +233,7 @@
         <option value="$PROJECT_DIR$/src/com/haochen/renju/main/Client.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/draw/LayerManager.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/TestFrame.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/main/Level.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/main/Config.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/Color.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/bean/Cell.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/bean/EmptyCell.java" />
@@ -267,18 +242,21 @@
         <option value="$PROJECT_DIR$/src/com/haochen/renju/bean/Piece.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/bean/RealPiece.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueAttribute.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/Board.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceTree.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceColor.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/control/player/HumanPlayer.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/control/player/AIPlayer.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java" />
-        <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/calculate/SingleContinue.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java" />
         <option value="$PROJECT_DIR$/src/com/haochen/renju/control/player/PlayerSet.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/main/Config.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java" />
+        <option value="$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java" />
       </list>
     </option>
   </component>
@@ -343,6 +321,9 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
+      <pane id="PackagesPane">
+        <subPane />
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -564,9 +545,6 @@
             </PATH_ELEMENT>
           </PATH>
         </subPane>
-      </pane>
-      <pane id="PackagesPane">
-        <subPane />
       </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
@@ -888,8 +866,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -898,17 +876,16 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20272315" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28360656" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3704918" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21406959" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3409836" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20272315" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.52459013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5098361" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -916,6 +893,7 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35573772" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -931,7 +909,15 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="27" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java</url>
+          <line>430</line>
+          <properties />
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="30" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -940,37 +926,12 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/common/GetChessObject.java" />
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/common/OperateStorage.java" />
-    <entry file="file://$PROJECT_DIR$/.idea/misc.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/copyright/profiles_settings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/renju.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#24894#24895#0" expanded="true" />
-            <element signature="e#24939#24940#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1006,16 +967,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ChessForm.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#19880#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/Dialogs.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="127">
@@ -1027,7 +978,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="184">
           <caret line="3295" column="16" selection-start-line="3295" selection-start-column="16" selection-end-line="3295" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1044,11 +994,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="902">
           <caret line="47" column="13" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#734#735#0" expanded="false" />
-            <element signature="e#782#783#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1056,55 +1001,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-844">
           <caret line="64" column="30" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/main/Level.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/EmptyCell.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/ForbiddenMove.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="28" column="13" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/Piece.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/main/Level.java" />
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/ImaginaryPiece.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1112,37 +1016,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="15" column="50" selection-start-line="15" selection-start-column="50" selection-end-line="15" selection-end-column="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueAttribute.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="924">
-          <caret line="46" column="19" selection-start-line="46" selection-start-column="19" selection-end-line="46" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/SingleContinue.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1150,7 +1023,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
           <caret line="16" column="4" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1158,15 +1030,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
           <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/main/Config.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="9" column="32" selection-start-line="9" selection-start-column="32" selection-end-line="9" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1174,17 +1037,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/Point.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="12" column="32" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1192,7 +1044,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1200,9 +1051,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#2903#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1214,56 +1062,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/Cell.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceTree.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceColor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-          <folding>
-            <element signature="e#308#309#0" expanded="true" />
-            <element signature="e#342#343#0" expanded="true" />
-            <element signature="e#931#932#0" expanded="true" />
-            <element signature="e#959#960#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="154" column="48" selection-start-line="154" selection-start-column="48" selection-end-line="154" selection-end-column="48" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1277,73 +1079,221 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/HumanPlayer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
+        <state relative-caret-position="154">
           <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#224#225#0" expanded="true" />
-            <element signature="e#258#259#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="36" column="32" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/AIPlayer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
+        <state relative-caret-position="132">
           <caret line="8" column="5" selection-start-line="8" selection-start-column="5" selection-end-line="8" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ChessForm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/SingleContinue.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="60" column="0" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
           <folding>
-            <element signature="e#180#181#0" expanded="true" />
-            <element signature="e#214#215#0" expanded="true" />
-            <element signature="e#254#255#0" expanded="true" />
-            <element signature="e#301#302#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#1084#1085#0" expanded="false" />
+            <element signature="e#1109#1110#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java">
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/EmptyCell.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="342" column="53" selection-start-line="342" selection-start-column="53" selection-end-line="342" selection-end-column="53" />
+        <state relative-caret-position="88">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/Cell.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="6" column="45" selection-start-line="6" selection-start-column="45" selection-end-line="6" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/ForbiddenMove.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="14" column="28" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/bean/Piece.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="30" column="4" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="880">
+          <caret line="44" column="42" selection-start-line="44" selection-start-column="42" selection-end-line="44" selection-end-column="42" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#663#664#0" expanded="false" />
+            <element signature="e#695#696#0" expanded="false" />
+            <element signature="e#983#984#0" expanded="false" />
+            <element signature="e#1010#1011#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceColor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="22" column="5" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/calculate/ContinueAttribute.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="74" column="26" selection-start-line="74" selection-start-column="26" selection-end-line="74" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Tools/x64/Java/jdk1.7.0_67/src.zip!/java/util/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="172" column="12" selection-start-line="172" selection-start-column="12" selection-end-line="172" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Tools/x64/Java/jdk1.7.0_67/src.zip!/java/util/HashMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="749" column="0" selection-start-line="749" selection-start-column="0" selection-end-line="749" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/Point.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Tools/x64/Java/jdk1.7.0_67/src.zip!/java/util/Date.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="973" column="15" selection-start-line="973" selection-start-column="15" selection-end-line="973" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/main/Config.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="359">
+          <caret line="18" column="30" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/TestMenuBar.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="904">
-          <caret line="324" column="38" selection-start-line="324" selection-start-column="38" selection-end-line="324" selection-end-column="38" />
+        <state relative-caret-position="114">
+          <caret line="235" column="54" selection-start-line="235" selection-start-column="54" selection-end-line="235" selection-end-column="54" />
+          <folding>
+            <element signature="e#7611#7612#0" expanded="true" />
+            <element signature="e#7678#8035#0" expanded="true" />
+            <element signature="e#7807#8001#0" expanded="true" />
+            <element signature="e#8000#8001#0" expanded="true" />
+            <element signature="e#8034#8035#0" expanded="true" />
+            <element signature="e#8071#8428#0" expanded="true" />
+            <element signature="e#8200#8394#0" expanded="true" />
+            <element signature="e#8393#8394#0" expanded="true" />
+            <element signature="e#8427#8428#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Tools/x64/Java/jdk1.7.0_67/src.zip!/java/util/Vector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="127">
+          <caret line="728" column="6" selection-start-line="728" selection-start-column="6" selection-end-line="728" selection-end-column="6" />
+          <folding>
+            <element signature="e#27816#27817#0" expanded="false" />
+            <element signature="e#27861#27862#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Tools/x64/Java/jdk1.7.0_67/src.zip!/java/util/Stack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="102" column="20" selection-start-line="102" selection-start-column="20" selection-end-line="102" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/PlayerSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+        <state relative-caret-position="81">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <element signature="e#635#636#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/player/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="81">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <element signature="e#504#505#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/Mediator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="379" column="20" selection-start-line="379" selection-start-column="20" selection-end-line="379" selection-end-column="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/ui/BoardPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="128" column="55" selection-start-line="128" selection-start-column="55" selection-end-line="128" selection-end-column="55" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/storage/PieceMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="110" column="33" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/haochen/renju/control/ai/AI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="663" column="22" selection-start-line="663" selection-start-column="22" selection-end-line="663" selection-end-column="22" />
+        <state relative-caret-position="215">
+          <caret line="704" column="65" selection-start-line="704" selection-start-column="65" selection-end-line="704" selection-end-column="65" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#24894#24895#0" expanded="true" />
-            <element signature="e#24939#24940#0" expanded="true" />
           </folding>
         </state>
       </provider>

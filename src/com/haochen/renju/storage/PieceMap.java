@@ -4,7 +4,9 @@ import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.ForbiddenMove;
 import com.haochen.renju.bean.RealPiece;
 
-public class PieceMap implements Cloneable {
+import java.util.Iterator;
+
+public class PieceMap implements Cloneable, Iterable<Point> {
     
     private Cell[][] map;
     
@@ -93,5 +95,34 @@ public class PieceMap implements Cloneable {
     public Cell getCell(int x, int y) {
         return map[x - 1][y - 1];
     }
-    
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            int x = 1;
+            int y = 1;
+
+            @Override
+            public boolean hasNext() {
+                return x <= 15 && y <= 15;
+            }
+
+            @Override
+            public Point next() {
+                Point result = new Point(x, y);
+                if (y < 15) {
+                    ++y;
+                } else {
+                    y = 1;
+                    ++x;
+                }
+                return result;
+            }
+
+            @Override
+            public void remove() {
+
+            }
+        };
+    }
 }

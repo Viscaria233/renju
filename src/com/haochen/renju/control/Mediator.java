@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
@@ -307,17 +308,27 @@ public class Mediator {
                 board.clearForbiddenMark();
                 display.clearForbiddenMark();
                 PieceMap map = board.createPieceMap();
-                Point point;
-                for (int i = 1; i <= 15; ++i) {
-                    for (int j = 1; j <= 15; ++j) {
-                        point = new Point(i, j);
-                        boolean n = ai.isForbiddenMove(map, point, Direction.all);
-                        if (n) {
-                            board.addForbiddenMark(point);
-                            display.drawForbiddenMark(point);
-                        }
+//                Point point;
+
+                for (Point point : map) {
+//                    point = cell.getLocation();
+                    boolean n = ai.isForbiddenMove(map, point, Direction.all);
+                    if (n) {
+                        board.addForbiddenMark(point);
+                        display.drawForbiddenMark(point);
                     }
                 }
+
+//                for (int i = 1; i <= 15; ++i) {
+//                    for (int j = 1; j <= 15; ++j) {
+//                        point = new Point(i, j);
+//                        boolean n = ai.isForbiddenMove(map, point, Direction.all);
+//                        if (n) {
+//                            board.addForbiddenMark(point);
+//                            display.drawForbiddenMark(point);
+//                        }
+//                    }
+//                }
                 display.commit();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -370,17 +381,67 @@ public class Mediator {
             try {
                 PieceMap pieceMap = board.createPieceMap();
                 Piece piece = board.getCurrentPiece();
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        pieceMap, piece.getColor(), piece.getLocation(), Direction.all);
-                Map<Direction, ContinueType> map = ai.getContinueTypes(pieceMap, attribute);
-                Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
-                for (Map.Entry<Direction, ContinueType> entry : set) {
-                    System.out.println(entry.getKey() + "    " + entry.getValue());
+                if (piece != null) {
+                    ContinueAttribute attribute = ai.getContinueAttribute(
+                            pieceMap, piece.getColor(), piece.getLocation(), Direction.all);
+                    Map<Direction, ContinueType> map = ai.getContinueTypes(pieceMap, attribute);
+                    Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
+                    for (Map.Entry<Direction, ContinueType> entry : set) {
+                        System.out.println(entry.getKey() + "    " + entry.getValue());
+                    }
                 }
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
         }
+
+        public void findAllFourPoints() {
+            try {
+//                List<Point> fourPoints = ai.findAllFourPoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
+                List<Point> fourPoints = ai.findAllFourPoints(board.createPieceMap(), Config.Test.color);
+
+                System.out.println("----findAllFourPoints----");
+                for (Point point : fourPoints) {
+                    System.out.println(point);
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void findAllFivePoints() {
+            try {
+//                List<Point> fivePoints = ai.findAllFivePoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
+                List<Point> fivePoints = ai.findAllFivePoints(board.createPieceMap(), Config.Test.color);
+
+                System.out.println("----findAllFivePoints----");
+                for (Point point : fivePoints) {
+                    System.out.println(point);
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void findVCF() {
+            try {
+                Date begin = new Date();
+
+                PieceMap map = board.createPieceMap();
+                List<Point> vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
+
+                Date end = new Date();
+
+                System.out.println("----findVCF----");
+                for (Point point : vcf) {
+                    System.out.println(point);
+                }
+                System.out.println((end.getTime() - begin.getTime()) + " ms");
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void drawRecords() {

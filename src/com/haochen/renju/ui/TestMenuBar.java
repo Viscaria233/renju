@@ -38,6 +38,9 @@ public class TestMenuBar extends JMenuBar {
 
     private JMenuItem about;
 
+    private JCheckBoxMenuItem black;
+    private JMenuItem find4;
+    private JMenuItem find5;
     private JMenuItem testItem;
     private JMenuItem breakPoint;
     private JMenuItem continueEnd;
@@ -69,7 +72,7 @@ public class TestMenuBar extends JMenuBar {
         JMenu help = new JMenu("Help");
         JMenu test = new JMenu("Test");
         JMenu setting = new JMenu("Setting");
-        JMenu aiColor = new JMenu("AI PieceColor");
+        JMenu aiColor = new JMenu("AI Color");
 //        ButtonGroup colorGroup = new ButtonGroup();
         JMenu aiLevel = new JMenu("AI Level");
         ButtonGroup levelGroup = new ButtonGroup();
@@ -96,6 +99,9 @@ public class TestMenuBar extends JMenuBar {
         about = new JMenuItem("About");
         help.add(about);
 
+        black = new JCheckBoxMenuItem("black");
+        find4 = new JMenuItem("find 4");
+        find5 = new JMenuItem("find 5");
         testItem = new JMenuItem("Test");
         breakPoint = new JMenuItem("Break Point");
         continueEnd = new JMenuItem("Continue End");
@@ -107,6 +113,9 @@ public class TestMenuBar extends JMenuBar {
         findFour = new JMenuItem("Find Four");
         separator = new JMenuItem("separator");
 
+        test.add(black);
+        test.add(find4);
+        test.add(find5);
         test.add(testItem);
         test.addSeparator();
         test.add(breakPoint);
@@ -215,6 +224,47 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
+        findVCF.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mediator.getOperator().findVCF();
+                    }
+                }
+        );
+
+        black.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Config.Test.color = black.getState() ? PieceColor.BLACK : PieceColor.WHITE;
+            }
+        });
+        black.setState(true);
+
+        find4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mediator.getOperator().findAllFourPoints();
+                    }
+                }).start();
+            }
+        });
+
+        find5.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mediator.getOperator().findAllFivePoints();
+                    }
+                }).start();
+            }
+        });
+
         testItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,8 +279,11 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.response("show long continue", null);
 //                        mediator.response("is it double four", null);
 //                        mediator.response("is it double three", null);
+
 //                        mediator.getOperator().launch();
-                        mediator.getOperator().getContinueTypes();
+//                        mediator.getOperator().getContinueTypes();
+//                        mediator.getOperator().findAllFourPoints();
+//                        mediator.getOperator().findAllFivePoints();
                     }
                 }).start();
             }
