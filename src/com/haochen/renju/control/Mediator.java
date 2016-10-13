@@ -1,5 +1,6 @@
 package com.haochen.renju.control;
 
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -433,11 +434,36 @@ public class Mediator {
                 Date end = new Date();
 
                 System.out.println("----findVCF----");
+                File file = new File("F:/renju_test/vcf_result_2.pts");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(vcf);
+                oos.flush();
+                oos.close();
                 for (Point point : vcf) {
                     System.out.println(point);
                 }
                 System.out.println((end.getTime() - begin.getTime()) + " ms");
-            } catch (CloneNotSupportedException e) {
+            } catch (CloneNotSupportedException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void savePieceMap() {
+            try {
+                File file = new File("F:/renju_test/vcf_piecemap_2.pm");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(board.createPieceMap());
+                oos.flush();
+                oos.close();
+            } catch (IOException | CloneNotSupportedException e) {
                 e.printStackTrace();
             }
         }

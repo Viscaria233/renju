@@ -4,9 +4,10 @@ import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.ForbiddenMove;
 import com.haochen.renju.bean.RealPiece;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class PieceMap implements Cloneable, Iterable<Point> {
+public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
     
     private Cell[][] map;
     

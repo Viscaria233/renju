@@ -1,5 +1,6 @@
 package com.haochen.renju.storage;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Stack;
 

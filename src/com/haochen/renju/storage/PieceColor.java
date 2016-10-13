@@ -1,11 +1,12 @@
 package com.haochen.renju.storage;
 
-import java.awt.*;
+import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * Created by Haochen on 2016/10/1.
  */
-public class PieceColor {
+public class PieceColor implements Serializable {
     public static final PieceColor BLACK = new PieceColor(1);
     public static final PieceColor WHITE = new PieceColor(2);
 

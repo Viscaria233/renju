@@ -567,7 +567,7 @@ public class  AI {
         if (single == null) {
             return null;
         }
-        if (Config.usingForbiddenMove
+        if (forbiddenMove
                 && attribute.getColor().equals(PieceColor.BLACK)
                 && isForbiddenMove(map, attribute.getLocation(), direction)) {
             return ContinueType.FORBIDDEN_MOVE;
@@ -701,7 +701,7 @@ public class  AI {
                         Point p = allFour.peek().get(peek);
                         cursor.pop();
                         cursor.push(peek + 1);
-                        if (Config.usingForbiddenMove
+                        if (forbiddenMove
                                 && color.equals(PieceColor.BLACK)
                                 && isForbiddenMove(map, p, Direction.all)) {
                             continue;

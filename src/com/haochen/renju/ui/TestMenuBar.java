@@ -1,6 +1,5 @@
 package com.haochen.renju.ui;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,7 +20,7 @@ import com.haochen.renju.storage.PieceColor;
 public class TestMenuBar extends JMenuBar {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -53,17 +52,17 @@ public class TestMenuBar extends JMenuBar {
     private JMenuItem separator;
 
     private JCheckBoxMenuItem usingForbidden;
-    
+
     private JCheckBoxMenuItem aiBlack;
     private JCheckBoxMenuItem aiWhite;
-    
+
     private JCheckBoxMenuItem aiNoUsed;
     private JCheckBoxMenuItem lvLow;
     private JCheckBoxMenuItem lvNormal;
     private JCheckBoxMenuItem lvHigh;
-    
+
     private Mediator mediator;
-    
+
     public TestMenuBar(TestFrame frame) {
         this.mainFrame = frame;
 
@@ -91,7 +90,7 @@ public class TestMenuBar extends JMenuBar {
         findVCT = new JMenuItem("Find VCT");
         findVCF = new JMenuItem("Find VCF");
         stopFinding = new JMenuItem("Stop finding");
-        
+
         edit.add(findVCT);
         edit.add(findVCF);
         edit.add(stopFinding);
@@ -130,7 +129,7 @@ public class TestMenuBar extends JMenuBar {
         test.add(findAsleepThree);
         test.addSeparator();
         test.add(separator);
-        
+
         usingForbidden = new JCheckBoxMenuItem("Using Forbidden");
 //        usingForbidden.addItemListener(new ItemListener() {
 //            
@@ -151,7 +150,7 @@ public class TestMenuBar extends JMenuBar {
         lvLow = new JCheckBoxMenuItem("Low");
         lvNormal = new JCheckBoxMenuItem("Normal");
         lvHigh = new JCheckBoxMenuItem("High");
-        
+
         aiColor.add(aiBlack);
         aiColor.add(aiWhite);
 //        colorGroup.add(aiBlack);
@@ -165,7 +164,7 @@ public class TestMenuBar extends JMenuBar {
         levelGroup.add(lvLow);
         levelGroup.add(lvNormal);
         levelGroup.add(lvHigh);
-        
+
         setting.add(usingForbidden);
         setting.add(aiColor);
         setting.add(aiLevel);
@@ -178,7 +177,7 @@ public class TestMenuBar extends JMenuBar {
 
         eventPerform();
     }
-    
+
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
     }
@@ -271,6 +270,7 @@ public class TestMenuBar extends JMenuBar {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Mediator.Operator operator = mediator.getOperator();
 //                        mediator.response("show five", null);
 //                        mediator.response("show alive four", null);
 //                        mediator.response("show asleep four", null);
@@ -284,11 +284,12 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.getOperator().getContinueTypes();
 //                        mediator.getOperator().findAllFourPoints();
 //                        mediator.getOperator().findAllFivePoints();
+                        operator.savePieceMap();
                     }
                 }).start();
             }
         });
-        
+
         breakPoint.addActionListener(new ActionListener() {
 
             @Override
@@ -316,7 +317,7 @@ public class TestMenuBar extends JMenuBar {
 
             }
         });
-        
+
         findAliveThree.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
