@@ -6,7 +6,6 @@ import com.haochen.renju.storage.PieceColor;
  * Created by Haochen on 2016/9/23.
  */
 public class Config {
-    public static boolean usingForbiddenMove;
 
     public static class AILevel {
         public static int level;

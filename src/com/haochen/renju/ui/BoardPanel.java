@@ -126,7 +126,8 @@ public class BoardPanel extends JPanel implements Mediator.Display {
 //                    mediator.response("is it hand cut", point);
 //                    mediator.getOperator().drawForbiddenMark();
                     System.out.println(point);
-                    mediator.getOperator().getContinueTypes();
+//                    mediator.getOperator().getContinueTypes();
+                    mediator.getOperator().isItForbiddenMove(point);
                 }
                     break;
                 case MouseEvent.BUTTON3: {

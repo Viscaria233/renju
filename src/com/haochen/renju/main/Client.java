@@ -7,7 +7,6 @@ import com.haochen.renju.ui.TestFrame;
 public class Client {
 
     public static void launch() throws ReadFileException {
-        Config.usingForbiddenMove = true;
         TestFrame frame = new TestFrame();
         frame.setVisible(true);
         frame.launch();

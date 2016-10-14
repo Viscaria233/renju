@@ -122,7 +122,7 @@ public class Mediator {
                 showWinMessage(player);
             } else {
                 if (board.getNumber() < 225) {
-                    if (Config.usingForbiddenMove) {
+                    if (AI.usingForbiddenMove) {
                         drawForbiddenMark();
                     }
                     playerSet.exchangePlayer();
@@ -143,7 +143,7 @@ public class Mediator {
             display.removePiece(current.getLocation(), last == null ? null : last.getLocation());
             drawRecords();
             display.commit();
-            if (Config.usingForbiddenMove) {
+            if (AI.usingForbiddenMove) {
                 drawForbiddenMark();
             }
 
@@ -256,7 +256,8 @@ public class Mediator {
                 return;
             }
             try {
-                Direction d = ai.findLongContinue(board.createPieceMap(), piece.getLocation(), Direction.all);
+                ContinueAttribute attribute = ai.getContinueAttribute(board.createPieceMap(), piece.getColor(), piece.getLocation(), Direction.all);
+                Direction d = ai.findLongContinue(attribute, Direction.all);
                 System.out.println(d);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -297,7 +298,8 @@ public class Mediator {
                 return;
             }
             try {
-                boolean n = ai.isForbiddenMove(board.createPieceMap(), point, Direction.all);
+                ContinueAttribute attribute = ai.getContinueAttribute(board.createPieceMap(), PieceColor.BLACK, point, Direction.all);
+                boolean n = ai.isForbiddenMove(board.createPieceMap(), attribute, Direction.all);
                 System.out.println(n);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -313,7 +315,16 @@ public class Mediator {
 
                 for (Point point : map) {
 //                    point = cell.getLocation();
-                    boolean n = ai.isForbiddenMove(map, point, Direction.all);
+                    boolean imaginary = false;
+                    if (map.available(point)) {
+                        map.addPiece(-1, point, PieceColor.BLACK);
+                        imaginary = true;
+                    }
+                    ContinueAttribute attribute = ai.getContinueAttribute(map, PieceColor.BLACK, point, Direction.all);
+                    boolean n = ai.isForbiddenMove(map, attribute, Direction.all);
+                    if (imaginary) {
+                        map.removeCell(point);
+                    }
                     if (n) {
                         board.addForbiddenMark(point);
                         display.drawForbiddenMark(point);
@@ -369,7 +380,7 @@ public class Mediator {
         }
 
         public void updateConfig() {
-            if (Config.usingForbiddenMove) {
+            if (AI.usingForbiddenMove) {
                 drawForbiddenMark();
             } else {
                 board.clearForbiddenMark();
@@ -434,7 +445,7 @@ public class Mediator {
                 Date end = new Date();
 
                 System.out.println("----findVCF----");
-                File file = new File("F:/renju_test/vcf_result_2.pts");
+                File file = new File("renju_test/vcf_answer_3.pts");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -454,7 +465,7 @@ public class Mediator {
 
         public void savePieceMap() {
             try {
-                File file = new File("F:/renju_test/vcf_piecemap_2.pm");
+                File file = new File("renju_test/vcf_question_3.pm");
                 if (!file.exists()) {
                     file.createNewFile();
                 }

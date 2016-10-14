@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
@@ -141,7 +142,7 @@ public class TestMenuBar extends JMenuBar {
 //                mainFrame.updateForbiddenMarks();
 //            }
 //        });
-        usingForbidden.setState(Config.usingForbiddenMove);
+        usingForbidden.setState(AI.usingForbiddenMove);
 //        mainFrame.setUsingForbidden(true);
 //        mainFrame.chessForm.setUsingForbidden(true);
         aiBlack = new JCheckBoxMenuItem("AI Uses Black");
@@ -337,7 +338,7 @@ public class TestMenuBar extends JMenuBar {
         usingForbidden.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Config.usingForbiddenMove = usingForbidden.getState();
+                AI.usingForbiddenMove = usingForbidden.getState();
                 mediator.getOperator().updateConfig();
             }
         });

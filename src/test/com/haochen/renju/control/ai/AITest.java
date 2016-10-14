@@ -8,11 +8,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import sun.invoke.empty.Empty;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 
 /**
@@ -24,7 +24,8 @@ import java.util.List;
  */
 public class AITest {
 
-    private File path = new File("F:/renju_test");
+    private AI ai = new AI();
+    private File path = new File("renju_test");
 
     private ObjectInputStream createStream(String fileName) {
         File file = new File(path, fileName);
@@ -171,15 +172,36 @@ public class AITest {
     @Test
     public void testFindVCF() throws Exception {
 //TODO: Test goes here...
-        ObjectInputStream ois = createStream("vcf_piecemap_1.pm");
-        PieceMap map = (PieceMap) ois.readObject();
+
+        List<PieceMap> ques = new ArrayList<>();
+        List<List<Point>> ans = new ArrayList<>();
+        List<List<Point>> found = new ArrayList<>();
+
+//        ObjectInputStream ois = createStream("vcf_question_1.pm");
+//        ois = createStream("(failed)vcf_question_2.pm");
+//        PieceMap map = (PieceMap) ois.readObject();
+//        ois.close();
+//        ois = createStream("vcf_answer_1.pts");
+//        List<Point> vcf = (List<Point>) ois.readObject();
+//        ois.close();
+
+        ObjectInputStream ois = createStream("vcf_question_1.pm");
+        ques.add((PieceMap) ois.readObject());
         ois.close();
-        ois = createStream("vcf_result_1.pts");
-        List<Point> vcf = (List<Point>) ois.readObject();
+        ois = createStream("vcf_question_2.pm");
+        ques.add((PieceMap) ois.readObject());
+        ois.close();
+        ois = createStream("vcf_answer_1.pts");
+        ans.add((List<Point>) ois.readObject());
+        ois.close();
+        ois = createStream("vcf_answer_2.pts");
+        ans.add((List<Point>) ois.readObject());
         ois.close();
 
-        List<Point> found = new AI().findVCF(map, PieceColor.BLACK);
-        Assert.assertEquals(found, vcf);
+        for (int i = 0; i < ques.size(); ++i) {
+            found.add(ai.findVCF(ques.get(i), PieceColor.BLACK));
+        }
+        Assert.assertEquals(found, ans);
     }
 
     /**
