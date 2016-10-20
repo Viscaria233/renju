@@ -445,7 +445,7 @@ public class Mediator {
                 Date end = new Date();
 
                 System.out.println("----findVCF----");
-                File file = new File("renju_test/vcf_answer_3.pts");
+                File file = new File("renju_test/vcf_answer_7.pts");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -465,7 +465,7 @@ public class Mediator {
 
         public void savePieceMap() {
             try {
-                File file = new File("renju_test/vcf_question_3.pm");
+                File file = new File("renju_test/vcf_question_7.pm");
                 if (!file.exists()) {
                     file.createNewFile();
                 }

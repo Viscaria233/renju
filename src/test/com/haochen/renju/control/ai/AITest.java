@@ -177,40 +177,27 @@ public class AITest {
         List<PieceMap> ques = new ArrayList<>();
         List<List<Point>> ans = new ArrayList<>();
         List<List<Point>> found = new ArrayList<>();
-        List<PieceColor> colors = new ArrayList<>();
+        PieceColor[] colors = {
+                PieceColor.BLACK,
+                PieceColor.BLACK,
+                PieceColor.WHITE,
+                PieceColor.BLACK,
+                PieceColor.BLACK,
+                PieceColor.BLACK,
+        };
 
-//        ObjectInputStream ois = createStream("vcf_question_1.pm");
-//        ois = createStream("(failed)vcf_question_2.pm");
-//        PieceMap map = (PieceMap) ois.readObject();
-//        ois.close();
-//        ois = createStream("vcf_answer_1.pts");
-//        List<Point> vcf = (List<Point>) ois.readObject();
-//        ois.close();
-
-        ObjectInputStream ois = createStream("vcf_question_1.pm");
-        ques.add((PieceMap) ois.readObject());
-        colors.add(PieceColor.BLACK);
-        ois.close();
-        ois = createStream("vcf_question_2.pm");
-        ques.add((PieceMap) ois.readObject());
-        colors.add(PieceColor.BLACK);
-        ois.close();
-        ois = createStream("vcf_question_3.pm");
-        ques.add((PieceMap) ois.readObject());
-        colors.add(PieceColor.WHITE);
-        ois.close();
-        ois = createStream("vcf_answer_1.pts");
-        ans.add((List<Point>) ois.readObject());
-        ois.close();
-        ois = createStream("vcf_answer_2.pts");
-        ans.add((List<Point>) ois.readObject());
-        ois.close();
-        ois = createStream("vcf_answer_3.pts");
-        ans.add((List<Point>) ois.readObject());
-        ois.close();
+        ObjectInputStream ois = null;
+        for (int i = 1; i <= 6; ++i) {
+            ois = createStream("vcf_question_" + i + ".pm");
+            ques.add((PieceMap) ois.readObject());
+            ois.close();
+            ois = createStream("vcf_answer_" + i + ".pts");
+            ans.add((List<Point>) ois.readObject());
+            ois.close();
+        }
 
         for (int i = 0; i < ques.size(); ++i) {
-            found.add(ai.findVCF(ques.get(i), colors.get(i)));
+            found.add(ai.findVCF(ques.get(i), colors[i]));
         }
         Assert.assertEquals(found, ans);
     }
