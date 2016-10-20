@@ -11,6 +11,7 @@ import org.junit.Test;
 import sun.invoke.empty.Empty;
 
 import java.io.*;
+import java.security.PermissionCollection;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -176,6 +177,7 @@ public class AITest {
         List<PieceMap> ques = new ArrayList<>();
         List<List<Point>> ans = new ArrayList<>();
         List<List<Point>> found = new ArrayList<>();
+        List<PieceColor> colors = new ArrayList<>();
 
 //        ObjectInputStream ois = createStream("vcf_question_1.pm");
 //        ois = createStream("(failed)vcf_question_2.pm");
@@ -187,9 +189,15 @@ public class AITest {
 
         ObjectInputStream ois = createStream("vcf_question_1.pm");
         ques.add((PieceMap) ois.readObject());
+        colors.add(PieceColor.BLACK);
         ois.close();
         ois = createStream("vcf_question_2.pm");
         ques.add((PieceMap) ois.readObject());
+        colors.add(PieceColor.BLACK);
+        ois.close();
+        ois = createStream("vcf_question_3.pm");
+        ques.add((PieceMap) ois.readObject());
+        colors.add(PieceColor.WHITE);
         ois.close();
         ois = createStream("vcf_answer_1.pts");
         ans.add((List<Point>) ois.readObject());
@@ -197,9 +205,12 @@ public class AITest {
         ois = createStream("vcf_answer_2.pts");
         ans.add((List<Point>) ois.readObject());
         ois.close();
+        ois = createStream("vcf_answer_3.pts");
+        ans.add((List<Point>) ois.readObject());
+        ois.close();
 
         for (int i = 0; i < ques.size(); ++i) {
-            found.add(ai.findVCF(ques.get(i), PieceColor.BLACK));
+            found.add(ai.findVCF(ques.get(i), colors.get(i)));
         }
         Assert.assertEquals(found, ans);
     }

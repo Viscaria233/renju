@@ -778,7 +778,12 @@ public class AI {
 
             List<Point> def = findAllFivePoints(map, PieceColor.WHITE);
             def.removeAll(five);
-            ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, def.get(0), Direction.all);
+
+            Point def0 = def.get(0);
+            map.addPiece(-1, def0, PieceColor.BLACK);
+            ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, def0, Direction.all);
+            map.removeCell(def0);
+
             if (isForbiddenMove(map, attribute, Direction.all)) {
                 result.add(p);
             }
@@ -803,13 +808,14 @@ public class AI {
             if (five.size() > 0) {
                 result.push(five.get(0));
                 break;
-            } else if (color.equals(PieceColor.WHITE)) {
-                List<Point> catchPoints = findAllCatchPoint(map);
-                if (catchPoints.size() > 0) {
-                    result.push(catchPoints.get(0));
-                    break;
-                }
             } else {
+                if (color.equals(PieceColor.WHITE)) {
+                    List<Point> catchPoints = findAllCatchPoint(map);
+                    if (catchPoints.size() > 0) {
+                        result.push(catchPoints.get(0));
+                        break;
+                    }
+                }
                 allFour.push(findAllFourPoints(map, color));
                 cursor.push(0);
                 imaginary.push(new ArrayList<Point>());
