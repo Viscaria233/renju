@@ -793,25 +793,28 @@ public class AI {
         return result;
     }
 
+    public List<Point> findAllWinPoints(PieceMap map, PieceColor color) {
+        List<Point> five = findAllFivePoints(map, color);
+        if (color.equals(PieceColor.WHITE)) {
+            five.addAll(findAllCatchPoint(map));
+        }
+        return five;
+    }
+
     public List<Point> findVCF(PieceMap map, PieceColor color) {
         Stack<Point> result = new Stack<>();
         Stack<List<Point>> allFour = new Stack<>();
         Stack<List<Point>> imaginary = new Stack<>();
         Stack<Integer> cursor = new Stack<>();
 
+        List<List<Point>> allVCF = new ArrayList<>();
+
         while (true) {
-            List<Point> five = findAllFivePoints(map, color);
-            if (five.size() > 0) {
-                result.push(five.get(0));
+            List<Point> win = findAllWinPoints(map, color);
+            if (win.size() > 0) {
+                result.push(win.get(0));
                 break;
             } else {
-                if (color.equals(PieceColor.WHITE)) {
-                    List<Point> catchPoints = findAllCatchPoint(map);
-                    if (catchPoints.size() > 0) {
-                        result.push(catchPoints.get(0));
-                        break;
-                    }
-                }
                 allFour.push(findAllFourPoints(map, color));
                 cursor.push(0);
                 imaginary.push(new ArrayList<Point>());
