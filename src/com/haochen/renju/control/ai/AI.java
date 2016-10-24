@@ -809,8 +809,16 @@ public class AI {
 
         List<List<Point>> allVCF = new ArrayList<>();
 
+        List<Point> win = findAllWinPoints(map, color);
+        if (win.size() > 0) {
+            result.push(win.get(0));
+            return result;
+        }
+
+        allFour.push(findAllFourPoints(map, color));
+
         while (true) {
-            List<Point> win = findAllWinPoints(map, color);
+            win = findAllWinPoints(map, color);
             if (win.size() > 0) {
                 result.push(win.get(0));
                 break;
