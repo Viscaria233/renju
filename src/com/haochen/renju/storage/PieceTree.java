@@ -62,7 +62,7 @@ public class PieceTree {
     }
     
 //    private TreeNode findNodeInChild(TreeNode treeNode) {
-//        ArrayList<TreeNode> list = getChildren();
+//        ArrayList<TreeNode> list = getChild();
 //        for (int i = 0; i < list.size(); i++) {
 //            if (list.get(i).equals(treeNode)) {
 //                return list.get(i);

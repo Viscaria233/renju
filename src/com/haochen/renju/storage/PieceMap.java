@@ -122,7 +122,6 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
 
             @Override
             public void remove() {
-
             }
         };
     }

@@ -29,7 +29,7 @@
 //	}
 //	
 //	public ArrayList<TreeNode> getChild() {
-//		return current.getChildren();
+//		return current.getChild();
 //	}
 //	
 //	@Override
@@ -38,7 +38,7 @@
 //	}
 //	
 //	public int getChildNumber() {
-//		return current.getChildren().size();
+//		return current.getChild().size();
 //	}
 //	
 //	@Override
@@ -77,11 +77,11 @@
 //	
 //	
 //	public void clearChild(TreeNode treeNode) {
-//		for (int i = 0; i < treeNode.getChildren().size() - 1; i++) {
+//		for (int i = 0; i < treeNode.getChild().size() - 1; i++) {
 //			//子节点中有父节点的引用，必须从叶子节点开始递归删除，否则内存泄漏
-//			clearChild(treeNode.getChildren().get(i));
+//			clearChild(treeNode.getChild().get(i));
 //		}
-//		treeNode.getChildren().clear();
+//		treeNode.getChild().clear();
 //	}
 //	
 //	public void back() {
@@ -101,11 +101,11 @@
 //	@Override
 //	public boolean addChess(Point location) {
 //		TreeNode treeNode = new TreeNode(current, location);
-//		if (current.getChildren().contains(treeNode)) {
+//		if (current.getChild().contains(treeNode)) {
 //			current = findNodeInChild(treeNode);
 //			return false;
 //		}
-//		current.getChildren().add(treeNode);
+//		current.getChild().add(treeNode);
 //		current = treeNode;
 //		return true;
 //	}
@@ -117,7 +117,7 @@
 //			return false;
 //		}
 //		current = current.getParent();
-//		current.getChildren().remove(temp);
+//		current.getChild().remove(temp);
 //		clearChild(temp);
 //		return true;
 //	}
