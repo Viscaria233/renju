@@ -815,7 +815,9 @@ public class AI {
             return result;
         }
 
-        allFour.push(findAllFourPoints(map, color));
+//        allFour.push(findAllFourPoints(map, color));
+//        cursor.push(0);
+//        imaginary.push(new ArrayList<Point>());
 
         while (true) {
             win = findAllWinPoints(map, color);
