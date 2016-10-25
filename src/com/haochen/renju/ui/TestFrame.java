@@ -44,5 +44,8 @@ public class TestFrame extends JFrame {
     public void launch() {
         mediator.getOperator().launch();
     }
-    
+
+    public Mediator getMediator() {
+        return mediator;
+    }
 }

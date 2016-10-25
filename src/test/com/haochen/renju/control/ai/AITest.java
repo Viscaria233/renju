@@ -1,22 +1,26 @@
 package test.com.haochen.renju.control.ai;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
+import com.haochen.renju.bean.Piece;
+import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
+import com.haochen.renju.ui.TestFrame;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * AI Tester.
@@ -168,7 +172,7 @@ public class AITest {
     public void testGetMove() throws Exception {
 //TODO: Test goes here... 
     }
-    
+
     /**
      * Method: findVCF(PieceMap map, PieceColor color)
      */
