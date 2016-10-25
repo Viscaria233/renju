@@ -1,20 +1,22 @@
 package test.com.haochen.renju.control.ai;
 
-import com.haochen.renju.control.ai.AI;
-import com.haochen.renju.storage.PieceColor;
-import com.haochen.renju.storage.PieceMap;
-import com.haochen.renju.storage.Point;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sun.invoke.empty.Empty;
 
-import java.io.*;
-import java.security.PermissionCollection;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
+import com.haochen.renju.control.ai.AI;
+import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.storage.PieceColor;
+import com.haochen.renju.storage.PieceMap;
+import com.haochen.renju.storage.Point;
 
 /**
  * AI Tester.
@@ -166,7 +168,7 @@ public class AITest {
     public void testGetMove() throws Exception {
 //TODO: Test goes here... 
     }
-
+    
     /**
      * Method: findVCF(PieceMap map, PieceColor color)
      */
@@ -196,10 +198,12 @@ public class AITest {
             ois.close();
         }
 
+		List<WinTree> trees = new ArrayList<>();
         for (int i = 0; i < ques.size(); ++i) {
-            found.add(ai.findVCF(ques.get(i), colors[i]));
+//            found.add(ai.findVCF(ques.get(i), colors[i]));
+        	trees.add(ai.findVCF(ques.get(i), colors[i], 0));
         }
-        Assert.assertEquals(found, ans);
+        Assert.assertEquals(trees, ans);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,18 +37,30 @@ public class WinTreeFinder {
         PieceColor foeColor = color.foeColor();
         for (int i = 0; i < tree.size(); ++i) {
             WinTree t = tree.getChild(i);
+            map.addPiece(-1, t.getPoint(), t.getColor());
             List<Point> foeMoves = getMoveSet(map, lastFoeMove, foeColor);
             t.add(foeMoves, foeColor);
             for (WinTree foe : t) {
-                WinTree result = getWinTree(map, foe.getPoint(), foeColor);
-                if (result.isEmpty()) {
+                if (isWin(map, foe.getPoint(), color.foeColor())) {
                     tree.remove(t);
                     --i;
                     break;
                 } else {
-                    foe.add(result);
+                    map.addPiece(-1, foe.getPoint(), foe.getColor());
+                    WinTree result = getWinTree(map, foe.getPoint(), color);
+                    if (result.isEmpty()) {
+                        tree.remove(t);
+                        --i;
+                    } else {
+                        foe.add(result);
+                    }
+                    map.removeCell(foe.getPoint());
+                    if (result.isEmpty()) {
+                        break;
+                    }
                 }
             }
+            map.removeCell(t.getPoint());
         }
         return tree;
     }
