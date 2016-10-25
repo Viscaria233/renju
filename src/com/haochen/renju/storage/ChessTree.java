@@ -61,7 +61,7 @@
 //		TreeNode treeNode = current;
 //		ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
 //		while (treeNode.getParent() != null) {
-//			nodes.add(treeNode);
+//			nodes.addAllChildren(treeNode);
 //			treeNode = treeNode.getParent();
 //		}
 //		
@@ -105,7 +105,7 @@
 //			current = findNodeInChild(treeNode);
 //			return false;
 //		}
-//		current.getChild().add(treeNode);
+//		current.getChild().addAllChildren(treeNode);
 //		current = treeNode;
 //		return true;
 //	}

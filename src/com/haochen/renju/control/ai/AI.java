@@ -2,6 +2,7 @@ package com.haochen.renju.control.ai;
 
 import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.Piece;
+import com.haochen.renju.bean.RealPiece;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
@@ -436,7 +437,7 @@ public class AI {
 //
 //        SingleContinue single = getContinueAttribute(map, PieceColor.BLACK, location, direction).getContinue(direction);
 //        if (single.getLength() > 5) {
-//            result.add(direction);
+//            result.addAllChildren(direction);
 //        }
 //        return result;
 //    }
@@ -814,45 +815,64 @@ public class AI {
 			winMethod = new WinTreeFinder.WinMethod() {
 				@Override
 				public boolean isWin(PieceMap map, Point point, PieceColor color) {
-					boolean result;
-					map.addPiece(-1, point, color);
-					ContinueAttribute attribute = getContinueAttribute(map, color, point, Direction.all);
-					Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
+//					boolean result;
+//					map.addPiece(-1, point, color);
+//					ContinueAttribute attribute = getContinueAttribute(map, color, point, Direction.all);
+//					Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
+
+//					if (color.equals(PieceColor.BLACK)) {
+//						result = types.containsValue(ContinueType.FIVE)
+//								|| (!types.containsValue(ContinueType.FORBIDDEN_MOVE)
+//										&& types.containsValue(ContinueType.ALIVE_FOUR));
+//					} else if (color.equals(PieceColor.WHITE)) {
+//						result = types.containsValue(ContinueType.FIVE);
+//					} else {
+//						result = false;
+//					}
 					
-					if (color.equals(PieceColor.BLACK)) {
-						result = types.containsValue(ContinueType.FIVE)
-								|| (!types.containsValue(ContinueType.FORBIDDEN_MOVE)
-										&& types.containsValue(ContinueType.ALIVE_FOUR));
-					} else if (color.equals(PieceColor.WHITE)) {
-						result = types.containsValue(ContinueType.FIVE);
-					} else {
-						result = false;
-					}
-					
-					map.removeCell(point);
-					return result;
+//					map.removeCell(point);
+//					return result;
+//                    return types.containsValue(ContinueType.FIVE);
+
+                    Piece p = new RealPiece(-1, point, color);
+                    PieceColor winner = findWinner(map, p);
+                    return winner != null && winner.equals(color);
 				}
 			};
-			
+
+            final PieceColor c = color;
 			moveSetGetter = new WinTreeFinder.MoveSetGetter() {
 				@Override
 				public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
 					List<Point> moveSet = null;
-					if (color.equals(PieceColor.BLACK)) {
+					if (color.equals(c)) {
 						moveSet = findAllFourPoints(map, color);
 						moveSet.addAll(findAllFivePoints(map, color));
-					} else if (color.equals(PieceColor.WHITE)) {
+					} else if (color.equals(c.foeColor())) {
 						moveSet = findAllFivePoints(map, color);
+
+                        ContinueAttribute attribute = getContinueAttribute(map, color, lastFoeMove, Direction.all);
+                        Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
+                        for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
+                            if (entry.getValue().equals(ContinueType.ALIVE_FOUR)) {
+                                moveSet.addAll(Arrays.asList(attribute.getContinue(entry.getKey()).getBreakPoint()));
+                            } else if (entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
+                                Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
+                                for (Point p : points) {
+                                    if (p != null) {
+                                        moveSet.add(p);
+                                    }
+                                }
+                            }
+                        }
+
 						moveSet.addAll(findAllFivePoints(map, color.foeColor()));
 					} else {
 						moveSet = new ArrayList<>();
 					}
-						return moveSet;
+                    return moveSet;
 				}
 			};
-		} else if (color.equals(PieceColor.WHITE)) {
-			result = new WinTree();
-			return result;
 		} else {
 			result = new WinTree();
 			return result;

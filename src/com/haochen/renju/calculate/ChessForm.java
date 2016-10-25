@@ -87,7 +87,7 @@
 //		
 //		SingleContinue single = getContinueAttribute(Piece.BLACK, location, direction).getContinue(direction);
 //		if (single.getLength() > 5) {
-//			longContinueDirection.add(direction);
+//			longContinueDirection.addAllChildren(direction);
 //		}
 //		return longContinueDirection;
 //	}
@@ -272,16 +272,16 @@
 //		if (usingForbidden) {
 //			if (color == Piece.BLACK) {
 //				if (single.getLength() == 5) {
-//					fiveDirection.add(direction);
+//					fiveDirection.addAllChildren(direction);
 //				}
 //			} else {
 //				if (single.getLength() >= 5) {
-//					fiveDirection.add(direction);
+//					fiveDirection.addAllChildren(direction);
 //				}
 //			}
 //		} else {
 //			if (single.getLength() >= 5) {
-//				fiveDirection.add(direction);
+//				fiveDirection.addAllChildren(direction);
 //			} 
 //		}
 //		return fiveDirection;
@@ -330,7 +330,7 @@
 //			}
 //		}
 //		if (fivePoint == 2) {
-//			fourDirection.add(direction);
+//			fourDirection.addAllChildren(direction);
 //		}
 //		return fourDirection;
 //	}
@@ -471,7 +471,7 @@
 //			}
 //		}
 //		if (fivePoint == 1) {
-//			fourDirection.add(direction);
+//			fourDirection.addAllChildren(direction);
 //		} else if (fivePoint == 2 && single.getLength() != 4) {
 //			fourDirection.doubleAdd(direction);
 //		}
@@ -535,7 +535,7 @@
 //			}
 //		}
 //		if (aliveFourPoint > 0) {
-//			threeDirection.add(direction);
+//			threeDirection.addAllChildren(direction);
 //		}
 //		return threeDirection;
 //	}
@@ -615,8 +615,8 @@
 //					continue;
 //				}
 //				if (isForbiddenPoint(location, Direction.all)) {
-////					System.out.print("  add");
-//					forbiddenPoints.add(location);
+////					System.out.print("  addAllChildren");
+//					forbiddenPoints.addAllChildren(location);
 //				}
 ////				System.out.println();
 //			}

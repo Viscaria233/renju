@@ -11,6 +11,7 @@ import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.bean.RealPiece;
+import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.*;
 import com.haochen.renju.calculate.ContinueAttribute;
@@ -440,27 +441,34 @@ public class Mediator {
                 Date begin = new Date();
 
                 PieceMap map = board.createPieceMap();
-                List<Point> vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
+//                List<Point> vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
+                WinTree vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor(), 0);
 
                 Date end = new Date();
 
                 System.out.println("----findVCF----");
-                File file = new File("renju_test/vcf_answer_7.pts");
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                FileOutputStream fos = new FileOutputStream(file);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-                oos.writeObject(vcf);
-                oos.flush();
-                oos.close();
-                for (Point point : vcf) {
-                    System.out.println(point);
+//                File file = new File("renju_test/vcf_answer_7.pts");
+//                if (!file.exists()) {
+//                    file.createNewFile();
+//                }
+//                FileOutputStream fos = new FileOutputStream(file);
+//                ObjectOutputStream oos = new ObjectOutputStream(fos);
+//                oos.writeObject(vcf);
+//                oos.flush();
+//                oos.close();
+//                for (Point point : vcf) {
+//                    System.out.println(point);
+//                }
+                for (WinTree t : vcf) {
+                    System.out.println(t.getPoint());
                 }
                 System.out.println((end.getTime() - begin.getTime()) + " ms");
-            } catch (CloneNotSupportedException | IOException e) {
+            } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
         public void savePieceMap() {

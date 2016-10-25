@@ -200,8 +200,8 @@ public class AITest {
 
 		List<WinTree> trees = new ArrayList<>();
         for (int i = 0; i < ques.size(); ++i) {
-//            found.add(ai.findVCF(ques.get(i), colors[i]));
-        	trees.add(ai.findVCF(ques.get(i), colors[i], 0));
+//            found.addAllChildren(ai.findVCF(ques.get(i), colors[i]));
+            trees.add(ai.findVCF(ques.get(i), colors[i], 0));
         }
         Assert.assertEquals(trees, ans);
     }

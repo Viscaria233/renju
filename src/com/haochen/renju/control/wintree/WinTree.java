@@ -17,6 +17,11 @@ public class WinTree implements Iterable<WinTree> {
     private PieceColor color;
 
     public void add(WinTree tree) {
+        tree.setParent(this);
+        children.add(tree);
+    }
+
+    public void addAllChildren(WinTree tree) {
         for (WinTree t : tree.children) {
             t.setParent(this);
             children.add(t);

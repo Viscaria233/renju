@@ -8,7 +8,7 @@ public class RealPiece extends Piece {
     public RealPiece() {
         super();
     }
-    
+
     public RealPiece(int index, Point boardLocation, PieceColor color) {
         super(index, boardLocation, color);
     }

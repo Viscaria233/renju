@@ -154,8 +154,8 @@ public class TestMenuBar extends JMenuBar {
 
         aiColor.add(aiBlack);
         aiColor.add(aiWhite);
-//        colorGroup.add(aiBlack);
-//        colorGroup.add(aiWhite);
+//        colorGroup.addAllChildren(aiBlack);
+//        colorGroup.addAllChildren(aiWhite);
 
         aiLevel.add(aiNoUsed);
         aiLevel.add(lvLow);

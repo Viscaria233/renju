@@ -40,7 +40,7 @@ public class PieceTree {
 //        TreeNode treeNode = current;
 //        ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
 //        while (treeNode.getParent() != null) {
-//            nodes.add(treeNode);
+//            nodes.addAllChildren(treeNode);
 //            treeNode = treeNode.getParent();
 //        }
 //        

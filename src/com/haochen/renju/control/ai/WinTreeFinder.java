@@ -5,7 +5,6 @@ import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,35 +31,45 @@ public class WinTreeFinder {
                 return tree;
             }
         }
-        List<Point> moves = getMoveSet(map, lastFoeMove, color);
-        tree.add(moves, color);
+        tree.add(moveSet, color);
         PieceColor foeColor = color.foeColor();
         for (int i = 0; i < tree.size(); ++i) {
             WinTree t = tree.getChild(i);
             map.addPiece(-1, t.getPoint(), t.getColor());
-            List<Point> foeMoves = getMoveSet(map, lastFoeMove, foeColor);
+            List<Point> foeMoves = getMoveSet(map, t.getPoint(), foeColor);
             t.add(foeMoves, foeColor);
+            boolean win = true;
             for (WinTree foe : t) {
                 if (isWin(map, foe.getPoint(), color.foeColor())) {
                     tree.remove(t);
                     --i;
+                    win = false;
                     break;
                 } else {
                     map.addPiece(-1, foe.getPoint(), foe.getColor());
                     WinTree result = getWinTree(map, foe.getPoint(), color);
                     if (result.isEmpty()) {
                         tree.remove(t);
+                        map.removeCell(foe.getPoint());
                         --i;
+                        win = false;
+                        break;
                     } else {
-                        foe.add(result);
+                        foe.addAllChildren(result);
                     }
                     map.removeCell(foe.getPoint());
-                    if (result.isEmpty()) {
-                        break;
-                    }
                 }
             }
             map.removeCell(t.getPoint());
+            if (win) {
+//                for (int j = i + 1; j < tree.size(); ++j) {
+//                    tree.remove(tree.getChild(j));
+//                    tree.addAllChildren(t);
+//                }
+                tree.clearChildren();
+                tree.add(t);
+                return tree;
+            }
         }
         return tree;
     }
