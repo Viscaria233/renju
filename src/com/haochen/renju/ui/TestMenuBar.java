@@ -285,7 +285,6 @@ public class TestMenuBar extends JMenuBar {
 //                        mediator.getOperator().getContinueTypes();
 //                        mediator.getOperator().findAllFourPoints();
 //                        mediator.getOperator().findAllFivePoints();
-                        operator.savePieceMap();
                     }
                 }).start();
             }

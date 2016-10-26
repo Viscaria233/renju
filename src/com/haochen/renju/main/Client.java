@@ -8,10 +8,7 @@ import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.Dialogs;
 import com.haochen.renju.ui.TestFrame;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -20,7 +17,6 @@ import java.util.List;
 public class Client {
 
     private static TestFrame frame;
-    private static File path = new File("renju_test");
 
     public static void launch() throws ReadFileException {
         frame = new TestFrame();
@@ -28,24 +24,13 @@ public class Client {
         frame.launch();
     }
 
-    private static ObjectInputStream createStream(String fileName) {
-        File file = new File(path, fileName);
-        ObjectInputStream stream = null;
-        try {
-            stream = new ObjectInputStream(new FileInputStream(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return stream;
-    }
-
     public static void showPieceMap() {
         List<PieceMap> ques = new ArrayList<>();
 
         ObjectInputStream ois = null;
         try {
-            for (int i = 1; i <= 6; ++i) {
-                ois = createStream("vcf_question_" + i + ".pm");
+            for (int i = 1; i <= Config.Test.QuesCount.vcf; ++i) {
+                ois = Config.Test.createVCFStream("vcf_question_" + i + ".pm");
                 ques.add((PieceMap) ois.readObject());
                 ois.close();
             }
@@ -74,7 +59,7 @@ public class Client {
 
         Mediator mediator = frame.getMediator();
 
-        drawPieceMap(mediator, pieces.get(2));
+        drawPieceMap(mediator, pieces.get(5));
     }
 
     private static void drawPieceMap(Mediator mediator, List<Piece> pieces) {
@@ -82,11 +67,73 @@ public class Client {
             mediator.getOperator().move(p.getLocation());
         }
     }
-    
+
+    private static void saveList(List<PieceMap> maps) {
+        ObjectOutputStream oos = null;
+        try {
+            for (int i = 0; i < maps.size(); ++i) {
+                oos = new ObjectOutputStream(
+                        new FileOutputStream(new File(Config.Test.Path.VCF, "list_" + i + ".list")));
+                PieceMap map = maps.get(i);
+                List<Piece> pieces = new ArrayList<>();
+                for (Point p : map) {
+                    if (!map.available(p)) {
+                        pieces.add((Piece) map.getCell(p));
+                    }
+                }
+
+                Piece[] sorted = pieces.toArray(new Piece[1]);
+                Arrays.sort(sorted, new Comparator<Piece>() {
+                    @Override
+                    public int compare(Piece o1, Piece o2) {
+                        return o1.getIndex() - o2.getIndex();
+                    }
+                });
+
+                List<Point> points = new ArrayList<>();
+                for (Piece p : sorted) {
+                    points.add(p.getLocation());
+                }
+
+                oos.writeObject(points);
+                oos.flush();
+                oos.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void showList() {
+        List<List<Point>> ques = new ArrayList<>();
+
+        ObjectInputStream ois = null;
+        try {
+            for (int i = 0; i < 6; ++i) {
+                ois = Config.Test.createVCFStream("list_" + i + ".list");
+                ques.add((List<Point>) ois.readObject());
+                ois.close();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Mediator mediator = frame.getMediator();
+
+        drawList(mediator, ques.get(5));
+    }
+
+    private static void drawList(Mediator mediator, List<Point> points) {
+        for (Point p : points) {
+            mediator.getOperator().move(p);
+        }
+    }
+
     public static void main(String[] args) {
         try {
+            Config.init();
             launch();
-            showPieceMap();
+            showList();
         } catch (ReadFileException e) {
             e.printStackTrace();
             Dialogs.errorDialog(e.getMessage() + '\n' + e.getFile().getAbsolutePath());

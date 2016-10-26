@@ -805,7 +805,7 @@ public class AI {
         return five;
     }
 
-    public WinTree findVCF(PieceMap map, PieceColor color, int n) {
+    public WinTree findVCF(PieceMap map, PieceColor color) {
 
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
@@ -858,160 +858,160 @@ public class AI {
         return result;
     }
 
-    public List<Point> findVCF(PieceMap map, PieceColor color) {
-        Stack<Point> result = new Stack<>();
-        Stack<List<Point>> allFour = new Stack<>();
-        Stack<List<Point>> imaginary = new Stack<>();
-        Stack<Integer> cursor = new Stack<>();
+//    public List<Point> findVCF(PieceMap map, PieceColor color) {
+//        Stack<Point> result = new Stack<>();
+//        Stack<List<Point>> allFour = new Stack<>();
+//        Stack<List<Point>> imaginary = new Stack<>();
+//        Stack<Integer> cursor = new Stack<>();
+//
+//        List<List<Point>> allVCF = new ArrayList<>();
+//
+//        List<Point> win = findAllWinPoints(map, color);
+//        if (win.size() > 0) {
+//            result.push(win.get(0));
+//            return result;
+//        }
+//
+////        allFour.push(findAllFourPoints(map, color));
+////        cursor.push(0);
+////        imaginary.push(new ArrayList<Point>());
+//
+//        while (true) {
+//            win = findAllWinPoints(map, color);
+//            if (win.size() > 0) {
+//                result.push(win.get(0));
+//                break;
+//            } else {
+//                allFour.push(findAllFourPoints(map, color));
+//                cursor.push(0);
+//                imaginary.push(new ArrayList<Point>());
+//
+//                while (true) {
+//                    if (cursor.peek() >= allFour.peek().size()) {
+//                        allFour.pop();
+//                        if (allFour.isEmpty()) {
+//                            return result;
+//                        }
+//                        cursor.pop();
+//                        imaginary.pop();
+//                        result.pop();
+//                        List<Point> ima = imaginary.peek();
+//                        for (Point p : ima) {
+//                            map.removeCell(p);
+//                        }
+//                        imaginary.peek().clear();
+//                    } else {
+//                        int peek = cursor.peek();
+//                        Point p = allFour.peek().get(peek);
+//                        cursor.pop();
+//                        cursor.push(peek + 1);
+//                        map.addPiece(-1, p, color);
+//                        ContinueAttribute pAttr = getContinueAttribute(map, color, p, Direction.all);
+//                        if (usingForbiddenMove
+//                                && color.equals(PieceColor.BLACK)
+//                                && isForbiddenMove(map, pAttr, Direction.all)) {
+//                            map.removeCell(p);
+//                            continue;
+//                        }
+//                        result.push(p);
+//                        imaginary.peek().add(p);
+//                        if (findAllFivePoints(map, color.foeColor()).size() > 0) {
+//                            map.removeCell(p);
+//                            imaginary.peek().remove(p);
+//                            result.pop();
+//                        } else {
+//                            List<Point> defend = findAllFivePoints(map, color);
+//                            Point def = defend.get(0);
+//                            map.addPiece(-1, def, color.foeColor());
+//                            imaginary.peek().add(def);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        if (result.size() > 1) {
+//            result.pop();
+//        }
+//        return result;
+//    }
 
-        List<List<Point>> allVCF = new ArrayList<>();
-
-        List<Point> win = findAllWinPoints(map, color);
-        if (win.size() > 0) {
-            result.push(win.get(0));
-            return result;
-        }
-
-//        allFour.push(findAllFourPoints(map, color));
-//        cursor.push(0);
-//        imaginary.push(new ArrayList<Point>());
-
-        while (true) {
-            win = findAllWinPoints(map, color);
-            if (win.size() > 0) {
-                result.push(win.get(0));
-                break;
-            } else {
-                allFour.push(findAllFourPoints(map, color));
-                cursor.push(0);
-                imaginary.push(new ArrayList<Point>());
-
-                while (true) {
-                    if (cursor.peek() >= allFour.peek().size()) {
-                        allFour.pop();
-                        if (allFour.isEmpty()) {
-                            return result;
-                        }
-                        cursor.pop();
-                        imaginary.pop();
-                        result.pop();
-                        List<Point> ima = imaginary.peek();
-                        for (Point p : ima) {
-                            map.removeCell(p);
-                        }
-                        imaginary.peek().clear();
-                    } else {
-                        int peek = cursor.peek();
-                        Point p = allFour.peek().get(peek);
-                        cursor.pop();
-                        cursor.push(peek + 1);
-                        map.addPiece(-1, p, color);
-                        ContinueAttribute pAttr = getContinueAttribute(map, color, p, Direction.all);
-                        if (usingForbiddenMove
-                                && color.equals(PieceColor.BLACK)
-                                && isForbiddenMove(map, pAttr, Direction.all)) {
-                            map.removeCell(p);
-                            continue;
-                        }
-                        result.push(p);
-                        imaginary.peek().add(p);
-                        if (findAllFivePoints(map, color.foeColor()).size() > 0) {
-                            map.removeCell(p);
-                            imaginary.peek().remove(p);
-                            result.pop();
-                        } else {
-                            List<Point> defend = findAllFivePoints(map, color);
-                            Point def = defend.get(0);
-                            map.addPiece(-1, def, color.foeColor());
-                            imaginary.peek().add(def);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (result.size() > 1) {
-            result.pop();
-        }
-        return result;
-    }
-
-    public List<Point> findVCT(PieceMap map, PieceColor color) {
-        Stack<Point> result = new Stack<>();
-        Stack<List<Point>> allThree = new Stack<>();
-        Stack<List<Point>> imaginary = new Stack<>();
-        Stack<Integer> cursor = new Stack<>();
-
-        while (true) {
-            List<Point> vcf = findVCF(map, color);
-            if (vcf.size() > 0) {
-                result.push(vcf.get(0));
-                break;
-            } else {
-                allThree.push(findAllThreePoints(map, color));
-                cursor.push(0);
-                imaginary.push(new ArrayList<Point>());
-
-                while (true) {
-                    if (cursor.peek() >= allThree.peek().size()) {
-                        allThree.pop();
-                        if (allThree.isEmpty()) {
-                            return result;
-                        }
-                        cursor.pop();
-                        imaginary.pop();
-                        result.pop();
-                        List<Point> ima = imaginary.peek();
-                        for (Point p : ima) {
-                            map.removeCell(p);
-                        }
-                        imaginary.peek().clear();
-                    } else {
-                        int peek = cursor.peek();
-                        Point p = allThree.peek().get(peek);
-                        cursor.pop();
-                        cursor.push(peek + 1);
-                        map.addPiece(-1, p, color);
-                        ContinueAttribute pAttr = getContinueAttribute(map, color, p, Direction.all);
-                        if (usingForbiddenMove
-                                && color.equals(PieceColor.BLACK)
-                                && isForbiddenMove(map, pAttr, Direction.all)) {
-                            map.removeCell(p);
-                            continue;
-                        }
-                        result.push(p);
-                        imaginary.peek().add(p);
-                        if (findVCF(map, color.foeColor()).size() > 0) {
-                            map.removeCell(p);
-                            imaginary.peek().remove(p);
-                            result.pop();
-                        } else {
-
-                            /**
-                             * BUG HERE
-                             */
-
-                            List<Point> defend = findAllFivePoints(map, color);
-                            Point def = defend.get(0);
-                            map.addPiece(-1, def, color.foeColor());
-                            imaginary.peek().add(def);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (result.size() > 1) {
-            result.pop();
-        }
-        return result;
-    }
+//    public List<Point> findVCT(PieceMap map, PieceColor color) {
+//        Stack<Point> result = new Stack<>();
+//        Stack<List<Point>> allThree = new Stack<>();
+//        Stack<List<Point>> imaginary = new Stack<>();
+//        Stack<Integer> cursor = new Stack<>();
+//
+//        while (true) {
+//            List<Point> vcf = findVCF(map, color);
+//            if (vcf.size() > 0) {
+//                result.push(vcf.get(0));
+//                break;
+//            } else {
+//                allThree.push(findAllThreePoints(map, color));
+//                cursor.push(0);
+//                imaginary.push(new ArrayList<Point>());
+//
+//                while (true) {
+//                    if (cursor.peek() >= allThree.peek().size()) {
+//                        allThree.pop();
+//                        if (allThree.isEmpty()) {
+//                            return result;
+//                        }
+//                        cursor.pop();
+//                        imaginary.pop();
+//                        result.pop();
+//                        List<Point> ima = imaginary.peek();
+//                        for (Point p : ima) {
+//                            map.removeCell(p);
+//                        }
+//                        imaginary.peek().clear();
+//                    } else {
+//                        int peek = cursor.peek();
+//                        Point p = allThree.peek().get(peek);
+//                        cursor.pop();
+//                        cursor.push(peek + 1);
+//                        map.addPiece(-1, p, color);
+//                        ContinueAttribute pAttr = getContinueAttribute(map, color, p, Direction.all);
+//                        if (usingForbiddenMove
+//                                && color.equals(PieceColor.BLACK)
+//                                && isForbiddenMove(map, pAttr, Direction.all)) {
+//                            map.removeCell(p);
+//                            continue;
+//                        }
+//                        result.push(p);
+//                        imaginary.peek().add(p);
+//                        if (findVCF(map, color.foeColor()).size() > 0) {
+//                            map.removeCell(p);
+//                            imaginary.peek().remove(p);
+//                            result.pop();
+//                        } else {
+//
+//                            /**
+//                             * BUG HERE
+//                             */
+//
+//                            List<Point> defend = findAllFivePoints(map, color);
+//                            Point def = defend.get(0);
+//                            map.addPiece(-1, def, color.foeColor());
+//                            imaginary.peek().add(def);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        if (result.size() > 1) {
+//            result.pop();
+//        }
+//        return result;
+//    }
 
     public List<Point> findAllThreePoints(PieceMap map, PieceColor color) {
         List<Point> result = new ArrayList<>();
         result.addAll(findAllAliveThreePoints(map, color));
         result.addAll(findAllAsleepThreePoints(map, color));
-        List<Point> vcf = findVCF(map, color);
+        WinTree vcf = findVCF(map, color);
         for (Point p : map) {
             map.addPiece(-1, p, color);
             if (!findVCF(map, color).equals(vcf)) {

@@ -43,4 +43,9 @@ public class PieceColor implements Serializable {
     public int hashCode() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value == 1 ? "[B]" : "[W]";
+    }
 }

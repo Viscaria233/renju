@@ -1,25 +1,18 @@
 package test.com.haochen.renju.control.ai;
 
-import com.haochen.renju.bean.Piece;
-import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
-import com.haochen.renju.ui.TestFrame;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -32,21 +25,10 @@ import java.util.List;
 public class AITest {
 
     private AI ai = new AI();
-    private File path = new File("renju_test");
-
-    private ObjectInputStream createStream(String fileName) {
-        File file = new File(path, fileName);
-        ObjectInputStream stream = null;
-        try {
-            stream = new ObjectInputStream(new FileInputStream(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return stream;
-    }
 
     @Before
     public void before() throws Exception {
+        Config.init();
     }
 
     @After
@@ -181,8 +163,8 @@ public class AITest {
 //TODO: Test goes here...
 
         List<PieceMap> ques = new ArrayList<>();
-        List<List<Point>> ans = new ArrayList<>();
-        List<List<Point>> found = new ArrayList<>();
+        List<WinTree> ans = new ArrayList<>();
+        List<WinTree> found = new ArrayList<>();
         PieceColor[] colors = {
                 PieceColor.BLACK,
                 PieceColor.BLACK,
@@ -193,21 +175,19 @@ public class AITest {
         };
 
         ObjectInputStream ois = null;
-        for (int i = 1; i <= 6; ++i) {
-            ois = createStream("vcf_question_" + i + ".pm");
+        for (int i = 0; i < Config.Test.QuesCount.vcf; ++i) {
+            ois = Config.Test.createVCFStream("vcf_question_" + i + ".ques");
             ques.add((PieceMap) ois.readObject());
             ois.close();
-            ois = createStream("vcf_answer_" + i + ".pts");
-            ans.add((List<Point>) ois.readObject());
+            ois = Config.Test.createVCFStream("vcf_answer_" + i + ".ans");
+            ans.add((WinTree) ois.readObject());
             ois.close();
         }
 
-		List<WinTree> trees = new ArrayList<>();
         for (int i = 0; i < ques.size(); ++i) {
-//            found.addAllChildren(ai.findVCF(ques.get(i), colors[i]));
-            trees.add(ai.findVCF(ques.get(i), colors[i], 0));
+            found.add(ai.findVCF(ques.get(i), colors[i]));
         }
-        Assert.assertEquals(trees, ans);
+        Assert.assertEquals(found, ans);
     }
 
     /**

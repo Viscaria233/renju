@@ -438,52 +438,77 @@ public class Mediator {
 
         public void findVCF() {
             try {
-                Date begin = new Date();
-
                 PieceMap map = board.createPieceMap();
-//                List<Point> vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
-                WinTree vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor(), 0);
 
+                Date begin = new Date();
+                WinTree vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
                 Date end = new Date();
 
                 System.out.println("----findVCF----");
-//                File file = new File("renju_test/vcf_answer_7.pts");
-//                if (!file.exists()) {
-//                    file.createNewFile();
-//                }
-//                FileOutputStream fos = new FileOutputStream(file);
-//                ObjectOutputStream oos = new ObjectOutputStream(fos);
-//                oos.writeObject(vcf);
-//                oos.flush();
-//                oos.close();
-//                for (Point point : vcf) {
-//                    System.out.println(point);
-//                }
                 for (WinTree t : vcf) {
+                    System.out.print(t.getColor() + ": ");
                     System.out.println(t.getPoint());
                 }
+
                 System.out.println((end.getTime() - begin.getTime()) + " ms");
+
+                saveVCFInfo(vcf);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
         }
 
-        public void savePieceMap() {
+        public void saveVCFInfo(WinTree tree) {
+            ObjectOutputStream qS = null;
+            ObjectOutputStream aS = null;
+            BufferedWriter bw = null;
             try {
-                File file = new File("renju_test/vcf_question_7.pm");
+                File file = new File(Config.Test.Path.VCF, "vcf_question_" + Config.Test.QuesCount.vcf + ".ques");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
-                FileOutputStream fos = new FileOutputStream(file);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-                oos.writeObject(board.createPieceMap());
-                oos.flush();
-                oos.close();
+                qS = new ObjectOutputStream(new FileOutputStream(file));
+                qS.writeObject(board.createPieceMap());
+                qS.flush();
+
+                file = new File(Config.Test.Path.VCF, "vcf_answer_" + Config.Test.QuesCount.vcf + ".ans");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                aS = new ObjectOutputStream(new FileOutputStream(file));
+                aS.writeObject(tree);
+                aS.flush();
+
+                ++Config.Test.QuesCount.vcf;
+                bw = new BufferedWriter(
+                        new OutputStreamWriter(
+                                new FileOutputStream(new File(Config.Test.Path.VCF, "vcf_count.txt"))));
+                bw.write(Config.Test.QuesCount.vcf + "");
+                bw.flush();
             } catch (IOException | CloneNotSupportedException e) {
                 e.printStackTrace();
+            } finally {
+                if (qS != null) {
+                    try {
+                        qS.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (aS != null) {
+                    try {
+                        aS.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (bw != null) {
+                    try {
+                        bw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 

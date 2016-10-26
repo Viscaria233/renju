@@ -3,6 +3,7 @@ package com.haochen.renju.control.wintree;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * Created by Haochen on 2016/10/24.
  */
-public class WinTree implements Iterable<WinTree> {
+public class WinTree implements Iterable<WinTree>, Serializable {
     private WinTree parent;
     private List<WinTree> children = new ArrayList<>();
     private Point point;
@@ -111,5 +112,23 @@ public class WinTree implements Iterable<WinTree> {
             public void remove() {
             }
         };
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof WinTree)) {
+            return false;
+        }
+        WinTree t = (WinTree) obj;
+        if ((point == null && t.point == null && color == null && t.color == null)
+                || ((point != null && t.point != null && point.equals(t.point))
+                && (color != null && t.color != null && color.equals(t.color)))) {
+            if (children.isEmpty()) {
+                return true;
+            } else {
+                return children.equals(t.children);
+            }
+        }
+        return false;
     }
 }
