@@ -62,10 +62,6 @@ public class WinTreeFinder {
             }
             map.removeCell(t.getPoint());
             if (win) {
-//                for (int j = i + 1; j < tree.size(); ++j) {
-//                    tree.remove(tree.getChild(j));
-//                    tree.addAllChildren(t);
-//                }
                 tree.clearChildren();
                 tree.add(t);
                 return tree;

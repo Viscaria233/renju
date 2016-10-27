@@ -1,12 +1,8 @@
 package com.haochen.renju.control;
 
 import java.io.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import com.haochen.renju.bean.Cell;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
@@ -411,7 +407,9 @@ public class Mediator {
         public void findAllFourPoints() {
             try {
 //                List<Point> fourPoints = ai.findAllFourPoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
-                List<Point> fourPoints = ai.findAllFourPoints(board.createPieceMap(), Config.Test.color);
+                List<Point> fourPoints = ai.findPoints(board.createPieceMap(), Config.Test.color,
+                        Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
+                        Arrays.asList(ContinueType.FIVE));
 
                 System.out.println("----findAllFourPoints----");
                 for (Point point : fourPoints) {
@@ -425,7 +423,8 @@ public class Mediator {
         public void findAllFivePoints() {
             try {
 //                List<Point> fivePoints = ai.findAllFivePoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
-                List<Point> fivePoints = ai.findAllFivePoints(board.createPieceMap(), Config.Test.color);
+                List<Point> fivePoints = ai.findPoints(board.createPieceMap(), Config.Test.color,
+                        Arrays.asList(ContinueType.FIVE), null);
 
                 System.out.println("----findAllFivePoints----");
                 for (Point point : fivePoints) {

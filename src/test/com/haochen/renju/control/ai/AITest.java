@@ -5,7 +5,6 @@ import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
-import com.haochen.renju.storage.Point;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

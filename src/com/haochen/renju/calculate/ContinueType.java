@@ -1,5 +1,7 @@
 package com.haochen.renju.calculate;
 
+import java.util.Collection;
+
 /**
  * Created by Haochen on 2016/10/1.
  */

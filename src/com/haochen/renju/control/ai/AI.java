@@ -772,15 +772,17 @@ public class AI {
 
     public List<Point> findAllCatchPoint(PieceMap map) {
         List<Point> result = new ArrayList<>();
-        if (findAllFivePoints(map, PieceColor.BLACK).size() > 0) {
+        if (findPoints(map, PieceColor.BLACK, Arrays.asList(ContinueType.FIVE), null).size() > 0) {
             return result;
         }
-        List<Point> five = findAllFivePoints(map, PieceColor.WHITE);
-        List<Point> four = findAllAsleepFourPoints(map, PieceColor.WHITE);
+        List<Point> five = findPoints(map, PieceColor.WHITE, Arrays.asList(ContinueType.FIVE), null);
+        List<Point> four = findPoints(map, PieceColor.WHITE,
+                Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
+                Arrays.asList(ContinueType.FIVE));
         for (Point p : four) {
             map.addPiece(-1, p, PieceColor.WHITE);
 
-            List<Point> def = findAllFivePoints(map, PieceColor.WHITE);
+            List<Point> def = findPoints(map, PieceColor.WHITE, Arrays.asList(ContinueType.FIVE), null);
             def.removeAll(five);
 
             Point def0 = def.get(0);
@@ -798,7 +800,7 @@ public class AI {
     }
 
     public List<Point> findAllWinPoints(PieceMap map, PieceColor color) {
-        List<Point> five = findAllFivePoints(map, color);
+        List<Point> five = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
         if (color.equals(PieceColor.WHITE)) {
             five.addAll(findAllCatchPoint(map));
         }
@@ -824,37 +826,81 @@ public class AI {
         moveSetGetter = new WinTreeFinder.MoveSetGetter() {
             @Override
             public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
-                List<Point> moveSet = null;
+                List<Point> result = new ArrayList<>();
                 if (color.equals(c)) {
-                    moveSet = findAllFourPoints(map, color);
-                    moveSet.addAll(findAllFivePoints(map, color));
+                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null);
                 } else if (color.equals(c.foeColor())) {
-                    moveSet = findAllFivePoints(map, color);
-
-                    ContinueAttribute attribute = getContinueAttribute(map, color, lastFoeMove, Direction.all);
+                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
+                    ContinueAttribute attribute = getContinueAttribute(map, c, lastFoeMove, Direction.all);
                     Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
                     for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
-                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)) {
-                            moveSet.addAll(Arrays.asList(attribute.getContinue(entry.getKey()).getBreakPoint()));
-                        } else if (entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
+                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
+                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
                             Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
                             for (Point p : points) {
-                                if (p != null) {
-                                    moveSet.add(p);
+                                if (p != null && c.equals(findWinner(map, new RealPiece(-1, p, c)))) {
+                                    result.add(p);
                                 }
                             }
                         }
                     }
-                    moveSet.addAll(findAllFivePoints(map, color.foeColor()));
-                } else {
-                    moveSet = new ArrayList<>();
+//                    result.addAll(findPoints(map, color.foeColor(), Arrays.asList(ContinueType.FIVE), null));
                 }
-                return moveSet;
+                return result;
             }
         };
 
         result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, null, color);
 
+        return result;
+    }
+
+    public WinTree findVCT(PieceMap map, PieceColor color) {
+        WinMethod winMethod = null;
+        MoveSetGetter moveSetGetter = null;
+        WinTree result = null;
+
+        winMethod = new WinMethod() {
+            @Override
+            public boolean isWin(PieceMap map, Point point, PieceColor color) {
+                Piece p = new RealPiece(-1, point, color);
+                PieceColor winner = findWinner(map, p);
+                return winner != null && winner.equals(color);
+            }
+        };
+
+        final PieceColor c = color;
+        moveSetGetter = new MoveSetGetter() {
+            @Override
+            public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
+                List<Point> result = new ArrayList<>();
+                ContinueAttribute attribute;
+                ContinueType type;
+                Map<Direction, ContinueType> types;
+                for (Point point : map) {
+                    if (map.available(point)) {
+
+                        map.addPiece(-1, point, color);
+
+                        attribute = getContinueAttribute(map, color, point, Direction.all);
+                        types = getContinueTypes(map, attribute);
+
+                        if (!types.containsValue(ContinueType.FIVE)) {
+                            if (types.containsValue(ContinueType.ASLEEP_FOUR)
+                                    || types.containsValue(ContinueType.ALIVE_FOUR)
+                                    || types.containsValue(ContinueType.ASLEEP_THREE)
+                                    || types.containsValue(ContinueType.ALIVE_THREE)) {
+                                result.add(point);
+                            }
+                        }
+
+                        map.removeCell(point);
+                    }
+                }
+                return result;
+            }
+        };
+        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, null, color);
         return result;
     }
 
@@ -936,103 +982,7 @@ public class AI {
 //        return result;
 //    }
 
-//    public List<Point> findVCT(PieceMap map, PieceColor color) {
-//        Stack<Point> result = new Stack<>();
-//        Stack<List<Point>> allThree = new Stack<>();
-//        Stack<List<Point>> imaginary = new Stack<>();
-//        Stack<Integer> cursor = new Stack<>();
-//
-//        while (true) {
-//            List<Point> vcf = findVCF(map, color);
-//            if (vcf.size() > 0) {
-//                result.push(vcf.get(0));
-//                break;
-//            } else {
-//                allThree.push(findAllThreePoints(map, color));
-//                cursor.push(0);
-//                imaginary.push(new ArrayList<Point>());
-//
-//                while (true) {
-//                    if (cursor.peek() >= allThree.peek().size()) {
-//                        allThree.pop();
-//                        if (allThree.isEmpty()) {
-//                            return result;
-//                        }
-//                        cursor.pop();
-//                        imaginary.pop();
-//                        result.pop();
-//                        List<Point> ima = imaginary.peek();
-//                        for (Point p : ima) {
-//                            map.removeCell(p);
-//                        }
-//                        imaginary.peek().clear();
-//                    } else {
-//                        int peek = cursor.peek();
-//                        Point p = allThree.peek().get(peek);
-//                        cursor.pop();
-//                        cursor.push(peek + 1);
-//                        map.addPiece(-1, p, color);
-//                        ContinueAttribute pAttr = getContinueAttribute(map, color, p, Direction.all);
-//                        if (usingForbiddenMove
-//                                && color.equals(PieceColor.BLACK)
-//                                && isForbiddenMove(map, pAttr, Direction.all)) {
-//                            map.removeCell(p);
-//                            continue;
-//                        }
-//                        result.push(p);
-//                        imaginary.peek().add(p);
-//                        if (findVCF(map, color.foeColor()).size() > 0) {
-//                            map.removeCell(p);
-//                            imaginary.peek().remove(p);
-//                            result.pop();
-//                        } else {
-//
-//                            /**
-//                             * BUG HERE
-//                             */
-//
-//                            List<Point> defend = findAllFivePoints(map, color);
-//                            Point def = defend.get(0);
-//                            map.addPiece(-1, def, color.foeColor());
-//                            imaginary.peek().add(def);
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        if (result.size() > 1) {
-//            result.pop();
-//        }
-//        return result;
-//    }
-
-    public List<Point> findAllThreePoints(PieceMap map, PieceColor color) {
-        List<Point> result = new ArrayList<>();
-        result.addAll(findAllAliveThreePoints(map, color));
-        result.addAll(findAllAsleepThreePoints(map, color));
-        WinTree vcf = findVCF(map, color);
-        for (Point p : map) {
-            map.addPiece(-1, p, color);
-            if (!findVCF(map, color).equals(vcf)) {
-                result.add(p);
-            }
-            map.removeCell(p);
-        }
-        return result;
-    }
-
-    public List<Point> findAllAliveThreePoints(PieceMap map, PieceColor color) {
-        List<Point> result = new ArrayList<>();
-        return result;
-    }
-
-    public List<Point> findAllAsleepThreePoints(PieceMap map, PieceColor color) {
-        List<Point> result = new ArrayList<>();
-        return result;
-    }
-
-    public List<Point> findAllAsleepFourPoints(PieceMap map, PieceColor color) {
+    public List<Point> findPoints(PieceMap map, PieceColor color, Collection<ContinueType> contains, Collection<ContinueType> excludes) {
         List<Point> result = new ArrayList<>();
         ContinueAttribute attribute;
         ContinueType type;
@@ -1045,8 +995,7 @@ public class AI {
                 attribute = getContinueAttribute(map, color, point, Direction.all);
                 types = getContinueTypes(map, attribute);
 
-                if (!types.containsValue(ContinueType.FIVE)
-                        && types.containsValue(ContinueType.ASLEEP_FOUR)) {
+                if (containsAType(types, contains) && excludesAllTypes(types, excludes)) {
                     result.add(point);
                 }
 
@@ -1056,48 +1005,27 @@ public class AI {
         return result;
     }
 
-    public List<Point> findAllFourPoints(PieceMap map, PieceColor color) {
-        List<Point> result = new ArrayList<>();
-        ContinueAttribute attribute;
-        ContinueType type;
-        Map<Direction, ContinueType> types;
-        for (Point point : map) {
-            if (map.available(point)) {
-
-                map.addPiece(-1, point, color);
-
-                attribute = getContinueAttribute(map, color, point, Direction.all);
-                types = getContinueTypes(map, attribute);
-
-                if (!types.containsValue(ContinueType.FIVE)
-                        && (types.containsValue(ContinueType.ALIVE_FOUR)
-                        || types.containsValue(ContinueType.ASLEEP_FOUR))) {
-                    result.add(point);
-                }
-
-                map.removeCell(point);
+    private boolean containsAType(Map<Direction, ContinueType> map, Collection<ContinueType> types) {
+        if (types == null) {
+            return true;
+        }
+        for (ContinueType t : types) {
+            if (map.containsValue(t)) {
+                return true;
             }
         }
-        return result;
+        return false;
     }
 
-    public List<Point> findAllFivePoints(PieceMap map, PieceColor color) {
-        List<Point> result = new ArrayList<>();
-        for (Point point : map) {
-            if (map.available(point)) {
-
-                map.addPiece(-1, point, color);
-
-                ContinueAttribute attribute = getContinueAttribute(map, color, point, Direction.all);
-                Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
-
-                map.removeCell(point);
-
-                if (types.containsValue(ContinueType.FIVE)) {
-                    result.add(point);
-                }
+    private boolean excludesAllTypes(Map<Direction, ContinueType> map, Collection<ContinueType> types) {
+        if (types == null) {
+            return true;
+        }
+        for (ContinueType t : types) {
+            if (map.containsValue(t)) {
+                return false;
             }
         }
-        return result;
+        return true;
     }
 }
