@@ -4,9 +4,10 @@ import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created by Haochen on 2016/10/24.
@@ -22,7 +23,7 @@ public class WinTreeFinder {
     }
 
 
-    public WinTree getWinTree(PieceMap map, Point lastFoeMove, PieceColor color) {
+    public WinTree getWinTree(final PieceMap map, Point lastFoeMove, final PieceColor color) {
         WinTree tree = new WinTree();
         List<Point> moveSet = getMoveSet(map, lastFoeMove, color);
         for (Point p : moveSet) {
@@ -34,34 +35,68 @@ public class WinTreeFinder {
         tree.add(moveSet, color);
         PieceColor foeColor = color.foeColor();
         for (int i = 0; i < tree.size(); ++i) {
-            WinTree t = tree.getChild(i);
+            final WinTree t = tree.getChild(i);
             map.addPiece(-1, t.getPoint(), t.getColor());
             List<Point> foeMoves = getMoveSet(map, t.getPoint(), foeColor);
             t.add(foeMoves, foeColor);
-            boolean win = true;
-            for (WinTree foe : t) {
+
+            final List<Runnable> runnables = new ArrayList<>();
+            final Map<WinTree, Boolean> win = new HashMap<>();
+            for (final WinTree foe : t) {
                 if (isWin(map, foe.getPoint(), color.foeColor())) {
                     tree.remove(t);
                     --i;
-                    win = false;
+                    runnables.clear();
+                    win.clear();
                     break;
                 } else {
-                    map.addPiece(-1, foe.getPoint(), foe.getColor());
-                    WinTree result = getWinTree(map, foe.getPoint(), color);
-                    if (result.isEmpty()) {
-                        tree.remove(t);
-                        map.removeCell(foe.getPoint());
-                        --i;
-                        win = false;
-                        break;
-                    } else {
-                        foe.addAllChildren(result);
-                    }
-                    map.removeCell(foe.getPoint());
+                    final Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                PieceMap newMap = map.clone();
+                                newMap.addPiece(-1, foe.getPoint(), foe.getColor());
+                                WinTree result = getWinTree(map, foe.getPoint(), color);
+                                synchronized (win) {
+                                    if (result.isEmpty()) {
+                                        win.put(t, false);
+                                    } else {
+                                        win.put(t, true);
+                                        foe.addAllChildren(result);
+                                    }
+                                    win.notifyAll();
+                                }
+                            } catch (CloneNotSupportedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    runnables.add(r);
                 }
             }
             map.removeCell(t.getPoint());
-            if (win) {
+
+            if (runnables.size() > 0) {
+                for (Runnable r : runnables) {
+                    new Thread(r).start();
+                }
+                try {
+                    synchronized (win) {
+                        while (win.size() != runnables.size()) {
+                            win.wait();
+                        }
+                        for (Map.Entry<WinTree, Boolean> entry : win.entrySet()) {
+                            if (!entry.getValue()) {
+                                tree.remove(t);
+                                --i;
+                                break;
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
                 tree.clearChildren();
                 tree.add(t);
                 return tree;
@@ -69,7 +104,6 @@ public class WinTreeFinder {
         }
         return tree;
     }
-
 
     private boolean isWin(PieceMap map, Point point, PieceColor color) {
         return winMethod.isWin(map, point, color);
