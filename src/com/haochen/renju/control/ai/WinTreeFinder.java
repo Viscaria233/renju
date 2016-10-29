@@ -40,66 +40,53 @@ public class WinTreeFinder {
             List<Point> foeMoves = getMoveSet(map, t.getPoint(), foeColor);
             t.add(foeMoves, foeColor);
 
-            final List<Runnable> runnables = new ArrayList<>();
-            final Map<WinTree, Boolean> win = new HashMap<>();
+            List<Thread> threads = new ArrayList<>();
+            List<Boolean> win = new ArrayList<>();
             for (final WinTree foe : t) {
                 if (isWin(map, foe.getPoint(), color.foeColor())) {
-                    tree.remove(t);
-                    --i;
-                    runnables.clear();
+                    threads.clear();
                     win.clear();
                     break;
                 } else {
-                    final Runnable r = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                PieceMap newMap = map.clone();
-                                newMap.addPiece(-1, foe.getPoint(), foe.getColor());
-                                WinTree result = getWinTree(map, foe.getPoint(), color);
-                                synchronized (win) {
-                                    if (result.isEmpty()) {
-                                        win.put(t, false);
-                                    } else {
-                                        win.put(t, true);
-                                        foe.addAllChildren(result);
-                                    }
-                                    win.notifyAll();
-                                }
-                            } catch (CloneNotSupportedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-                    runnables.add(r);
+                    try {
+                        PieceMap newMap = map.clone();
+                        Thread thread = new WinTreeThread(newMap, this, foe, color, threads, win);
+                        threads.add(thread);
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             map.removeCell(t.getPoint());
 
-            if (runnables.size() > 0) {
-                for (Runnable r : runnables) {
-                    new Thread(r).start();
+            if (threads.size() > 0) {
+                for (Thread thread : threads) {
+                    thread.start();
                 }
                 try {
                     synchronized (win) {
-                        while (win.size() != runnables.size()) {
+                        while (win.size() < threads.size()) {
                             win.wait();
                         }
-                        for (Map.Entry<WinTree, Boolean> entry : win.entrySet()) {
-                            if (!entry.getValue()) {
-                                tree.remove(t);
-                                --i;
-                                break;
-                            }
+                        boolean allWin = true;
+                        for (boolean b : win) {
+                            allWin &=  b;
+                        }
+                        if (allWin) {
+                            tree.clearChildren();
+                            tree.add(t);
+                            return tree;
+                        } else {
+                            tree.remove(t);
+                            --i;
                         }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } else {
-                tree.clearChildren();
-                tree.add(t);
-                return tree;
+                tree.remove(t);
+                --i;
             }
         }
         return tree;
