@@ -6,7 +6,9 @@ import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Haochen on 2016/10/24.
@@ -22,7 +24,7 @@ public class WinTreeFinder {
     }
 
 
-    public WinTree getWinTree(PieceMap map, Point lastFoeMove, PieceColor color) {
+    public WinTree getWinTree(final PieceMap map, Point lastFoeMove, PieceColor color) {
         WinTree tree = new WinTree();
         List<Point> moveSet = getMoveSet(map, lastFoeMove, color);
         for (Point p : moveSet) {
@@ -32,12 +34,40 @@ public class WinTreeFinder {
             }
         }
         tree.add(moveSet, color);
-        PieceColor foeColor = color.foeColor();
+        final PieceColor foeColor = color.foeColor();
+
+        final Map<WinTree, List<Point>> foeMoveSets = new HashMap<>();
+        for (final WinTree t : tree) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        PieceMap newMap = map.clone();
+                        newMap.addPiece(-1, t.getPoint(), t.getColor());
+                        List<Point> foe = getMoveSet(newMap, t.getPoint(), foeColor);
+                        t.add(foe, foeColor);
+                        synchronized (foeMoveSets) {
+                            foeMoveSets.put(t, foe);
+                            foeMoveSets.notifyAll();
+                        }
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+        try {
+            synchronized (foeMoveSets) {
+                while (foeMoveSets.size() < tree.size()) {
+                    foeMoveSets.wait();
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < tree.size(); ++i) {
             WinTree t = tree.getChild(i);
             map.addPiece(-1, t.getPoint(), t.getColor());
-            List<Point> foeMoves = getMoveSet(map, t.getPoint(), foeColor);
-            t.add(foeMoves, foeColor);
             boolean win = true;
             for (WinTree foe : t) {
                 if (isWin(map, foe.getPoint(), color.foeColor())) {
