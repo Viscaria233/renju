@@ -451,7 +451,7 @@ public class Mediator {
 
                 System.out.println((end.getTime() - begin.getTime()) + " ms");
 
-                saveVCFInfo(vcf);
+//                saveVCFInfo(vcf);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
@@ -508,6 +508,28 @@ public class Mediator {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+
+        public void findVCT() {
+            try {
+                PieceMap map = board.createPieceMap();
+
+                Date begin = new Date();
+                WinTree vct = ai.findVCT(map, playerSet.getMovingPlayer().getColor());
+                Date end = new Date();
+
+                System.out.println("----findVCT----");
+                for (WinTree t : vct) {
+                    System.out.print(t.getColor() + ": ");
+                    System.out.println(t.getPoint());
+                }
+
+                System.out.println((end.getTime() - begin.getTime()) + " ms");
+
+//                saveVCFInfo(vct);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
             }
         }
 

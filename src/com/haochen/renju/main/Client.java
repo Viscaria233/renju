@@ -133,7 +133,7 @@ public class Client {
         try {
             Config.init();
             launch();
-            showList();
+//            showList();
         } catch (ReadFileException e) {
             e.printStackTrace();
             Dialogs.errorDialog(e.getMessage() + '\n' + e.getFile().getAbsolutePath());

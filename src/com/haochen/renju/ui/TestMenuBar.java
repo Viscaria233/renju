@@ -233,6 +233,15 @@ public class TestMenuBar extends JMenuBar {
                 }
         );
 
+        findVCT.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mediator.getOperator().findVCT();
+                    }
+                }
+        );
+
         black.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
