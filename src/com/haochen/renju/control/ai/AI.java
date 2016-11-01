@@ -808,7 +808,7 @@ public class AI {
     }
 
     public WinTree findVCF(PieceMap map, PieceColor color) {
-
+        System.out.println("findVCF");
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
         WinTree result = null;
@@ -856,6 +856,7 @@ public class AI {
     }
 
     public WinTree findVCT(PieceMap map, PieceColor color) {
+        System.out.println("findVCT");
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
         WinTree result = null;
@@ -865,7 +866,8 @@ public class AI {
             public boolean isWin(PieceMap map, Point point, PieceColor color) {
                 Piece p = new RealPiece(-1, point, color);
                 PieceColor winner = findWinner(map, p);
-                return winner != null && winner.equals(color);
+                return (winner != null && winner.equals(color))
+                        || !findVCF(map, color).isEmpty();
             }
         };
 
@@ -873,6 +875,7 @@ public class AI {
         moveSetGetter = new MoveSetGetter() {
             @Override
             public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
+                System.out.println("getMoveSet");
                 List<Point> result = new ArrayList<>();
                 if (color.equals(c)) {
                     result = findPoints(map, color, Arrays.asList(
@@ -891,7 +894,7 @@ public class AI {
                                 || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
                             Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
                             for (Point p : points) {
-                                if (p != null) {
+                                if (p != null && map.available(p)) {
                                     result.add(p);
                                 }
                             }
