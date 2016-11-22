@@ -1,27 +1,26 @@
 package com.haochen.renju.bean;
 
-import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
-public abstract class Piece extends Cell {
+public class Piece extends Cell {
     
 	protected int index;
-	protected Point location;
-	protected PieceColor color;
+	protected Point point;
+	protected int type;
 	
 	public Piece() {
 	}
 
-	public Piece(int index, Point location, PieceColor color) {
+	public Piece(int index, Point point, int type) {
 		this.index = index;
-		this.location = location;
-		this.color = color;
+		this.point = point;
+		this.type = type;
 	}
 	
-	public Piece(int index, int x, int y, PieceColor color) {
+	public Piece(int index, int x, int y, int type) {
         this.index = index;
-        this.location = new Point(x, y);
-        this.color = color;
+        this.point = new Point(x, y);
+        this.type = type;
     }
 	
 	@Override
@@ -30,13 +29,13 @@ public abstract class Piece extends Cell {
 	}
 	
 	@Override
-	public Point getLocation() {
-	    return location;
+	public Point getPoint() {
+	    return point;
 	}
 	
 	@Override
-	public PieceColor getColor() {
-	    return color;
+	public int getType() {
+	    return type;
 	}
 	
 	@Override
@@ -44,42 +43,24 @@ public abstract class Piece extends Cell {
 	    return true;
 	}
 	
-	@Override
-	public boolean isForbiddenMove() {
-	    return false;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Piece piece = (Piece) o;
+
+        if (index != piece.index) return false;
+        if (type != piece.type) return false;
+        return point != null ? point.equals(piece.point) : piece.point == null;
+
+    }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((color == null) ? 0 : color.hashCode());
-        result = prime * result + index;
+        int result = index;
+        result = 31 * result + (point != null ? point.hashCode() : 0);
+        result = 31 * result + type;
         return result;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Piece other = (Piece) obj;
-        if (color == null) {
-            if (other.color != null)
-                return false;
-        } else if (!color.equals(other.color))
-            return false;
-        if (index != other.index)
-            return false;
-        if (location == null) {
-            if (other.location != null)
-                return false;
-        } else if (!location.equals(other.location))
-            return false;
-        return true;
-    }
-	
 }

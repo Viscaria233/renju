@@ -1,12 +1,10 @@
 package com.haochen.renju.calculate;
 
-import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Direction;
-import com.haochen.renju.storage.Point;
 
 public class ContinueAttribute {
-	private PieceColor color;
-	private Point location;
+	private int color;
+	private int location;
 	
 	private SingleContinue horizontal;
 	private SingleContinue vertical;
@@ -16,7 +14,7 @@ public class ContinueAttribute {
 	public ContinueAttribute() {
 	}
 	
-	public ContinueAttribute(PieceColor color, Point location, Direction direction) {
+	public ContinueAttribute(int color, int location, Direction direction) {
 		this.color = color;
 		this.location = location;
 		
@@ -38,7 +36,7 @@ public class ContinueAttribute {
 		}
 	}
 	
-	public void initialize(PieceColor color, Point location, Direction direction) {
+	public void initialize(int color, int location, Direction direction) {
 		this.color = color;
 		this.location = location;
 		
@@ -85,16 +83,16 @@ public class ContinueAttribute {
 		return null;
 	}
 
-	public PieceColor getColor() {
+	public int getColor() {
 		return color;
 	}
 
-	public Point getLocation() {
+	public int getLocation() {
 		return location;
 	}
 	
 	public void append(ContinueAttribute attribute) {
-		if (!location.equals(attribute.location)) {
+		if (location != attribute.location) {
 			return;
 		}
 		

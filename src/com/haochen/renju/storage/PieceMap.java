@@ -1,8 +1,9 @@
 package com.haochen.renju.storage;
 
 import com.haochen.renju.bean.Cell;
+import com.haochen.renju.bean.EmptyCell;
 import com.haochen.renju.bean.ForbiddenMove;
-import com.haochen.renju.bean.RealPiece;
+import com.haochen.renju.bean.Piece;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -15,7 +16,7 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
         map = new Cell[15][15];
         for (int i = 0; i < 15; ++i) {
             for (int j = 0; j < 15; ++j) {
-                map[i][j] = Cell.empty;
+                map[i][j] = EmptyCell.INSTANCE;
             }
         }
     }
@@ -28,19 +29,19 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
     }
     
     public void addCell(Cell cell) {
-        if (cell == Cell.empty) {
+        if (cell.getType() == Cell.EMPTY) {
             return;
         }
-        Point point = cell.getLocation();
+        Point point = cell.getPoint();
         map[point.x - 1][point.y - 1] = cell;
     }
     
-    public void addPiece(int index, Point boardLocation, PieceColor color) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = new RealPiece(index, boardLocation, color);
+    public void addPiece(int index, Point boardLocation, int color) {
+        map[boardLocation.x - 1][boardLocation.y - 1] = new Piece(index, boardLocation, color);
     }
     
-    public void addPiece(int index, int x, int y, PieceColor color) {
-        map[x - 1][y - 1] = new RealPiece(index, x, y, color);
+    public void addPiece(int index, int x, int y, int color) {
+        map[x - 1][y - 1] = new Piece(index, x, y, color);
     }
     
     public void addForbiddenMark(Point boardLocation) {
@@ -52,11 +53,11 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
     }
     
     public void removeCell(Point boardLocation) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = Cell.empty;
+        map[boardLocation.x - 1][boardLocation.y - 1] = EmptyCell.INSTANCE;
     }
     
     public void removeCell(int x, int y) {
-        map[x - 1][y - 1] = Cell.empty;
+        map[x - 1][y - 1] = EmptyCell.INSTANCE;
     }
     
     public void clear() {

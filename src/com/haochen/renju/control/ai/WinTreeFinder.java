@@ -1,9 +1,8 @@
 package com.haochen.renju.control.ai;
 
 import com.haochen.renju.control.wintree.WinTree;
-import com.haochen.renju.storage.PieceColor;
-import com.haochen.renju.storage.PieceMap;
-import com.haochen.renju.storage.Point;
+import com.haochen.renju.storage.BitPieceMap;
+import com.haochen.renju.util.CellUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,34 +23,30 @@ public class WinTreeFinder {
     }
 
 
-    public WinTree getWinTree(final PieceMap map, Point lastFoeMove, PieceColor color) {
+    public WinTree getWinTree(final BitPieceMap map, int lastFoeMove, int color) {
         WinTree tree = new WinTree();
-        List<Point> moveSet = getMoveSet(map, lastFoeMove, color);
-        for (Point p : moveSet) {
+        List<Integer> moveSet = getMoveSet(map, lastFoeMove, color);
+        for (int p : moveSet) {
             if (isWin(map, p, color)) {
                 tree.add(Arrays.asList(p), color);
                 return tree;
             }
         }
         tree.add(moveSet, color);
-        final PieceColor foeColor = color.foeColor();
+        final int foeColor = CellUtils.foeColor(color);
 
-        final Map<WinTree, List<Point>> foeMoveSets = new HashMap<>();
+        final Map<WinTree, List<Integer>> foeMoveSets = new HashMap<>();
         for (final WinTree t : tree) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        PieceMap newMap = map.clone();
-                        newMap.addPiece(-1, t.getPoint(), t.getColor());
-                        List<Point> foe = getMoveSet(newMap, t.getPoint(), foeColor);
-                        t.add(foe, foeColor);
-                        synchronized (foeMoveSets) {
-                            foeMoveSets.put(t, foe);
-                            foeMoveSets.notifyAll();
-                        }
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
+                    BitPieceMap newMap = map.clone();
+                    newMap.addPiece(t.getPoint(), t.getColor());
+                    List<Integer> foe = getMoveSet(newMap, t.getPoint(), foeColor);
+                    t.add(foe, foeColor);
+                    synchronized (foeMoveSets) {
+                        foeMoveSets.put(t, foe);
+                        foeMoveSets.notifyAll();
                     }
                 }
             }).start();
@@ -67,16 +62,16 @@ public class WinTreeFinder {
         }
         for (int i = 0; i < tree.size(); ++i) {
             WinTree t = tree.getChild(i);
-            map.addPiece(-1, t.getPoint(), t.getColor());
+            map.addPiece(t.getPoint(), t.getColor());
             boolean win = true;
             for (WinTree foe : t) {
-                if (isWin(map, foe.getPoint(), color.foeColor())) {
+                if (isWin(map, foe.getPoint(), CellUtils.foeColor(color))) {
                     tree.remove(t);
                     --i;
                     win = false;
                     break;
                 } else {
-                    map.addPiece(-1, foe.getPoint(), foe.getColor());
+                    map.addPiece(foe.getPoint(), foe.getColor());
                     WinTree result = getWinTree(map, foe.getPoint(), color);
                     if (result.isEmpty()) {
                         tree.remove(t);
@@ -101,18 +96,18 @@ public class WinTreeFinder {
     }
 
 
-    private boolean isWin(PieceMap map, Point point, PieceColor color) {
+    private boolean isWin(BitPieceMap map, int point, int color) {
         return winMethod.isWin(map, point, color);
     }
 
-    private List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
+    private List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
         return moveSetGetter.getMoveSet(map, lastFoeMove, color);
     }
 
     public interface WinMethod {
-        boolean isWin(PieceMap map, Point point, PieceColor color);
+        boolean isWin(BitPieceMap map, int point, int color);
     }
     public interface MoveSetGetter {
-        List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color);
+        List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color);
     }
 }

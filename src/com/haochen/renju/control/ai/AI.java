@@ -2,7 +2,6 @@ package com.haochen.renju.control.ai;
 
 import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.Piece;
-import com.haochen.renju.bean.RealPiece;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
@@ -10,10 +9,9 @@ import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
 import com.haochen.renju.control.ai.WinTreeFinder.WinMethod;
 import com.haochen.renju.control.wintree.WinTree;
-import com.haochen.renju.storage.Direction;
-import com.haochen.renju.storage.PieceColor;
-import com.haochen.renju.storage.PieceMap;
-import com.haochen.renju.storage.Point;
+import com.haochen.renju.storage.*;
+import com.haochen.renju.util.CellUtils;
+import com.haochen.renju.util.PointUtils;
 
 import java.util.*;
 
@@ -26,51 +24,55 @@ public class AI {
         this.mediator = mediator;
     }
 
-    public PieceColor findWinner(PieceMap map, Piece piece) {
-        Point location = piece.getLocation();
-        PieceColor color = piece.getColor();
-        if (color.equals(PieceColor.BLACK)) {
-            if (usingForbiddenMove && map.getCell(location).isForbiddenMove()) {
-                return PieceColor.WHITE;
+    public int findWinner(Board board, int point, int color) {
+        return findWinner(board.bitPieceMap(), point, color);
+    }
+
+    private int findWinner(BitPieceMap map, int point, int color) {
+        if (color == Cell.BLACK) {
+            if (usingForbiddenMove && map.getCell(point) == 3) {
+                return Cell.WHITE;
             }
         }
 
-        PieceColor winner = null;
+        int winner = 0;
         boolean isImaginary = false;
         //插入假想棋子
-        if (map.available(location)) {
-            map.addPiece(-1, location, color);
+        if (map.available(point)) {
+            map.addPiece(point, color);
             isImaginary = true;
         }
 
-        ContinueAttribute attribute = getContinueAttribute(map, color, location, Direction.all);
+        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
         if (findFive(attribute, Direction.all).getQuantity() > 0) {
             winner = color;
         }
 
         //删除假想棋子
         if (isImaginary) {
-            map.removeCell(location);
+            map.removeCell(point);
         }
         return winner;
     }
 
-    public ContinueAttribute getContinueAttribute(PieceMap map, PieceColor color, Point location, Direction direction) {
+    public ContinueAttribute getContinueAttribute(Board board, Point point, Direction direction) {
+        return getContinueAttribute(board.bitPieceMap(), PointUtils.parse(point), direction);
+    }
+
+    private ContinueAttribute getContinueAttribute(BitPieceMap map, int point, Direction direction) {
         //坐标不合法，或坐标处没有棋子
-        if (!location.isValid() || map.available(location)) {
+        if (!PointUtils.isValid(point) || map.available(point)) {
             return null;
         }
-        if (!map.getCell(location).getColor().equals(color)) {
-            return new ContinueAttribute(color, location, direction);
-        }
+        int color = map.getCell(point);
 
-        ContinueAttribute attribute = new ContinueAttribute(color, location, Direction.empty);
+        ContinueAttribute attribute = new ContinueAttribute(color, point, Direction.empty);
 
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
             for (Direction d : directionArray) {
                 if (direction.contains(d)) {
-                    attribute.append(getContinueAttribute(map, color, location, d));
+                    attribute.append(getContinueAttribute(map, point, d));
                 }
             }
             return attribute;
@@ -80,16 +82,10 @@ public class AI {
         for (int i = 0; i < isValid.length; i++) {
             isValid[i] = true;
         }
-        Point[] backup = new Point[2];
-        for (int i = 0; i < backup.length; i++) {
-            backup[i] = new Point();
-        }
-        Point[] temp = new Point[2];
-        for (int i = 0; i < temp.length; i++) {
-            temp[i] = new Point();
-        }
-        Point[] continueEnd = new Point[2];
-        Point[] breakPoint = new Point[2];
+        int[] backup = new int[2];
+        int[] temp = new int[2];
+        int[] continueEnd = new int[2];
+        int[] breakPoint = new int[2];
 
         for (int i = 1; i < 15; i++) {
             if (!isValid[0] && !isValid[1]) {
@@ -97,40 +93,40 @@ public class AI {
             }
             if (isValid[0]) {
                 if (direction == Direction.horizontal) {
-                    backup[0].setLocation(location.x - (i - 1), location.y);
-                    temp[0].setLocation(location.x - i, location.y);
+                    backup[0] = PointUtils.move(point, 1 - i, 0);
+                    temp[0] = PointUtils.move(point, - i, 0);
                 } else if (direction == Direction.vertical) {
-                    backup[0].setLocation(location.x, location.y - (i - 1));
-                    temp[0].setLocation(location.x, location.y - i);
+                    backup[0] = PointUtils.move(point, 0, 1 - i);
+                    temp[0] = PointUtils.move(point, 0, - i);
                 } else if (direction == Direction.mainDiagonal) {
-                    backup[0].setLocation(location.x - (i - 1), location.y + (i - 1));
-                    temp[0].setLocation(location.x - i, location.y + i);
+                    backup[0] = PointUtils.move(point, 1 - i, i - 1);
+                    temp[0] = PointUtils.move(point, - i, i);
                 } else if (direction == Direction.counterDiagonal) {
-                    backup[0].setLocation(location.x - (i - 1), location.y - (i - 1));
-                    temp[0].setLocation(location.x - i, location.y - i);
+                    backup[0] = PointUtils.move(point, 1 - i, 1 - i);
+                    temp[0] = PointUtils.move(point, - i, - i);
                 }
-                isValid[0] = temp[0].isValid();
+                isValid[0] = PointUtils.isValid(temp[0]);
             }
             if (isValid[1]) {
                 if (direction == Direction.horizontal) {
-                    backup[1].setLocation(location.x + (i - 1), location.y);
-                    temp[1].setLocation(location.x + i, location.y);
+                    backup[1] = PointUtils.move(point, i - 1, 0);
+                    temp[1] = PointUtils.move(point, i, 0);
                 } else if (direction == Direction.vertical) {
-                    backup[1].setLocation(location.x, location.y + (i - 1));
-                    temp[1].setLocation(location.x, location.y + i);
+                    backup[1] = PointUtils.move(point, 0, i - 1);
+                    temp[1] = PointUtils.move(point, 0, i);
                 } else if (direction == Direction.mainDiagonal) {
-                    backup[1].setLocation(location.x + (i - 1), location.y - (i - 1));
-                    temp[1].setLocation(location.x + i, location.y - i);
+                    backup[1] = PointUtils.move(point, i - 1, 1 - i);
+                    temp[1] = PointUtils.move(point, i, - i);
                 } else if (direction == Direction.counterDiagonal) {
-                    backup[1].setLocation(location.x + (i - 1), location.y + (i - 1));
-                    temp[1].setLocation(location.x + i, location.y + i);
+                    backup[1] = PointUtils.move(point, i - 1, i - 1);
+                    temp[1] = PointUtils.move(point, i, i);
                 }
-                isValid[1] = temp[1].isValid();
+                isValid[1] = PointUtils.isValid(temp[1]);
             }
             for (int j = 0; j < isValid.length; j++) {
                 if (isValid[j]) {
-                    Cell cell = map.getCell(temp[j]);
-                    if (!cell.isPiece() || !cell.getColor().equals(color)) {
+                    int cell = map.getCell(temp[j]);
+                    if (cell != color) {
                         continueEnd[j] = backup[j];
                         breakPoint[j] = temp[j];
                         isValid[j] = false;
@@ -139,8 +135,8 @@ public class AI {
                     continueEnd[j] = backup[j];
                     breakPoint[j] = temp[j];
                 }
-                if (!temp[j].isValid()) {
-                    breakPoint[j] = null;
+                if (!PointUtils.isValid(temp[j])) {
+                    breakPoint[j] = 0;
                 }
             }
             SingleContinue single = new SingleContinue();
@@ -171,7 +167,7 @@ public class AI {
 
         SingleContinue single = attribute.getContinue(direction);
         if (usingForbiddenMove) {
-            if (attribute.getColor().equals(PieceColor.BLACK)) {
+            if (attribute.getColor() == Cell.BLACK) {
                 if (single.getLength() == 5) {
                     result.add(direction);
                 }
@@ -188,7 +184,11 @@ public class AI {
         return result;
     }
 
-    public Direction findAliveFour(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    public Direction findAliveFour(Board board, ContinueAttribute attribute, Direction direction) {
+        return findAliveFour(board.bitPieceMap(), attribute, direction);
+    }
+
+    private Direction findAliveFour(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -204,23 +204,23 @@ public class AI {
             return result;
         }
 
-        PieceColor color = attribute.getColor();
+        int color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() != 4) {
             return result;
         }
-        Point[] breakPoint = single.getBreakPoint();
+        int[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
-        for (Point p : breakPoint) {
-            if (p != null) {
+        for (int p : breakPoint) {
+            if (p != 0) {
                 boolean isImaginary = false;
                 if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, p, color);
+                    map.addPiece(p, color);
                     isImaginary = true;
                 }
 
-                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                ContinueAttribute breakAttr = getContinueAttribute(map, p, direction);
                 if (findFive(breakAttr, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
@@ -237,7 +237,11 @@ public class AI {
         return result;
     }
 
-    public Direction findAsleepFour(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    public Direction findAsleepFour(Board board, ContinueAttribute attribute, Direction direction) {
+        return findAsleepFour(board.bitPieceMap(), attribute, direction);
+    }
+
+    private Direction findAsleepFour(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -253,23 +257,23 @@ public class AI {
             return result;
         }
 
-        PieceColor color = attribute.getColor();
+        int color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 4) {
             return result;
         }
-        Point[] breakPoint = single.getBreakPoint();
+        int[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
-        for (Point p : breakPoint) {
-            if (p != null) {
+        for (int p : breakPoint) {
+            if (p != 0) {
                 boolean isImaginary = false;
                 if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, p, color);
+                    map.addPiece(p, color);
                     isImaginary = true;
                 }
 
-                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                ContinueAttribute breakAttr = getContinueAttribute(map, p, direction);
                 if (findFive(breakAttr, direction).getQuantity() > 0) {
                     fivePoint++;
                 }
@@ -288,7 +292,11 @@ public class AI {
         return result;
     }
 
-    public Direction findAliveThree(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    public Direction findAliveThree(Board board, ContinueAttribute attribute, Direction direction) {
+        return findAliveThree(board.bitPieceMap(), attribute, direction);
+    }
+
+    private Direction findAliveThree(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -304,27 +312,27 @@ public class AI {
             return result;
         }
 
-        PieceColor color = attribute.getColor();
+        int color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
             return result;
         }
-        Point[] breakPoint = single.getBreakPoint();
+        int[] breakPoint = single.getBreakPoint();
         int aliveFourPoint = 0;
-        for (Point p : breakPoint) {
-            if (p != null) {
+        for (int p : breakPoint) {
+            if (p != 0) {
                 //先判断此处是不是禁手
-                if (map.getCell(p).isForbiddenMove()) {
+                if (map.getCell(p) == 3) {
                     continue;
                 }
                 boolean isImaginary = false;
                 if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, p, color);
+                    map.addPiece(p, color);
                     isImaginary = true;
                 }
 
-                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                ContinueAttribute breakAttr = getContinueAttribute(map, p, direction);
                 if (findAliveFour(map, breakAttr, direction).getQuantity() > 0) {
                     aliveFourPoint++;
                 }
@@ -341,7 +349,11 @@ public class AI {
         return result;
     }
 
-    public Direction findAsleepThree(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    public Direction findAsleepThree(Board board, ContinueAttribute attribute, Direction direction) {
+        return findAsleepThree(board.bitPieceMap(), attribute, direction);
+    }
+
+    private Direction findAsleepThree(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -357,27 +369,27 @@ public class AI {
             return result;
         }
 
-        PieceColor color = attribute.getColor();
+        int color = attribute.getColor();
         SingleContinue single = attribute.getContinue(direction);
         if (single.getLength() > 3) {
             return result;
         }
-        Point[] breakPoint = single.getBreakPoint();
+        int[] breakPoint = single.getBreakPoint();
         int asleepFourPoint = 0;
-        for (Point p : breakPoint) {
-            if (p != null) {
+        for (int p : breakPoint) {
+            if (p != 0) {
                 //先判断此处是不是禁手
-                if (map.getCell(p).isForbiddenMove()) {
+                if (map.getCell(p) == 3) {
                     continue;
                 }
                 boolean isImaginary = false;
                 if (map.available(p)) {
                     //插入假想棋子
-                    map.addPiece(-1, p, color);
+                    map.addPiece(p, color);
                     isImaginary = true;
                 }
 
-                ContinueAttribute breakAttr = getContinueAttribute(map, color, p, direction);
+                ContinueAttribute breakAttr = getContinueAttribute(map, p, direction);
                 if (findAsleepFour(map, breakAttr, direction).getQuantity() > 0) {
                     asleepFourPoint++;
                 }
@@ -397,9 +409,11 @@ public class AI {
         return result;
     }
 
-
     public Direction findLongContinue(ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
+//        if (attribute == null) {
+//            return result;
+//        }
 
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
@@ -418,71 +432,58 @@ public class AI {
         return result;
     }
 
+    public boolean isDoubleFour(Board board, Point point) {
+        return isDoubleFour(board.bitPieceMap(), PointUtils.parse(point));
+    }
 
-//    public Direction findLongContinue(PieceMap map, Point location, Direction direction) {
-//        Direction result = new Direction();
-//        if (!location.isValid() || map.available(location)) {
-//            return result;
-//        }
-//
-//        Direction[] directionArray = Direction.createDirectionArray();
-//        if (!direction.isSingle()) {
-//            for (Direction d : directionArray) {
-//                if (direction.contains(d)) {
-//                    result.append(findLongContinue(map, location, d));
-//                }
-//            }
-//            return result;
-//        }
-//
-//        SingleContinue single = getContinueAttribute(map, PieceColor.BLACK, location, direction).getContinue(direction);
-//        if (single.getLength() > 5) {
-//            result.addAllChildren(direction);
-//        }
-//        return result;
-//    }
-
-    public boolean isDoubleFour(PieceMap map, Point location) {
+    private boolean isDoubleFour(BitPieceMap map, int point) {
         boolean isImaginary = false;
         //插入假想棋子
-        if (map.available(location)) {
-            map.addPiece(-1, location, PieceColor.BLACK);
+        if (map.available(point)) {
+            map.addPiece(point, Cell.BLACK);
             isImaginary = true;
         }
 
-        ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, location, Direction.all);
+        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
         int four = findAliveFour(map, attribute, Direction.all).getQuantity()
                 + findAsleepFour(map, attribute, Direction.all).getQuantity();
 
         //删除假想棋子
         if (isImaginary) {
-            map.removeCell(location);
+            map.removeCell(point);
         }
         return four >= 2;
     }
 
-    public boolean isDoubleThree(PieceMap map, Point location) {
+    public boolean isDoubleThree(Board board, Point point) {
+        return isDoubleThree(board.bitPieceMap(), PointUtils.parse(point));
+    }
+
+    private boolean isDoubleThree(BitPieceMap map, int point) {
         boolean isImaginary = false;
         //插入假想棋子
-        if (map.available(location)) {
-            map.addPiece(-1, location, PieceColor.BLACK);
+        if (map.available(point)) {
+            map.addPiece(point, Cell.BLACK);
             isImaginary = true;
         }
 
-        ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, location, Direction.all);
+        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
         int three = findAliveThree(map, attribute, Direction.all).getQuantity();
 
         //删除假想棋子
         if (isImaginary) {
-            map.removeCell(location);
+            map.removeCell(point);
         }
         return three >= 2;
     }
 
+    public boolean isForbiddenMove(Board board, ContinueAttribute attribute, Direction direction) {
+        return isForbiddenMove(board.bitPieceMap(), attribute, direction);
+    }
 
-    public boolean isForbiddenMove(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    private boolean isForbiddenMove(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         boolean forbidden = false;
-        PieceColor color = PieceColor.BLACK;
+        int color = Cell.BLACK;
 
         if (findFive(attribute, direction).getQuantity() > 0) {
             forbidden = false;
@@ -498,17 +499,17 @@ public class AI {
                 for (Direction d : directionArray) {
                     if (aliveThree.contains(d)) {
                         SingleContinue single = attribute.getContinue(d);
-                        Point[] breakPoint = single.getBreakPoint();
-                        Point[] aliveFourPoint = new Point[2];
+                        int[] breakPoint = single.getBreakPoint();
+                        int[] aliveFourPoint = new int[2];
                         for (int j = 0; j < breakPoint.length; j++) {
-                            if (breakPoint[j] != null) {
+                            if (breakPoint[j] != 0) {
                                 boolean isImaginary1 = false;
                                 //插入假想棋子
                                 if (map.available(breakPoint[j])) {
-                                    map.addPiece(-1, breakPoint[j], color);
+                                    map.addPiece(breakPoint[j], color);
                                     isImaginary1 = true;
                                 }
-                                ContinueAttribute breakAttr = getContinueAttribute(map, color, breakPoint[j], d);
+                                ContinueAttribute breakAttr = getContinueAttribute(map, breakPoint[j], d);
                                 if (findAliveFour(map, breakAttr, d).getQuantity() > 0) {
                                     aliveFourPoint[j] = breakPoint[j];
                                 }
@@ -518,17 +519,17 @@ public class AI {
                                 }
                             }
                         }
-                        for (Point p : aliveFourPoint) {
-                            if (p != null) {
+                        for (int p : aliveFourPoint) {
+                            if (p != 0) {
                                 boolean isImaginary1 = false;
                                 //插入假想棋子
                                 if (map.available(p)) {
-                                    map.addPiece(-1, p, color);
+                                    map.addPiece(p, color);
                                     isImaginary1 = true;
                                 }
 
                                 Direction dire = direction.remove(d);
-                                ContinueAttribute aliveFour = getContinueAttribute(map, color, p, Direction.all);
+                                ContinueAttribute aliveFour = getContinueAttribute(map, p, Direction.all);
                                 if (findFive(aliveFour, dire).getQuantity() > 0) {
                                     //删除假想棋子
                                     if (isImaginary1) {
@@ -561,102 +562,11 @@ public class AI {
         return forbidden;
     }
 
+    public Map<Direction, ContinueType> getContinueTypes(Board board, ContinueAttribute attribute) {
+        return getContinueTypes(board.bitPieceMap(), attribute);
+    }
 
-//    public boolean isForbiddenMove(PieceMap map, Point location, Direction direction) {
-//        boolean forbidden = false;
-//        boolean isImaginary = false;
-//        PieceColor color = PieceColor.BLACK;
-//        //插入假想棋子
-//        if (map.available(location)) {
-//            map.addPiece(-1, location, color);
-//            isImaginary = true;
-//        }
-//
-//        ContinueAttribute allDirection = getContinueAttribute(map, color, location, direction);
-//        if (findFive(allDirection, direction).getQuantity() > 0) {
-//            forbidden = false;
-//        } else if (findAliveFour(map, allDirection, direction).getQuantity()
-//                + findAsleepFour(map, allDirection, direction).getQuantity() >= 2
-//                || findLongContinue(map, location, direction).getQuantity() > 0) {
-//            forbidden = true;
-//        } else {
-//            Direction aliveThree = findAliveThree(map, allDirection, direction);
-//            if (aliveThree.getQuantity() >= 2) {
-//                ContinueAttribute aliveThreeAttr = getContinueAttribute(map, color, location, aliveThree);
-//                Direction[] directionArray = Direction.createDirectionArray();
-//                int valid = 0;
-//                for (Direction d : directionArray) {
-//                    if (aliveThree.contains(d)) {
-//                        SingleContinue single = aliveThreeAttr.getContinue(d);
-//                        Point[] breakPoint = single.getBreakPoint();
-//                        Point[] aliveFourPoint = new Point[2];
-//                        for (int j = 0; j < breakPoint.length; j++) {
-//                            if (breakPoint[j] != null) {
-//                                boolean isImaginary1 = false;
-//                                //插入假想棋子
-//                                if (map.available(breakPoint[j])) {
-//                                    map.addPiece(-1, breakPoint[j], color);
-//                                    isImaginary1 = true;
-//                                }
-//                                ContinueAttribute breakAttr = getContinueAttribute(map, color, breakPoint[j], d);
-//                                if (findAliveFour(map, breakAttr, d).getQuantity() > 0) {
-//                                    aliveFourPoint[j] = breakPoint[j];
-//                                }
-//                                //删除假想棋子
-//                                if (isImaginary1) {
-//                                    map.removeCell(breakPoint[j]);
-//                                }
-//                            }
-//                        }
-//                        for (Point p : aliveFourPoint) {
-//                            if (p != null) {
-//                                boolean isImaginary1 = false;
-//                                //插入假想棋子
-//                                if (map.available(p)) {
-//                                    map.addPiece(-1, p, color);
-//                                    isImaginary1 = true;
-//                                }
-//
-//                                Direction dire = direction.remove(d);
-//                                ContinueAttribute aliveFour = getContinueAttribute(map, color, p, dire);
-//                                if (findFive(aliveFour, dire).getQuantity() > 0) {
-//                                    //删除假想棋子
-//                                    if (isImaginary1) {
-//                                        map.removeCell(p);
-//                                    }
-//                                    continue;
-//                                }
-//                                if (isForbiddenMove(map, p, Direction.all)) {
-//                                    //删除假想棋子
-//                                    if (isImaginary1) {
-//                                        map.removeCell(p);
-//                                    }
-//                                    continue;
-//                                }
-//                                //删除假想棋子
-//                                if (isImaginary1) {
-//                                    map.removeCell(p);
-//                                }
-//                                valid++;
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//                if (valid >= 2) {
-//                    forbidden = true;
-//                }
-//            }
-//        }
-//        //删除假想棋子
-//        if (isImaginary) {
-//            map.removeCell(location);
-//        }
-//        return forbidden;
-//    }
-
-
-    public Map<Direction, ContinueType> getContinueTypes(PieceMap map, ContinueAttribute attribute) {
+    private Map<Direction, ContinueType> getContinueTypes(BitPieceMap map, ContinueAttribute attribute) {
         Map<Direction, ContinueType> result = new HashMap<>();
         Direction[] directions = Direction.createDirectionArray();
         for (Direction direction : directions) {
@@ -668,13 +578,13 @@ public class AI {
         return result;
     }
 
-    private ContinueType getContinueType(PieceMap map, ContinueAttribute attribute, Direction direction) {
+    private ContinueType getContinueType(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         SingleContinue single = attribute.getContinue(direction);
         if (single == null) {
             return null;
         }
         if (usingForbiddenMove
-                && attribute.getColor().equals(PieceColor.BLACK)
+                && attribute.getColor() == Cell.BLACK
                 && isForbiddenMove(map, attribute, Direction.all)) {
             return ContinueType.FORBIDDEN_MOVE;
         }
@@ -694,35 +604,38 @@ public class AI {
         }
     }
 
-    public Point getCloseMove(PieceMap map, PieceColor color, Piece lastPiece) {
-        if (lastPiece == null) {
-            return new Point(8, 8);
-        }
-        int x = lastPiece.getLocation().x;
-        int y = lastPiece.getLocation().y;
-        Point point;
+    public Point getCloseMove(Board board, Piece lastPiece) {
+        return PointUtils.build(
+                getCloseMove(board.bitPieceMap(), PointUtils.parse(lastPiece.getPoint())));
+    }
+
+    private int getCloseMove(BitPieceMap map, int point) {
+        int x = PointUtils.getX(point);
+        int y = PointUtils.getY(point);
+        int result;
         do {
-            point = new Point((int) (Math.random() * 3) - 1 + x, (int) (Math.random() * 3) - 1 + y);
-        } while (!map.available(point));
-        return point;
+            result = PointUtils.parse((int) (Math.random() * 3) - 1 + x, (int) (Math.random() * 3) - 1 + y);
+        } while (!map.available(result));
+        return result;
     }
 
-    public Point getMove(PieceMap map, PieceColor color) {
-        Map<Point, Integer> scores = getAllScore(map, color);
-        Set<Map.Entry<Point, Integer>> set = scores.entrySet();
+    public Point getMove(Board board, int color) {
+        BitPieceMap map = board.bitPieceMap();
+        Map<Integer, Integer> scores = getAllScore(map, color);
+        Set<Map.Entry<Integer, Integer>> set = scores.entrySet();
 
-        Map.Entry<Point, Integer>[] entries = set.toArray(new Map.Entry[1]);
-        Point[] highScore = getHighScorePoints(entries, 1);
+        Map.Entry<Integer, Integer>[] entries = set.toArray(new Map.Entry[1]);
+        int[] highScore = getHighScorePoints(entries, 1);
 
-        return highScore[0];
+        return PointUtils.build(highScore[0]);
     }
 
-    private Point[] getHighScorePoints(Map.Entry<Point, Integer>[] entries, int size) {
+    private int[] getHighScorePoints(Map.Entry<Integer, Integer>[] entries, int size) {
         if (size > entries.length) {
             size = entries.length;
         }
 
-        Point[] highScore = new Point[size];
+        int[] highScore = new int[size];
         for (int i = 0; i < size; ++i) {
             int max = i;
             for (int j = i; j < entries.length; ++j) {
@@ -731,7 +644,7 @@ public class AI {
                 }
             }
             if (max != i) {
-                Map.Entry<Point, Integer> t = entries[max];
+                Map.Entry<Integer, Integer> t = entries[max];
                 entries[max] = entries[i];
                 entries[i] = t;
                 highScore[i] = t.getKey();
@@ -740,54 +653,43 @@ public class AI {
         return highScore;
     }
 
-    private Map<Point, Integer> getAllScore(PieceMap map, PieceColor color) {
-        Map<Point, Integer> result = new HashMap<>();
+    private Map<Integer, Integer> getAllScore(BitPieceMap map, int color) {
+        Map<Integer, Integer> result = new HashMap<>();
         ContinueAttribute current;
         ContinueAttribute other;
 
-        for (Point point : map) {
-            if (map.available(point)) {
-                current = getContinueAttribute(map, color, point, Direction.all);
-                other = getContinueAttribute(map, color.foeColor(), point, Direction.all);
-                result.put(point, getScore(map, current, other));
+        for (int p : map) {
+            if (map.available(p)) {
+                current = getContinueAttribute(map, p, Direction.all);
+                other = getContinueAttribute(map, p, Direction.all);
+                result.put(p, getScore(map, current, other));
             }
         }
-//        for (int i = 1; i <= 15; ++i) {
-//            for (int j = 1; j<= 15; ++j) {
-//                point = new Point(i, j);
-//                if (map.available(point)) {
-//                    current = getContinueAttribute(map, color, point, Direction.all);
-//                    other = getContinueAttribute(map, color.foeColor(), point, Direction.all);
-//                    result.put(point, getScore(map, current, other));
-//                }
-//            }
-//        }
         return result;
     }
 
-    private int getScore(PieceMap map, ContinueAttribute currentPlayer, ContinueAttribute otherPlayer) {
+    private int getScore(BitPieceMap map, ContinueAttribute currentPlayer, ContinueAttribute otherPlayer) {
         return new Random().nextInt();
     }
 
-
-    public List<Point> findAllCatchPoint(PieceMap map) {
-        List<Point> result = new ArrayList<>();
-        if (findPoints(map, PieceColor.BLACK, Arrays.asList(ContinueType.FIVE), null).size() > 0) {
+    private List<Integer> findAllCatchPoint(BitPieceMap map) {
+        List<Integer> result = new ArrayList<>();
+        if (findPoints(map, Cell.BLACK, Arrays.asList(ContinueType.FIVE), null).size() > 0) {
             return result;
         }
-        List<Point> five = findPoints(map, PieceColor.WHITE, Arrays.asList(ContinueType.FIVE), null);
-        List<Point> four = findPoints(map, PieceColor.WHITE,
+        List<Integer> five = findPoints(map, Cell.WHITE, Arrays.asList(ContinueType.FIVE), null);
+        List<Integer> four = findPoints(map, Cell.WHITE,
                 Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
                 Arrays.asList(ContinueType.FIVE));
-        for (Point p : four) {
-            map.addPiece(-1, p, PieceColor.WHITE);
+        for (int p : four) {
+            map.addPiece(p, Cell.WHITE);
 
-            List<Point> def = findPoints(map, PieceColor.WHITE, Arrays.asList(ContinueType.FIVE), null);
+            List<Integer> def = findPoints(map, Cell.WHITE, Arrays.asList(ContinueType.FIVE), null);
             def.removeAll(five);
 
-            Point def0 = def.get(0);
-            map.addPiece(-1, def0, PieceColor.BLACK);
-            ContinueAttribute attribute = getContinueAttribute(map, PieceColor.BLACK, def0, Direction.all);
+            int def0 = def.get(0);
+            map.addPiece(def0, Cell.BLACK);
+            ContinueAttribute attribute = getContinueAttribute(map, def0, Direction.all);
             map.removeCell(def0);
 
             if (isForbiddenMove(map, attribute, Direction.all)) {
@@ -799,63 +701,68 @@ public class AI {
         return result;
     }
 
-    public List<Point> findAllWinPoints(PieceMap map, PieceColor color) {
-        List<Point> five = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
-        if (color.equals(PieceColor.WHITE)) {
+    private List<Integer> findAllWinPoints(BitPieceMap map, int color) {
+        List<Integer> five = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
+        if (color == Cell.WHITE) {
             five.addAll(findAllCatchPoint(map));
         }
         return five;
     }
 
-    public WinTree findVCF(PieceMap map, PieceColor color) {
-        System.out.println("findVCF");
+    public WinTree findVCF(Board board, int color) {
+        return findVCF(board.bitPieceMap(), color);
+    }
+
+    private WinTree findVCF(BitPieceMap map, int color) {
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
         WinTree result = null;
 
         winMethod = new WinTreeFinder.WinMethod() {
             @Override
-            public boolean isWin(PieceMap map, Point point, PieceColor color) {
-                Piece p = new RealPiece(-1, point, color);
-                PieceColor winner = findWinner(map, p);
-                return winner != null && winner.equals(color);
+            public boolean isWin(BitPieceMap map, int point, int color) {
+                return findWinner(map, point, color) == color;
             }
         };
 
-        final PieceColor c = color;
+        final int c = color;
         moveSetGetter = new WinTreeFinder.MoveSetGetter() {
             @Override
-            public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
-                List<Point> result = new ArrayList<>();
-                if (color.equals(c)) {
+            public List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
+                List<Integer> result = new ArrayList<>();
+                if (color == c) {
                     result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null);
-                } else if (color.equals(c.foeColor())) {
+                } else if (color == CellUtils.foeColor(c)) {
                     result = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
-                    ContinueAttribute attribute = getContinueAttribute(map, c, lastFoeMove, Direction.all);
+                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
                     Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
                     for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
                         if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
                                 || entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
-                            Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
-                            for (Point p : points) {
-                                if (p != null && c.equals(findWinner(map, new RealPiece(-1, p, c)))) {
+                            int[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
+                            for (int p : points) {
+                                if (p != 0 && c == findWinner(map, p, c)) {
                                     result.add(p);
                                 }
                             }
                         }
                     }
-//                    result.addAll(findPoints(map, color.foeColor(), Arrays.asList(ContinueType.FIVE), null));
+//                    result.addAll(findPoints(map, type.foeColor(), Arrays.asList(ContinueType.FIVE), null));
                 }
                 return result;
             }
         };
 
-        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, null, color);
+        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, 0, color);
 
         return result;
     }
 
-    public WinTree findVCT(PieceMap map, PieceColor color) {
+    public WinTree findVCT(Board board, int color) {
+        return findVCT(board.bitPieceMap(), color);
+    }
+
+    private WinTree findVCT(BitPieceMap map, int color) {
         System.out.println("findVCT");
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
@@ -863,28 +770,26 @@ public class AI {
 
         winMethod = new WinMethod() {
             @Override
-            public boolean isWin(PieceMap map, Point point, PieceColor color) {
-                Piece p = new RealPiece(-1, point, color);
-                PieceColor winner = findWinner(map, p);
-                return (winner != null && winner.equals(color))
+            public boolean isWin(BitPieceMap map, int point, int color) {
+                return (findWinner(map, point, color) == color)
                         || !findVCF(map, color).isEmpty();
             }
         };
 
-        final PieceColor c = color;
+        final int c = color;
         moveSetGetter = new MoveSetGetter() {
             @Override
-            public List<Point> getMoveSet(PieceMap map, Point lastFoeMove, PieceColor color) {
+            public List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
                 System.out.println("getMoveSet");
-                List<Point> result = new ArrayList<>();
-                if (color.equals(c)) {
+                List<Integer> result = new ArrayList<>();
+                if (color == c) {
                     result = findPoints(map, color, Arrays.asList(
                             ContinueType.FIVE, ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR,
                             ContinueType.ALIVE_THREE), null);
-                } else if (color.equals(c.foeColor())) {
+                } else if (color == CellUtils.foeColor(c)) {
                     result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
-                                    ContinueType.ASLEEP_FOUR), null);
-                    ContinueAttribute attribute = getContinueAttribute(map, c, lastFoeMove, Direction.all);
+                            ContinueType.ASLEEP_FOUR), null);
+                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
                     Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
                     for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
 
@@ -892,63 +797,49 @@ public class AI {
                                 || entry.getValue().equals(ContinueType.ASLEEP_FOUR)
                                 || entry.getValue().equals(ContinueType.ALIVE_THREE)
                                 || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
-                            Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
-                            for (Point p : points) {
-                                if (p != null && map.available(p)) {
+                            int[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
+                            for (int p : points) {
+                                if (p != 0 && map.available(p)) {
                                     result.add(p);
                                 }
                             }
                         }
-
-
-//                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
-//                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
-//                            result.addAll(findPoints(map, c, Arrays.asList(ContinueType.FIVE), null));
-//                            Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
-//                            for (Point p : points) {
-//                                if (p != null && c.equals(findWinner(map, new RealPiece(-1, p, c)))) {
-//                                    result.add(p);
-//                                }
-//                            }
-//                        } else if (entry.getValue().equals(ContinueType.ALIVE_THREE)
-//                                || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
-//                            result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
-//                                    ContinueType.ASLEEP_FOUR), null);
-//                            Point[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
-//                            for (Point p : points) {
-//                                if (p != null && findPoints(map, c, Arrays.asList(ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null).contains(p)) {
-//                                    result.add(p);
-//                                }
-//                            }
-//                        }
                     }
-//                    result.addAll(findPoints(map, color.foeColor(), Arrays.asList(ContinueType.FIVE), null));
                 }
                 return result;
             }
         };
-        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, null, color);
+        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, 0, color);
         return result;
     }
 
-    public List<Point> findPoints(PieceMap map, PieceColor color, Collection<ContinueType> contains, Collection<ContinueType> excludes) {
+    public List<Point> findPoints(Board board, int color,
+                                     Collection<ContinueType> contains, Collection<ContinueType> excludes) {
+        List<Integer> temp = findPoints(board.bitPieceMap(), color, contains, excludes);
         List<Point> result = new ArrayList<>();
+        for (int i : temp) {
+            result.add(PointUtils.build(i));
+        }
+        return result;
+    }
+
+    private List<Integer> findPoints(BitPieceMap map, int color,
+                                     Collection<ContinueType> contains, Collection<ContinueType> excludes) {
+        List<Integer> result = new ArrayList<>();
         ContinueAttribute attribute;
-        ContinueType type;
         Map<Direction, ContinueType> types;
-        for (Point point : map) {
-            if (map.available(point)) {
+        for (int p : map) {
+            if (map.available(p)) {
+                map.addPiece(p, color);
 
-                map.addPiece(-1, point, color);
-
-                attribute = getContinueAttribute(map, color, point, Direction.all);
+                attribute = getContinueAttribute(map, p, Direction.all);
                 types = getContinueTypes(map, attribute);
 
                 if (containsAType(types, contains) && excludesAllTypes(types, excludes)) {
-                    result.add(point);
+                    result.add(p);
                 }
 
-                map.removeCell(point);
+                map.removeCell(p);
             }
         }
         return result;

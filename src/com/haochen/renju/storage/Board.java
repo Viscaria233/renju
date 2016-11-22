@@ -1,12 +1,12 @@
 package com.haochen.renju.storage;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.bean.Piece;
-import com.haochen.renju.bean.RealPiece;
+import com.haochen.renju.util.PointUtils;
 
 public class Board {
     
@@ -19,7 +19,11 @@ public class Board {
     public Board() {
         map = new PieceMap();
         tree = new PieceTree();
-        number = 0;
+    }
+
+    public Board(PieceMap map) {
+        this.map = map;
+        this.tree = new PieceTree();
     }
     
     public void setMediator(Mediator mediator) {
@@ -34,8 +38,8 @@ public class Board {
         return map.available(boardLocation);
     }
     
-    public void addPiece(int index, Point boardLocation, PieceColor color) {
-        addPiece(new RealPiece(index, boardLocation, color));
+    public void addPiece(int index, Point boardLocation, int color) {
+        addPiece(new Piece(index, boardLocation, color));
     }
     
     public void addPiece(Piece piece) {
@@ -60,7 +64,7 @@ public class Board {
         }
         --number;
         tree.back();
-        map.removeCell(piece.getLocation());
+        map.removeCell(piece.getPoint());
     }
     
     public void removeForbiddenMark(Point location) {
@@ -70,7 +74,7 @@ public class Board {
     public void clearForbiddenMark() {
         for (int i = 1; i <= 15; ++i) {
             for (int j = 1; j <= 15; ++j) {
-                if (map.getCell(i, j).isForbiddenMove()) {
+                if (map.getCell(i, j).getType() == Cell.FORBIDDEN) {
                     map.removeCell(i, j);
                 }
             }
@@ -93,8 +97,22 @@ public class Board {
         return list;
     }
 
-    public PieceMap createPieceMap() throws CloneNotSupportedException {
-        return map.clone();
+    public BitPieceMap bitPieceMap() {
+        BitPieceMap result = new BitPieceMap();
+        for (Point p : map) {
+            result.addPiece(PointUtils.parse(p), map.getCell(p).getType());
+        }
+        return result;
+    }
+
+    public PieceMap pieceMap() {
+        PieceMap result = null;
+        try {
+            result = map.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
     
     public void display() {

@@ -1,9 +1,13 @@
 package com.haochen.renju.bean;
 
-import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
+import com.haochen.renju.util.CellUtils;
 
 public class EmptyCell extends Cell {
+
+    public static final EmptyCell INSTANCE = new EmptyCell();
+
+    private EmptyCell() {}
 
     @Override
     public int getIndex() {
@@ -11,23 +15,17 @@ public class EmptyCell extends Cell {
     }
 
     @Override
-    public Point getLocation() {
+    public Point getPoint() {
         return null;
     }
 
     @Override
-    public PieceColor getColor() {
-        return null;
+    public int getType() {
+        return Cell.EMPTY;
     }
 
     @Override
     public boolean isPiece() {
         return false;
     }
-    
-    @Override
-    public boolean isForbiddenMove() {
-        return false;
-    }
-
 }

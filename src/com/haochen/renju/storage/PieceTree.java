@@ -1,11 +1,9 @@
 package com.haochen.renju.storage;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Stack;
 
 import com.haochen.renju.bean.Piece;
-import com.haochen.renju.bean.RealPiece;
 
 public class PieceTree {
     private TreeNode root;
@@ -46,7 +44,7 @@ public class PieceTree {
 //        
 //        ChessMap chessMap = new ChessMap();
 //        while (nodes.size() > 0) {
-//            Point chessLocation = nodes.get(nodes.size() - 1).getPiece().getLocation();
+//            Point chessLocation = nodes.get(nodes.size() - 1).getPiece().getPoint();
 //            chessMap.addChess(chessLocation);
 //            nodes.remove(nodes.size() - 1);
 //        }
@@ -71,8 +69,8 @@ public class PieceTree {
 //        return null;
 //    }
 
-    public void addPiece(int index, Point boardLocation, PieceColor color) {
-        addPiece(new RealPiece(index, boardLocation, color));
+    public void addPiece(int index, Point boardLocation, int color) {
+        addPiece(new Piece(index, boardLocation, color));
     }
     
     public void addPiece(Piece piece) {
@@ -102,7 +100,7 @@ public class PieceTree {
             temp = temp.getParent();
         }
         while (!stack.isEmpty()) {
-            System.out.println(stack.peek().getIndex() + "  " + stack.pop().getLocation());
+            System.out.println(stack.peek().getIndex() + "  " + stack.pop().getPoint());
         }
     }
 }

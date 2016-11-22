@@ -1,36 +1,36 @@
 package com.haochen.renju.calculate;
 
 import com.haochen.renju.storage.Direction;
-import com.haochen.renju.storage.Point;
+import com.haochen.renju.util.PointUtils;
 
 public class SingleContinue {
 	private int length;
-	private Point[] continueEnd;
-	private Point[] breakPoint;
+	private int[] continueEnd;
+	private int[] breakPoint;
 	private Direction direction;
 
 	public SingleContinue() {
-		continueEnd = new Point[2];
-		breakPoint = new Point[2];
+		continueEnd = new int[2];
+		breakPoint = new int[2];
 	}
 
 	public void generateLength() {
-		if (continueEnd[0] == null || continueEnd[1] == null) {
+		if (continueEnd[0] == 0 || continueEnd[1] == 0) {
 			return;
 		}
 		if (direction == Direction.horizontal || direction == Direction.mainDiagonal) {
-			length = Math.abs(continueEnd[1].x - continueEnd[0].x) + 1;
+			length = Math.abs(PointUtils.getX(continueEnd[1]) - PointUtils.getX(continueEnd[0])) + 1;
 		} else if (direction == Direction.vertical || direction == Direction.counterDiagonal) {
-			length = Math.abs(continueEnd[1].y - continueEnd[0].y) + 1;
+			length = Math.abs(PointUtils.getY(continueEnd[1]) - PointUtils.getY(continueEnd[0])) + 1;
 		}
 	}
 
-	public void setEnd(Point end0, Point end1) {
+	public void setEnd(int end0, int end1) {
 		continueEnd[0] = end0;
 		continueEnd[1] = end1;
 	}
 
-	public void setSide(Point side0, Point side1) {
+	public void setSide(int side0, int side1) {
 		breakPoint[0] = side0;
 		breakPoint[1] = side1;
 	}
@@ -39,19 +39,19 @@ public class SingleContinue {
 		this.direction = direction;
 	}
 
-	public Point[] getContinueEnd() {
+	public int[] getContinueEnd() {
 		return continueEnd;
 	}
 
-	public void setContinueEnd(Point[] end) {
+	public void setContinueEnd(int[] end) {
 		this.continueEnd = end;
 	}
 
-	public Point[] getBreakPoint() {
+	public int[] getBreakPoint() {
 		return breakPoint;
 	}
 
-	public void setBreakPoint(Point[] side) {
+	public void setBreakPoint(int[] side) {
 		this.breakPoint = side;
 	}
 

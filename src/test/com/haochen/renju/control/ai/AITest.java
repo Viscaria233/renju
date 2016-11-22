@@ -1,9 +1,10 @@
 package test.com.haochen.renju.control.ai;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
-import com.haochen.renju.storage.PieceColor;
+import com.haochen.renju.storage.Board;
 import com.haochen.renju.storage.PieceMap;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,7 +52,7 @@ public class AITest {
     }
 
     /**
-     * Method: getContinueAttribute(PieceMap map, PieceColor color, Point location, Direction direction)
+     * Method: getContinueAttribute(PieceMap map, int type, Point point, Direction direction)
      */
     @Test
     public void testGetContinueAttribute() throws Exception {
@@ -99,7 +100,7 @@ public class AITest {
     }
 
     /**
-     * Method: findLongContinue(PieceMap map, Point location, Direction direction)
+     * Method: findLongContinue(PieceMap map, Point point, Direction direction)
      */
     @Test
     public void testFindLongContinue() throws Exception {
@@ -107,7 +108,7 @@ public class AITest {
     }
 
     /**
-     * Method: isDoubleFour(PieceMap map, Point location)
+     * Method: isDoubleFour(PieceMap map, Point point)
      */
     @Test
     public void testIsDoubleFour() throws Exception {
@@ -115,7 +116,7 @@ public class AITest {
     }
 
     /**
-     * Method: isDoubleThree(PieceMap map, Point location)
+     * Method: isDoubleThree(PieceMap map, Point point)
      */
     @Test
     public void testIsDoubleThree() throws Exception {
@@ -123,7 +124,7 @@ public class AITest {
     }
 
     /**
-     * Method: isForbiddenMove(PieceMap map, Point location, Direction direction)
+     * Method: isForbiddenMove(PieceMap map, Point point, Direction direction)
      */
     @Test
     public void testIsForbiddenMove() throws Exception {
@@ -139,7 +140,7 @@ public class AITest {
     }
 
     /**
-     * Method: getCloseMove(PieceMap map, PieceColor color, Piece lastPiece)
+     * Method: getCloseMove(PieceMap map, int type, Piece lastPiece)
      */
     @Test
     public void testGetCloseMove() throws Exception {
@@ -147,7 +148,7 @@ public class AITest {
     }
 
     /**
-     * Method: getMove(PieceMap map, PieceColor color)
+     * Method: getMove(PieceMap map, int type)
      */
     @Test
     public void testGetMove() throws Exception {
@@ -155,7 +156,7 @@ public class AITest {
     }
 
     /**
-     * Method: findVCF(PieceMap map, PieceColor color)
+     * Method: findVCF(PieceMap map, int type)
      */
     @Test
     public void testFindVCF() throws Exception {
@@ -164,13 +165,13 @@ public class AITest {
         List<PieceMap> ques = new ArrayList<>();
         List<WinTree> ans = new ArrayList<>();
         List<WinTree> found = new ArrayList<>();
-        PieceColor[] colors = {
-                PieceColor.BLACK,
-                PieceColor.BLACK,
-                PieceColor.WHITE,
-                PieceColor.BLACK,
-                PieceColor.BLACK,
-                PieceColor.BLACK,
+        int[] colors = {
+                Cell.BLACK,
+                Cell.BLACK,
+                Cell.WHITE,
+                Cell.BLACK,
+                Cell.BLACK,
+                Cell.BLACK,
         };
 
         ObjectInputStream ois = null;
@@ -184,13 +185,13 @@ public class AITest {
         }
 
         for (int i = 0; i < ques.size(); ++i) {
-            found.add(ai.findVCF(ques.get(i), colors[i]));
+            found.add(ai.findVCF(new Board(ques.get(i)), colors[i]));
         }
         Assert.assertEquals(found, ans);
     }
 
     /**
-     * Method: findAllFourPoints(PieceMap map, PieceColor color)
+     * Method: findAllFourPoints(PieceMap map, int type)
      */
     @Test
     public void testFindAllFourPoints() throws Exception {
@@ -198,7 +199,7 @@ public class AITest {
     }
 
     /**
-     * Method: findAllFivePoints(PieceMap map, PieceColor color)
+     * Method: findAllFivePoints(PieceMap map, int type)
      */
     @Test
     public void testFindAllFivePoints() throws Exception {
@@ -243,14 +244,14 @@ try {
     }
 
     /**
-     * Method: getAllScore(PieceMap map, PieceColor color)
+     * Method: getAllScore(PieceMap map, int type)
      */
     @Test
     public void testGetAllScore() throws Exception {
 //TODO: Test goes here... 
 /* 
 try { 
-   Method method = AI.getClass().getMethod("getAllScore", PieceMap.class, PieceColor.class); 
+   Method method = AI.getClass().getMethod("getAllScore", PieceMap.class, int.class);
    method.setAccessible(true); 
    method.invoke(<Object>, <Parameters>); 
 } catch(NoSuchMethodException e) { 

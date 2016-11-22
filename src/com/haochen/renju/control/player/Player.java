@@ -1,15 +1,15 @@
 package com.haochen.renju.control.player;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.storage.PieceColor;
 
 public abstract class Player {
     
     protected String name;
-    protected PieceColor color;
+    protected int color;
     protected Mediator mediator;
     
-    public Player(String name, PieceColor color) {
+    public Player(String name, int color) {
         this.name = name;
         this.color = color;
     }
@@ -18,12 +18,12 @@ public abstract class Player {
         return name;
     }
     
-    public PieceColor getColor() {
+    public int getColor() {
         return color;
     }
     
     public String getColorString() {
-        if (color.equals(PieceColor.BLACK)) {
+        if (color == Cell.BLACK) {
             return "black";
         } else {
             return "white";

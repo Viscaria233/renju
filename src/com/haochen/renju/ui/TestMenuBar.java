@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.control.player.AIPlayer;
@@ -16,7 +17,6 @@ import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
 import com.haochen.renju.main.Config;
-import com.haochen.renju.storage.PieceColor;
 
 public class TestMenuBar extends JMenuBar {
 
@@ -245,7 +245,7 @@ public class TestMenuBar extends JMenuBar {
         black.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Config.Test.color = black.getState() ? PieceColor.BLACK : PieceColor.WHITE;
+                Config.Test.color = black.getState() ? Cell.BLACK : Cell.WHITE;
             }
         });
         black.setState(true);
@@ -305,8 +305,8 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
 //                System.out.println("Test------Break Point");
 //                Point[] side = new Point[2];
-//                side = mainFrame.chessForm.getContinueAttribute(mainFrame.chessForm.getLastChess().getColor(),
-//                        mainFrame.chessForm.getLastChess().getLocation(), Direction.horizontal).getContinue(Direction.horizontal).getBreakPoint();
+//                side = mainFrame.chessForm.getContinueAttribute(mainFrame.chessForm.getLastChess().getType(),
+//                        mainFrame.chessForm.getLastChess().getPoint(), Direction.horizontal).getContinue(Direction.horizontal).getBreakPoint();
 //                System.out.println("side[0] = " + side[0]);
 //                System.out.println("side[1] = " + side[1]);
                 mediator.getOperator().showBreakPoint();
@@ -356,14 +356,14 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Player player;
                 if (aiBlack.getState()) {
-                    player = new AIPlayer("Computer_01", PieceColor.BLACK);
+                    player = new AIPlayer("Computer_01", Cell.BLACK);
                 } else {
-                    player = new HumanPlayer("Human_01", PieceColor.BLACK);
+                    player = new HumanPlayer("Human_01", Cell.BLACK);
                 }
                 player.setMediator(mediator);
                 final PlayerSet set = mediator.getPlayerSet();
                 set.addPlayer(player);
-                if (set.getMovingPlayer().getColor().equals(PieceColor.BLACK)) {
+                if (set.getMovingPlayer().getColor() == Cell.BLACK) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -379,14 +379,14 @@ public class TestMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Player player;
                 if (aiWhite.getState()) {
-                    player = new AIPlayer("Computer_02", PieceColor.WHITE);
+                    player = new AIPlayer("Computer_02", Cell.WHITE);
                 } else {
-                    player = new HumanPlayer("Human_02", PieceColor.WHITE);
+                    player = new HumanPlayer("Human_02", Cell.WHITE);
                 }
                 player.setMediator(mediator);
                 final PlayerSet set = mediator.getPlayerSet();
                 set.addPlayer(player);
-                if (set.getMovingPlayer().getColor().equals(PieceColor.WHITE)) {
+                if (set.getMovingPlayer().getColor() == Cell.WHITE) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

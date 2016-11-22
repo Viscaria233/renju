@@ -3,10 +3,11 @@ package com.haochen.renju.control;
 import java.io.*;
 import java.util.*;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
-import com.haochen.renju.bean.RealPiece;
+import com.haochen.renju.control.ai.TTT;
 import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.*;
@@ -14,6 +15,7 @@ import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
+import com.haochen.renju.util.PointUtils;
 
 public class Mediator {
     private AI ai;
@@ -21,9 +23,11 @@ public class Mediator {
     private Board board;
 //    protected TestMenuBar menuBar;
 
+    private TTT ttt = new TTT();
+
     private PlayerSet playerSet = new PlayerSet();
 
-    private  Operator operator = new Operator();
+    private Operator operator = new Operator();
 
     public Mediator(Display display) {
         ai = new AI();
@@ -33,13 +37,13 @@ public class Mediator {
         board.setMediator(this);
         display.setMediator(this);
 
-        Player player = new HumanPlayer("Human_01", PieceColor.BLACK);
-//        Player player = new AIPlayer("Computer_01", PieceColor.BLACK);
+        Player player = new HumanPlayer("Human_01", Cell.BLACK);
+//        Player player = new AIPlayer("Computer_01", Cell.BLACK);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
-        player = new HumanPlayer("Human_02", PieceColor.WHITE);
-//        player = new AIPlayer("Computer_02", PieceColor.WHITE);
+        player = new HumanPlayer("Human_02", Cell.WHITE);
+//        player = new AIPlayer("Computer_02", Cell.WHITE);
         player.setMediator(this);
         playerSet.addPlayer(player);
     }
@@ -67,7 +71,7 @@ public class Mediator {
 
         void removePiece(Point currentLocation, Point lastLocation);
 
-        void drawRecord(Point location, PieceColor color);
+        void drawRecord(Point location, int color);
 
         void removeRecord(Point location);
 
@@ -90,26 +94,30 @@ public class Mediator {
                 return;
             }
             int index = board.getNumber() + 1;
-            PieceColor color = playerSet.getMovingPlayer().getColor();
-            Piece piece = new RealPiece(index, point, color);
+            int color = playerSet.getMovingPlayer().getColor();
+            Piece piece = new Piece(index, point, color);
             //先判断这个棋子是否能使某一方胜利
-            PieceMap map = null;
-            try {
-                map = board.createPieceMap();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
-            PieceColor winner = ai.findWinner(map, piece);
+            int winner = ai.findWinner(board, PointUtils.parse(point), color);
             //然后落子
+
+
+            /**
+             *
+             */
+            if (playerSet.getMovingPlayer().getColor() == Cell.WHITE) {
+                ttt.humanMove(piece.getPoint());
+            }
+
+
             board.addPiece(piece);
             display.drawPiece(piece);
             drawRecords();
             display.commit();
 
 
-            if (winner != null) {
+            if (winner != 0) {
                 Player player;
-                if (winner.equals(playerSet.getMovingPlayer().getColor())) {
+                if (winner == playerSet.getMovingPlayer().getColor()) {
                     player = playerSet.getMovingPlayer();
                     playerSet.exchangePlayer();
                 } else {
@@ -137,7 +145,7 @@ public class Mediator {
             }
             board.removeCurrentPiece();
             Piece last = board.getCurrentPiece();
-            display.removePiece(current.getLocation(), last == null ? null : last.getLocation());
+            display.removePiece(current.getPoint(), last == null ? null : last.getPoint());
             drawRecords();
             display.commit();
             if (AI.usingForbiddenMove) {
@@ -153,19 +161,24 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                ContinueAttribute c = ai.getContinueAttribute(
-                        board.createPieceMap(), piece.getColor(), piece.getLocation(), Direction.all);
-                Point[][] p = new Point[4][];
-                Direction[] d = Direction.createDirectionArray();
-                for (int i = 0; i < 4; ++i) {
-                    p[i] = c.getContinue(d[i]).getBreakPoint();
-                    System.out.println("" + p[i][0] + "  " + p[i][1] + " : " + d[i]);
+
+
+            /**
+             *
+             */
+            ttt.withdraw();
+
+
+            ContinueAttribute c = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction[] d = Direction.createDirectionArray();
+            for (int i = 0; i < 4; ++i) {
+                int[] temp = c.getContinue(d[i]).getBreakPoint();
+                for (int j = 0; j < temp.length; ++j) {
+                    System.out.print(" " + PointUtils.build(temp[j]).toString());
                 }
-                System.out.println();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+                System.out.println(" : " + d[i]);
             }
+            System.out.println();
         }
 
         public void showFive() {
@@ -173,14 +186,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        board.createPieceMap(), piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findFive(attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findFive(attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void showAliveFour() {
@@ -188,15 +196,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                PieceMap map = board.createPieceMap();
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        map, piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findAliveFour(map, attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findAliveFour(board, attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void showAsleepFour() {
@@ -204,15 +206,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                PieceMap map = board.createPieceMap();
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        map, piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findAsleepFour(map, attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findAsleepFour(board, attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void showAliveThree() {
@@ -220,15 +216,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                PieceMap map = board.createPieceMap();
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        map, piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findAliveThree(map, attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findAliveThree(board, attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void showAsleepThree() {
@@ -236,15 +226,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                PieceMap map = board.createPieceMap();
-                ContinueAttribute attribute = ai.getContinueAttribute(
-                        map, piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findAsleepThree(map, attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findAsleepThree(board, attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void showLongContinue() {
@@ -252,13 +236,9 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                ContinueAttribute attribute = ai.getContinueAttribute(board.createPieceMap(), piece.getColor(), piece.getLocation(), Direction.all);
-                Direction d = ai.findLongContinue(attribute, Direction.all);
-                System.out.println(d);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+            Direction d = ai.findLongContinue(attribute, Direction.all);
+            System.out.println(d);
         }
 
         public void isItDoubleFour() {
@@ -266,12 +246,8 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                boolean n = ai.isDoubleFour(board.createPieceMap(), piece.getLocation());
-                System.out.println(n);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            boolean n = ai.isDoubleFour(board, piece.getPoint());
+            System.out.println(n);
         }
 
         public void isItDoubleThree() {
@@ -279,12 +255,8 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-            try {
-                boolean n = ai.isDoubleThree(board.createPieceMap(), piece.getLocation());
-                System.out.println(n);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            boolean n = ai.isDoubleThree(board, piece.getPoint());
+            System.out.println(n);
         }
 
         public void isItForbiddenMove(Point point) {
@@ -294,54 +266,49 @@ public class Mediator {
             if (!board.available(point)) {
                 return;
             }
-            try {
-                ContinueAttribute attribute = ai.getContinueAttribute(board.createPieceMap(), PieceColor.BLACK, point, Direction.all);
-                boolean n = ai.isForbiddenMove(board.createPieceMap(), attribute, Direction.all);
-                System.out.println(n);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
+            boolean n = ai.isForbiddenMove(board, attribute, Direction.all);
+            System.out.println(n);
         }
 
         public void drawForbiddenMark() {
-            try {
-                board.clearForbiddenMark();
-                display.clearForbiddenMark();
-                PieceMap map = board.createPieceMap();
+            board.clearForbiddenMark();
+            display.clearForbiddenMark();
+            PieceMap map = board.pieceMap();
 //                Point point;
 
-                for (Point point : map) {
-//                    point = cell.getLocation();
-                    boolean imaginary = false;
-                    if (map.available(point)) {
-                        map.addPiece(-1, point, PieceColor.BLACK);
-                        imaginary = true;
-                    }
-                    ContinueAttribute attribute = ai.getContinueAttribute(map, PieceColor.BLACK, point, Direction.all);
-                    boolean n = ai.isForbiddenMove(map, attribute, Direction.all);
-                    if (imaginary) {
-                        map.removeCell(point);
-                    }
-                    if (n) {
+//                for (Point point : map) {
+////                    point = cell.getPoint();
+//                    boolean imaginary = false;
+//                    if (map.available(point)) {
+//                        map.addPiece(-1, point, Cell.BLACK);
+//                        imaginary = true;
+//                    }
+//                    ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
+//                    boolean n = ai.isForbiddenMove(board, attribute, Direction.all);
+//                    if (imaginary) {
+//                        map.removeCell(point);
+//                    }
+//                    if (n) {
+//                        board.addForbiddenMark(point);
+//                        display.drawForbiddenMark(point);
+//                    }
+//                }
+
+            for (Point point : map) {
+//                    point = cell.getPoint();
+                if (map.available(point)) {
+                    map.addPiece(-1, point, Cell.BLACK);
+                    ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
+                    map.removeCell(point);
+
+                    if (ai.isForbiddenMove(board, attribute, Direction.all)) {
                         board.addForbiddenMark(point);
                         display.drawForbiddenMark(point);
                     }
                 }
-
-//                for (int i = 1; i <= 15; ++i) {
-//                    for (int j = 1; j <= 15; ++j) {
-//                        point = new Point(i, j);
-//                        boolean n = ai.isForbiddenMove(map, point, Direction.all);
-//                        if (n) {
-//                            board.addForbiddenMark(point);
-//                            display.drawForbiddenMark(point);
-//                        }
-//                    }
-//                }
-                display.commit();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
             }
+            display.commit();
         }
 
         public void launch() {
@@ -357,17 +324,18 @@ public class Mediator {
             long start = new Date().getTime();
             try {
                 Thread.sleep(800 + (int) (Math.random() * 400));
-                PieceMap map = board.createPieceMap();
-                PieceColor color = playerSet.getMovingPlayer().getColor();
-//                Point point = ai.getCloseMove(map, color, board.getCurrentPiece());
-                Point point = ai.getMove(map, color);
+                PieceMap map = board.pieceMap();
+                int color = playerSet.getMovingPlayer().getColor();
+//                Point point = ai.getCloseMove(map, type, board.getCurrentPiece());
+//                Point point = ai.getMove(board, color);
+                Point point = ttt.aiMove();
                 String s = playerSet.getMovingPlayer().getColorString();
                 System.out.println(s + " AI moved. Think time = "
                         + (new Date().getTime() - start) + " ms.  "
                         + point);
                 move(point);
 
-            } catch (CloneNotSupportedException | InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -387,74 +355,52 @@ public class Mediator {
         }
 
         public void getContinueTypes() {
-            try {
-                PieceMap pieceMap = board.createPieceMap();
-                Piece piece = board.getCurrentPiece();
-                if (piece != null) {
-                    ContinueAttribute attribute = ai.getContinueAttribute(
-                            pieceMap, piece.getColor(), piece.getLocation(), Direction.all);
-                    Map<Direction, ContinueType> map = ai.getContinueTypes(pieceMap, attribute);
-                    Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
-                    for (Map.Entry<Direction, ContinueType> entry : set) {
-                        System.out.println(entry.getKey() + "    " + entry.getValue());
-                    }
+            Piece piece = board.getCurrentPiece();
+            if (piece != null) {
+                ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
+                Map<Direction, ContinueType> map = ai.getContinueTypes(board, attribute);
+                Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
+                for (Map.Entry<Direction, ContinueType> entry : set) {
+                    System.out.println(entry.getKey() + "    " + entry.getValue());
                 }
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
             }
         }
 
         public void findAllFourPoints() {
-            try {
-//                List<Point> fourPoints = ai.findAllFourPoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
-                List<Point> fourPoints = ai.findPoints(board.createPieceMap(), Config.Test.color,
-                        Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
-                        Arrays.asList(ContinueType.FIVE));
+            List<Point> fourPoints = ai.findPoints(board, Config.Test.color,
+                    Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
+                    Arrays.asList(ContinueType.FIVE));
 
-                System.out.println("----findAllFourPoints----");
-                for (Point point : fourPoints) {
-                    System.out.println(point);
-                }
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            System.out.println("----findAllFourPoints----");
+            for (Point point : fourPoints) {
+                System.out.println(point);
             }
         }
 
         public void findAllFivePoints() {
-            try {
-//                List<Point> fivePoints = ai.findAllFivePoints(board.createPieceMap(), playerSet.getMovingPlayer().getColor());
-                List<Point> fivePoints = ai.findPoints(board.createPieceMap(), Config.Test.color,
-                        Arrays.asList(ContinueType.FIVE), null);
+            List<Point> fivePoints = ai.findPoints(board, Config.Test.color,
+                    Arrays.asList(ContinueType.FIVE), null);
 
-                System.out.println("----findAllFivePoints----");
-                for (Point point : fivePoints) {
-                    System.out.println(point);
-                }
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            System.out.println("----findAllFivePoints----");
+            for (Point point : fivePoints) {
+                System.out.println(point);
             }
         }
 
         public void findVCF() {
-            try {
-                PieceMap map = board.createPieceMap();
+            Date begin = new Date();
+            WinTree vcf = ai.findVCF(board, playerSet.getMovingPlayer().getColor());
+            Date end = new Date();
 
-                Date begin = new Date();
-                WinTree vcf = ai.findVCF(map, playerSet.getMovingPlayer().getColor());
-                Date end = new Date();
-
-                System.out.println("----findVCF----");
-                for (WinTree t : vcf) {
-                    System.out.print(t.getColor() + ": ");
-                    System.out.println(t.getPoint());
-                }
-
-                System.out.println((end.getTime() - begin.getTime()) + " ms");
-
-//                saveVCFInfo(vcf);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            System.out.println("----findVCF----");
+            for (WinTree t : vcf) {
+                System.out.print(t.getColor() + ": ");
+                System.out.println(t.getPoint());
             }
+
+            System.out.println((end.getTime() - begin.getTime()) + " ms");
+
+//            saveVCFInfo(vcf);
         }
 
         public void saveVCFInfo(WinTree tree) {
@@ -467,7 +413,7 @@ public class Mediator {
                     file.createNewFile();
                 }
                 qS = new ObjectOutputStream(new FileOutputStream(file));
-                qS.writeObject(board.createPieceMap());
+                qS.writeObject(board.pieceMap());
                 qS.flush();
 
                 file = new File(Config.Test.Path.VCF, "vcf_answer_" + Config.Test.QuesCount.vcf + ".ans");
@@ -484,7 +430,7 @@ public class Mediator {
                                 new FileOutputStream(new File(Config.Test.Path.VCF, "vcf_count.txt"))));
                 bw.write(Config.Test.QuesCount.vcf + "");
                 bw.flush();
-            } catch (IOException | CloneNotSupportedException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 if (qS != null) {
@@ -512,25 +458,20 @@ public class Mediator {
         }
 
         public void findVCT() {
-            try {
-                PieceMap map = board.createPieceMap();
 
-                Date begin = new Date();
-                WinTree vct = ai.findVCT(map, playerSet.getMovingPlayer().getColor());
-                Date end = new Date();
+            Date begin = new Date();
+            WinTree vct = ai.findVCT(board, playerSet.getMovingPlayer().getColor());
+            Date end = new Date();
 
-                System.out.println("----findVCT----");
-                for (WinTree t : vct) {
-                    System.out.print(t.getColor() + ": ");
-                    System.out.println(t.getPoint());
-                }
-
-                System.out.println((end.getTime() - begin.getTime()) + " ms");
-
-//                saveVCFInfo(vct);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            System.out.println("----findVCT----");
+            for (WinTree t : vct) {
+                System.out.print(t.getColor() + ": ");
+                System.out.println(t.getPoint());
             }
+
+            System.out.println((end.getTime() - begin.getTime()) + " ms");
+
+//            saveVCFInfo(vct);
         }
 
     }
@@ -539,7 +480,7 @@ public class Mediator {
         display.removeRecord();
         List<Piece> records = board.getRecords();
         for (Piece p : records) {
-            display.drawRecord(p.getLocation(), p.getColor());
+            display.drawRecord(p.getPoint(), p.getType());
         }
     }
 

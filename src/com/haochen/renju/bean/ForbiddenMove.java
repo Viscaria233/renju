@@ -1,18 +1,17 @@
 package com.haochen.renju.bean;
 
-import com.haochen.renju.storage.PieceColor;
 import com.haochen.renju.storage.Point;
 
 public class ForbiddenMove extends Cell {
 
-    private Point location;
+    private Point point;
     
-    public ForbiddenMove(Point location) {
-        this.location = location;
+    public ForbiddenMove(Point point) {
+        this.point = point;
     }
     
     public ForbiddenMove(int x, int y) {
-        this.location = new Point(x, y);
+        this.point = new Point(x, y);
     }
     
     @Override
@@ -21,23 +20,17 @@ public class ForbiddenMove extends Cell {
     }
 
     @Override
-    public Point getLocation() {
-        return location;
+    public Point getPoint() {
+        return point;
     }
 
     @Override
-    public PieceColor getColor() {
-        return null;
+    public int getType() {
+        return Cell.FORBIDDEN;
     }
     
     @Override
     public boolean isPiece() {
         return false;
     }
-    
-    @Override
-    public boolean isForbiddenMove() {
-        return true;
-    }
-
 }

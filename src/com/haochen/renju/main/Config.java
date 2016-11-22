@@ -1,6 +1,6 @@
 package com.haochen.renju.main;
 
-import com.haochen.renju.storage.PieceColor;
+import com.haochen.renju.bean.Cell;
 
 import java.io.*;
 
@@ -55,7 +55,7 @@ public class Config {
             public static final File VCF = new File("renju_test/vcf");
             public static final File VCT = new File("renju_test/vct");
         }
-        public static PieceColor color = PieceColor.BLACK;
+        public static int color = Cell.BLACK;
         public static class QuesCount {
             public static int vcf;
             public static int vct;

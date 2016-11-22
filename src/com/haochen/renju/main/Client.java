@@ -64,7 +64,7 @@ public class Client {
 
     private static void drawPieceMap(Mediator mediator, List<Piece> pieces) {
         for (Piece p : pieces) {
-            mediator.getOperator().move(p.getLocation());
+            mediator.getOperator().move(p.getPoint());
         }
     }
 
@@ -92,7 +92,7 @@ public class Client {
 
                 List<Point> points = new ArrayList<>();
                 for (Piece p : sorted) {
-                    points.add(p.getLocation());
+                    points.add(p.getPoint());
                 }
 
                 oos.writeObject(points);

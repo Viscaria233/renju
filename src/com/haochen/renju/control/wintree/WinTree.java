@@ -1,8 +1,5 @@
 package com.haochen.renju.control.wintree;
 
-import com.haochen.renju.storage.PieceColor;
-import com.haochen.renju.storage.Point;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,8 +11,8 @@ import java.util.List;
 public class WinTree implements Iterable<WinTree>, Serializable {
     private WinTree parent;
     private List<WinTree> children = new ArrayList<>();
-    private Point point;
-    private PieceColor color;
+    private int point;
+    private int color;
 
     public void add(WinTree tree) {
         tree.setParent(this);
@@ -29,9 +26,9 @@ public class WinTree implements Iterable<WinTree>, Serializable {
         }
     }
 
-    public void add(List<Point> points, PieceColor color) {
+    public void add(List<Integer> points, int color) {
         WinTree winTree;
-        for (Point p : points) {
+        for (int p : points) {
             winTree = new WinTree();
             winTree.setParent(this);
             winTree.setPoint(p);
@@ -44,9 +41,9 @@ public class WinTree implements Iterable<WinTree>, Serializable {
         children.remove(tree);
     }
 
-    public void remove(Point point) {
+    public void remove(int point) {
         for (WinTree n : children) {
-            if (n.getPoint().equals(point)) {
+            if (n.getPoint() != point) {
                 children.remove(n);
             }
         }
@@ -76,19 +73,19 @@ public class WinTree implements Iterable<WinTree>, Serializable {
         return children.get(index);
     }
 
-    public Point getPoint() {
+    public int getPoint() {
         return point;
     }
 
-    public void setPoint(Point point) {
+    public void setPoint(int point) {
         this.point = point;
     }
 
-    public PieceColor getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(PieceColor color) {
+    public void setColor(int color) {
         this.color = color;
     }
 
@@ -115,20 +112,23 @@ public class WinTree implements Iterable<WinTree>, Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof WinTree)) {
-            return false;
-        }
-        WinTree t = (WinTree) obj;
-        if ((point == null && t.point == null && color == null && t.color == null)
-                || ((point != null && t.point != null && point.equals(t.point))
-                && (color != null && t.color != null && color.equals(t.color)))) {
-            if (children.isEmpty()) {
-                return true;
-            } else {
-                return children.equals(t.children);
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WinTree winTree = (WinTree) o;
+
+        if (point != winTree.point) return false;
+        if (color != winTree.color) return false;
+        return children != null ? children.equals(winTree.children) : winTree.children == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = children != null ? children.hashCode() : 0;
+        result = 31 * result + point;
+        result = 31 * result + color;
+        return result;
     }
 }
