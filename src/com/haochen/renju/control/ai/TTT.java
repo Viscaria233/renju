@@ -1,5 +1,6 @@
 package com.haochen.renju.control.ai;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.util.PointUtils;
 
@@ -36,7 +37,7 @@ public class TTT {
 
     int[][] chessboard = new int[15][15];//棋盘数组
     int step = 0; //当前步数
-    int cpt = 1, hum = 2;//双方棋子颜色
+    int cpt, hum;//双方棋子颜色
     int MaxDepth;//每次搜索最大深度
     int SearchDepth = 8; //搜索最大深度
     int BestVal; //最佳走法分值
@@ -52,7 +53,14 @@ public class TTT {
     int[][] move = new int[15][15];
 
 
-    public TTT() {
+    public TTT(int color) {
+        if (color == Cell.BLACK) {
+            cpt = Cell.BLACK;
+            hum = Cell.WHITE;
+        } else {
+            cpt = Cell.WHITE;
+            hum = Cell.BLACK;
+        }
         for (int i = 0; i < chessxy.length; ++i) {
             chessxy[i] = new xy();
         }
@@ -552,10 +560,6 @@ public class TTT {
         ThinkTime = (double) (finish.getTime() - start.getTime());
         System.out.println(BestMove.x + ", " + BestMove.y + ": " + BestVal + "/ " + score[BestMove.x][BestMove.y]);
         return BestMove;
-    }
-
-    public int getMove() {
-        return gobang().toInt();
     }
 
     //绘制棋盘

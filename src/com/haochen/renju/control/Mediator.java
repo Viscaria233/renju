@@ -8,6 +8,7 @@ import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.control.ai.TTT;
+import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.*;
@@ -23,7 +24,7 @@ public class Mediator {
     private Board board;
 //    protected TestMenuBar menuBar;
 
-    private TTT ttt = new TTT();
+    private TTT ttt = new TTT(Cell.BLACK);
 
     private PlayerSet playerSet = new PlayerSet();
 
@@ -131,7 +132,12 @@ public class Mediator {
                         drawForbiddenMark();
                     }
                     playerSet.exchangePlayer();
-                    playerSet.move();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playerSet.move();
+                        }
+                    }).start();
                 } else {
                     System.out.println("Draw game");
                 }
@@ -143,6 +149,15 @@ public class Mediator {
             if (current == null) {
                 return;
             }
+
+
+            /**
+             *
+             */
+            ttt.withdraw();
+            ttt.drawchess();
+
+
             board.removeCurrentPiece();
             Piece last = board.getCurrentPiece();
             display.removePiece(current.getPoint(), last == null ? null : last.getPoint());
@@ -153,7 +168,12 @@ public class Mediator {
             }
 
             playerSet.exchangePlayer();
-            playerSet.move();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    playerSet.move();
+                }
+            }).start();
         }
 
         public void showBreakPoint() {
@@ -161,14 +181,6 @@ public class Mediator {
             if (piece == null) {
                 return;
             }
-
-
-            /**
-             *
-             */
-            ttt.withdraw();
-
-
             ContinueAttribute c = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
             Direction[] d = Direction.createDirectionArray();
             for (int i = 0; i < 4; ++i) {

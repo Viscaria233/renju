@@ -17,7 +17,7 @@ import java.util.*;
 
 public class AI {
 
-    public static boolean usingForbiddenMove = true;
+    public static boolean usingForbiddenMove = false;
     private Mediator mediator;
 
     public void setMediator(Mediator mediator) {
@@ -411,9 +411,9 @@ public class AI {
 
     public Direction findLongContinue(ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
-//        if (attribute == null) {
-//            return result;
-//        }
+        if (attribute == null) {
+            return result;
+        }
 
         Direction[] directionArray = Direction.createDirectionArray();
         if (!direction.isSingle()) {
