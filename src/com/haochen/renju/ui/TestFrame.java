@@ -21,7 +21,7 @@ public class TestFrame extends JFrame {
     private TestMenuBar menuBar;
     private GridBagLayout g = new GridBagLayout();
     
-    public TestFrame() throws ReadFileException {
+    public TestFrame() {
         this.setLayout(g);
         this.setResizable(false);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

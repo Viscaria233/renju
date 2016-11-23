@@ -63,7 +63,7 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
     public void clear() {
         for (int i = 0; i < 15; ++i) {
             for (int j = 0; j < 15; ++j) {
-                map[i][j] = null;
+                map[i][j] = EmptyCell.INSTANCE;
             }
         }
     }

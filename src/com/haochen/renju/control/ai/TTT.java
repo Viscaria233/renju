@@ -45,9 +45,9 @@ public class TTT {
     int ABcut;//剪枝数
     int MaxLen[] = {0, 4, 5, 4, 5, 10, 10, 15, 20};
     xy BestMove = new xy(); //最佳走法
-    xy[] chessxy = new xy[255];//已落棋子数组
+    xy[] chessxy = new xy[225];//已落棋子数组
     //记录当前深度选点
-    point[][] s = new point[10][255];
+    point[][] s = new point[10][225];
     double ThinkTime; //电脑思考时间
     int[][] score = new int[15][15];//空格分值
     int[][] move = new int[15][15];
@@ -57,7 +57,7 @@ public class TTT {
             chessxy[i] = new xy();
         }
         for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 255; ++j) {
+            for (int j = 0; j < 225; ++j) {
                 s[i][j] = new point();
             }
         }
@@ -75,7 +75,7 @@ public class TTT {
             chessxy[i] = new xy();
         }
         for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 255; ++j) {
+            for (int j = 0; j < 225; ++j) {
                 s[i][j] = new point();
             }
         }
@@ -477,7 +477,7 @@ public class TTT {
 
     //生成下一步所有走法，返回总个数
     int GetMove(int depth) {
-        for (int i = 0; i < 255; ++i) {
+        for (int i = 0; i < 225; ++i) {
             s[depth][i].p.x = 0;
             s[depth][i].p.y = 0;
             s[depth][i].val = 0;

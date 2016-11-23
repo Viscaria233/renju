@@ -38,6 +38,7 @@ public class TestMenuBar extends JMenuBar {
 
     private JMenuItem about;
 
+    private JMenuItem newGame;
     private JCheckBoxMenuItem black;
     private JMenuItem find4;
     private JMenuItem find5;
@@ -99,6 +100,7 @@ public class TestMenuBar extends JMenuBar {
         about = new JMenuItem("About");
         help.add(about);
 
+        newGame = new JMenuItem("New Game");
         black = new JCheckBoxMenuItem("black");
         find4 = new JMenuItem("find 4");
         find5 = new JMenuItem("find 5");
@@ -113,6 +115,8 @@ public class TestMenuBar extends JMenuBar {
         findFour = new JMenuItem("Find Four");
         separator = new JMenuItem("separator");
 
+        test.add(newGame);
+        test.addSeparator();
         test.add(black);
         test.add(find4);
         test.add(find5);
@@ -241,6 +245,19 @@ public class TestMenuBar extends JMenuBar {
                     }
                 }
         );
+
+        newGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mediator.getOperator().clearScreen();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mediator.getOperator().newGame();
+                    }
+                }).start();
+            }
+        });
 
         black.addActionListener(new ActionListener() {
             @Override

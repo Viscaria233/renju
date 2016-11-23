@@ -19,7 +19,7 @@ public class Client {
 
     private static TestFrame frame;
 
-    public static void launch() throws ReadFileException {
+    public static void launch() {
         frame = new TestFrame();
         frame.setVisible(true);
         frame.launch();
@@ -131,14 +131,10 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        try {
             Config.init();
             launch();
 //            showList();
-        } catch (ReadFileException e) {
-            e.printStackTrace();
-            Dialogs.errorDialog(e.getMessage() + '\n' + e.getFile().getAbsolutePath());
-        }
+
 //        new TTT().launch();
     }
 

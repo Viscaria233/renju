@@ -42,6 +42,8 @@ public class Config {
         }
     }
 
+    public static boolean GAME_OVER = false;
+
     public static class AILevel {
         public static int level;
         public static final int NONE = -1;

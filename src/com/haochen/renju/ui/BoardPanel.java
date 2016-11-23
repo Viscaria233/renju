@@ -3,10 +3,10 @@ package com.haochen.renju.ui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.JPanel;
 
 import com.haochen.renju.bean.Cell;
@@ -14,6 +14,8 @@ import com.haochen.renju.control.Mediator;
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.exception.ReadFileException;
+import com.haochen.renju.main.Config;
+import com.haochen.renju.resources.Resource;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.draw.Layer;
 import com.haochen.renju.ui.draw.LayerManager;
@@ -29,7 +31,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     private final int cellWidth = 30;
     private final int lineNumber = 15;
     private final int pieceFieldWidth = cellWidth * lineNumber;
-    private String resourcePath = "resources\\";
+    private String resourcePath = "./resources/";
     private Image backgroundImage;
     private Image blackPiece;
     private Image whitePiece;
@@ -54,7 +56,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     
     private Mediator mediator;
     
-    public BoardPanel() throws ReadFileException {
+    public BoardPanel() {
         super();
         setLayout(gridBag);
         initial();
@@ -63,20 +65,16 @@ public class BoardPanel extends JPanel implements Mediator.Display {
 
     /**  
      * @Title: initial  
-     * @Description: TODO   
-     * @throws ReadFileException      
+     * @Description: TODO
      */
-    private void initial() throws ReadFileException {
-        File file = new File(resourcePath);
+    private void initial() {
         try {
-            file = new File(resourcePath + "marble.png");
-            backgroundImage = ImageIO.read(file);
-            file = new File(resourcePath + "black.png");
-            blackPiece = ImageIO.read(file);
-            file = new File(resourcePath + "white.png");
-            whitePiece = ImageIO.read(file);
+            backgroundImage = ImageIO.read(Resource.get("marble.png"));
+//            backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("marble.png"));
+            blackPiece = ImageIO.read(Resource.get("black.png"));
+            whitePiece = ImageIO.read(Resource.get("white.png"));
         } catch (IOException e) {
-            throw new ReadFileException(e.getMessage(), file);
+            e.printStackTrace();
         }
         
         background = new NetPanel();
@@ -112,6 +110,9 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         net.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (Config.GAME_OVER) {
+                    return;
+                }
                 switch (e.getButton()) {
                 case MouseEvent.BUTTON1: {
                     if (mediator.getPlayerSet().getMovingPlayer() instanceof HumanPlayer) {

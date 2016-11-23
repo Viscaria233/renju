@@ -119,4 +119,10 @@ public class Board {
         map.display();
         tree.display();
     }
+
+    public void clear() {
+        map.clear();
+        tree.clear();
+        number = 0;
+    }
 }

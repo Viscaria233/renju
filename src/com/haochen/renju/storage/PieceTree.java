@@ -1,5 +1,6 @@
 package com.haochen.renju.storage;
 
+import java.util.Currency;
 import java.util.List;
 import java.util.Stack;
 
@@ -93,7 +94,7 @@ public class PieceTree {
     }
     
     public void display() {
-        Stack<Piece> stack = new Stack<Piece>();
+        Stack<Piece> stack = new Stack<>();
         TreeNode temp = current;
         while (temp.getParent() != null) {
             stack.push(temp.getPiece());
@@ -102,5 +103,10 @@ public class PieceTree {
         while (!stack.isEmpty()) {
             System.out.println(stack.peek().getIndex() + "  " + stack.pop().getPoint());
         }
+    }
+
+    public void clear() {
+        root = new TreeNode(null, null);
+        current = root;
     }
 }

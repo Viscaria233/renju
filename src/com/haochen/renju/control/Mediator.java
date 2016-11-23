@@ -16,6 +16,7 @@ import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
+import com.haochen.renju.ui.Dialogs;
 import com.haochen.renju.util.PointUtils;
 
 public class Mediator {
@@ -27,7 +28,7 @@ public class Mediator {
     private TTT tttBlack = new TTT(Cell.BLACK);
     private TTT tttWhite = new TTT(Cell.WHITE);
 
-    private PlayerSet playerSet = new PlayerSet();
+    private PlayerSet playerSet;
 
     private Operator operator = new Operator();
 
@@ -39,12 +40,20 @@ public class Mediator {
         board.setMediator(this);
         display.setMediator(this);
 
+        initPlayerSet();
+    }
+
+    private void initPlayerSet() {
+        playerSet = new PlayerSet();
+
 //        Player player = new HumanPlayer("Human_01", Cell.BLACK);
-        Player player = new AIPlayer("Computer_01", Cell.BLACK);
+//        Player player = new AIPlayer("Computer_01", Cell.BLACK);
+        Player player = new AIPlayer("Computer", Cell.BLACK);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
-        player = new HumanPlayer("Human_02", Cell.WHITE);
+        player = new HumanPlayer("You", Cell.WHITE);
+//        player = new HumanPlayer("Human_02", Cell.WHITE);
 //        player = new AIPlayer("Computer_02", Cell.WHITE);
         player.setMediator(this);
         playerSet.addPlayer(player);
@@ -130,6 +139,7 @@ public class Mediator {
                     player = playerSet.getMovingPlayer();
                 }
                 showWinMessage(player);
+                Config.GAME_OVER = true;
             } else {
                 if (board.getNumber() < 225) {
                     if (AI.usingForbiddenMove) {
@@ -179,6 +189,21 @@ public class Mediator {
                     playerSet.move();
                 }
             }).start();
+        }
+
+        public void clearScreen() {
+            display.clear();
+            display.commit();
+        }
+
+        public void newGame() {
+            board.clear();
+            tttBlack = new TTT(Cell.BLACK);
+            tttWhite = new TTT(Cell.WHITE);
+            Config.GAME_OVER = false;
+            initPlayerSet();
+            board.display();
+            launch();
         }
 
         public void showBreakPoint() {
@@ -341,11 +366,11 @@ public class Mediator {
             long start = new Date().getTime();
             try {
                 Thread.sleep(800 + (int) (Math.random() * 400));
-                PieceMap map = board.pieceMap();
-                int color = playerSet.getMovingPlayer().getColor();
+//                PieceMap map = board.pieceMap();
+//                int color = playerSet.getMovingPlayer().getColor();
 //                Point point = ai.getCloseMove(map, type, board.getCurrentPiece());
 //                Point point = ai.getMove(board, color);
-                Point point = null;
+                Point point;
                 if (playerSet.getMovingPlayer().getColor() == Cell.BLACK) {
                     point = tttBlack.aiMove();
                 } else {
@@ -364,6 +389,7 @@ public class Mediator {
 
         public void showWinMessage(Player winner) {
             System.out.println(winner.getName() + " win with " + winner.getColorString());
+            Dialogs.messageDialog((winner.getName() + " win with " + winner.getColorString()));
         }
 
         public void updateConfig() {
