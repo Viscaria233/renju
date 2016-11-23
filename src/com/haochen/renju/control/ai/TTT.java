@@ -52,6 +52,16 @@ public class TTT {
     int[][] score = new int[15][15];//空格分值
     int[][] move = new int[15][15];
 
+    public TTT() {
+        for (int i = 0; i < chessxy.length; ++i) {
+            chessxy[i] = new xy();
+        }
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < 255; ++j) {
+                s[i][j] = new point();
+            }
+        }
+    }
 
     public TTT(int color) {
         if (color == Cell.BLACK) {
@@ -644,7 +654,7 @@ public class TTT {
         int dy = chessxy[step].y;
         for (i = -2; i <= 2; i++) {
             for (j = -2; j <= 2; j++) {
-                if (chessboard[dx + i][dy + j] == 0) {
+                if (CheckXy(dx + i, dy + j) == 1 && chessboard[dx + i][dy + j] == 0) {
                     dx += i;
                     dy += j;
                     i = j = 3;
@@ -667,13 +677,11 @@ public class TTT {
 
     public void humanMove(Point point) {
         move(PointUtils.parse(point));
-        drawchess();
     }
 
     public Point aiMove() {
         xy next = gobang();//下一步
         MakeMove(next);
-        drawchess();
         return PointUtils.build(next.toInt());
     }
 

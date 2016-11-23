@@ -2,6 +2,7 @@ package com.haochen.renju.main;
 
 import com.haochen.renju.bean.Piece;
 import com.haochen.renju.control.Mediator;
+import com.haochen.renju.control.ai.TTT;
 import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
@@ -138,6 +139,7 @@ public class Client {
             e.printStackTrace();
             Dialogs.errorDialog(e.getMessage() + '\n' + e.getFile().getAbsolutePath());
         }
+//        new TTT().launch();
     }
 
 }

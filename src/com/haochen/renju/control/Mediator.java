@@ -24,7 +24,8 @@ public class Mediator {
     private Board board;
 //    protected TestMenuBar menuBar;
 
-    private TTT ttt = new TTT(Cell.BLACK);
+    private TTT tttBlack = new TTT(Cell.BLACK);
+    private TTT tttWhite = new TTT(Cell.WHITE);
 
     private PlayerSet playerSet = new PlayerSet();
 
@@ -38,8 +39,8 @@ public class Mediator {
         board.setMediator(this);
         display.setMediator(this);
 
-        Player player = new HumanPlayer("Human_01", Cell.BLACK);
-//        Player player = new AIPlayer("Computer_01", Cell.BLACK);
+//        Player player = new HumanPlayer("Human_01", Cell.BLACK);
+        Player player = new AIPlayer("Computer_01", Cell.BLACK);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
@@ -106,8 +107,11 @@ public class Mediator {
              *
              */
             if (playerSet.getMovingPlayer().getColor() == Cell.WHITE) {
-                ttt.humanMove(piece.getPoint());
+                tttBlack.humanMove(piece.getPoint());
+            } else {
+                tttWhite.humanMove(piece.getPoint());
             }
+            tttBlack.drawchess();
 
 
             board.addPiece(piece);
@@ -154,8 +158,9 @@ public class Mediator {
             /**
              *
              */
-            ttt.withdraw();
-            ttt.drawchess();
+            tttBlack.withdraw();
+            tttWhite.withdraw();
+            tttBlack.drawchess();
 
 
             board.removeCurrentPiece();
@@ -340,7 +345,12 @@ public class Mediator {
                 int color = playerSet.getMovingPlayer().getColor();
 //                Point point = ai.getCloseMove(map, type, board.getCurrentPiece());
 //                Point point = ai.getMove(board, color);
-                Point point = ttt.aiMove();
+                Point point = null;
+                if (playerSet.getMovingPlayer().getColor() == Cell.BLACK) {
+                    point = tttBlack.aiMove();
+                } else {
+                    point = tttWhite.aiMove();
+                }
                 String s = playerSet.getMovingPlayer().getColorString();
                 System.out.println(s + " AI moved. Think time = "
                         + (new Date().getTime() - start) + " ms.  "

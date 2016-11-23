@@ -351,6 +351,7 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
+        aiBlack.setState(true);
         aiBlack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
