@@ -9,6 +9,10 @@ import java.awt.*;
  */
 public class CellUtils {
 
+    public static Cell build(int index, int point, int color) {
+        return new Cell(index, PointUtils.build(point), color);
+    }
+
     public static String toString(int cell) {
         switch (cell) {
             case Cell.EMPTY:
@@ -17,8 +21,6 @@ public class CellUtils {
                 return "[B]";
             case Cell.WHITE:
                 return "[W]";
-            case Cell.FORBIDDEN:
-                return "[F]";
         }
         return "";
     }

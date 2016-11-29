@@ -1,21 +1,15 @@
 package com.haochen.renju.ui;
 
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.exception.ReadFileException;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TestFrame extends JFrame {
 
-    /**  
-     * @Fields serialVersionUID :  
-     */ 
     private static final long serialVersionUID = 1L;
-    
-//    private AI ai;
+
     private BoardPanel panel;
-//    private Board board;
     private Mediator mediator;
     
     private TestMenuBar menuBar;
@@ -28,10 +22,8 @@ public class TestFrame extends JFrame {
         
         menuBar = new TestMenuBar(this);
         this.setJMenuBar(menuBar);
-        
-//        ai = new AI();
+
         panel = new BoardPanel();
-//        board = new Board();
         mediator = new Mediator(panel);
         menuBar.setMediator(mediator);
 

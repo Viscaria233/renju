@@ -6,14 +6,11 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.JPanel;
 
 import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.bean.Piece;
 import com.haochen.renju.control.player.HumanPlayer;
-import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.resources.Resource;
 import com.haochen.renju.storage.Point;
@@ -23,15 +20,9 @@ import com.haochen.renju.util.CellUtils;
 
 public class BoardPanel extends JPanel implements Mediator.Display {
 
-    /**  
-     * @Fields serialVersionUID :  
-     */ 
-    private static final long serialVersionUID = 1L;
-
     private final int cellWidth = 30;
     private final int lineNumber = 15;
     private final int pieceFieldWidth = cellWidth * lineNumber;
-    private String resourcePath = "./resources/";
     private Image backgroundImage;
     private Image blackPiece;
     private Image whitePiece;
@@ -56,7 +47,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     
     private Mediator mediator;
     
-    public BoardPanel() {
+    BoardPanel() {
         super();
         setLayout(gridBag);
         initial();
@@ -70,7 +61,6 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     private void initial() {
         try {
             backgroundImage = ImageIO.read(Resource.get("marble.png"));
-//            backgroundImage = ImageIO.read(getClass().getClassLoader().getResource("marble.png"));
             blackPiece = ImageIO.read(Resource.get("black.png"));
             whitePiece = ImageIO.read(Resource.get("white.png"));
         } catch (IOException e) {
@@ -122,12 +112,6 @@ public class BoardPanel extends JPanel implements Mediator.Display {
                 }
                     break;
                 case MouseEvent.BUTTON2: {
-                    Point point = boardLocation(new Point(e.getX(), e.getY()));
-//                    mediator.response("is it hand cut", point);
-//                    mediator.getOperator().drawForbiddenMark();
-                    System.out.println(point);
-//                    mediator.getOperator().getContinueTypes();
-                    mediator.getOperator().isItForbiddenMove(point);
                 }
                     break;
                 case MouseEvent.BUTTON3: {
@@ -137,9 +121,6 @@ public class BoardPanel extends JPanel implements Mediator.Display {
                 }
                     break;
                 }
-//                if (e.getButton() == MouseEvent.BUTTON3) {
-//                    fixBoard(point);
-//                }
             }
         });
     }
@@ -150,34 +131,33 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     }
 
     @Override
-    public void drawPiece(Piece piece) {
-        int index = piece.getIndex();
-        Point location = piece.getPoint();
-        int color = piece.getType();
+    public void drawPiece(Cell cell) {
+        int index = cell.getIndex();
+        Point point = cell.getPoint();
+        int color = cell.getType();
 
-        pieceLayer.draw(location, color);
-        highlightLayer.draw(location);
+        pieceLayer.draw(point, color);
+        highlightLayer.draw(point);
         color = CellUtils.foeColor(color);
-        indexLayer.draw(index, location, color);
+        indexLayer.draw(index, point, color);
     }
 
     @Override
-    public void removePiece(Point currentLocation, Point lastLocation) {
-        fixBoard(currentLocation);
-        if (lastLocation != null) {
-            drawHighlight(lastLocation);
+    public void removePiece(Point current, Point last) {
+        fixBoard(current);
+        if (last != null) {
+            drawHighlight(last);
         }
     }
 
     @Override
-    public void drawRecord(Point boardLocation, int color) {
-//        Point absolutelyLocation = absolutelyLocation(boardLocation);
-        recordLayer.draw(boardLocation, color);
+    public void drawRecord(Point onBoard, int color) {
+        recordLayer.draw(onBoard, color);
     }
 
     @Override
-    public void removeRecord(Point location) {
-        Point absolutely = absolutelyLocation(location);
+    public void removeRecord(Point onBoard) {
+        Point absolutely = absolutelyLocation(onBoard);
         recordLayer.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
     }
 
@@ -187,9 +167,8 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     }
 
     @Override
-    public void drawForbiddenMark(Point boardLocation) {
-//        Point absolutelyLocation = absolutelyLocation(boardLocation);
-        forbiddenMarkLayer.draw(boardLocation);
+    public void drawForbiddenMark(Point onBoard) {
+        forbiddenMarkLayer.draw(onBoard);
     }
 
     @Override
@@ -198,8 +177,8 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     }
 
     @Override
-    public void clear(Point location) {
-        Point absolutely = absolutelyLocation(location);
+    public void clear(Point onBoard) {
+        Point absolutely = absolutelyLocation(onBoard);
         lm.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
     }
 
@@ -214,12 +193,12 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         lm.commit();
     }
 
-    public void drawHighlight(Point boardLocation) {
-        highlightLayer.draw(boardLocation);
+    private void drawHighlight(Point onBoard) {
+        highlightLayer.draw(onBoard);
     }
     
-    public void fixBoard(Point boardLocation) {
-        Point absolutelyLocation = absolutelyLocation(boardLocation);
+    private void fixBoard(Point onBoard) {
+        Point absolutelyLocation = absolutelyLocation(onBoard);
         int x = absolutelyLocation.x;
         int y = absolutelyLocation.y;
         x -= cellWidth / 2;
@@ -227,25 +206,9 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         lm.erase(x, y, cellWidth, cellWidth);
     }
     
-//    private void removeAllForbiddenMarks() {
-//        ArrayList<Location> bannedPoint = map.getForbiddenPoint();
-//        for (int i = 0; i < bannedPoint.size(); i++) {
-//            fixChessBoard(bannedPoint.get(i));
-//        }
-//    }
-
-//    private void removeAllRecords() {
-//        ChessTree tree = map.getChessTree();
-//        TreeNode node = tree.getCurrent();
-//        ArrayList<TreeNode> list = node.getChild();
-//        for (int i = 0; i < list.size(); i++) {
-//            fixChessBoard(list.get(i).getPoint());
-//        }
-//    }
-    
-    private Point boardLocation(Point absolutelyLocation) {
-        int x = absolutelyLocation.x;
-        int y = absolutelyLocation.y;
+    private Point boardLocation(Point absolutely) {
+        int x = absolutely.x;
+        int y = absolutely.y;
         Point point = new Point(
                 x / cellWidth + 1,
                 15 - y  / cellWidth);
@@ -254,12 +217,12 @@ public class BoardPanel extends JPanel implements Mediator.Display {
 
     /**
      *
-     * @param boardLocation
+     * @param onBoard
      * @return  这个格子左上角的绝对坐标
      */
-     private Point absolutelyLocation(Point boardLocation) {
-        int x = boardLocation.x;
-        int y = boardLocation.y;
+     private Point absolutelyLocation(Point onBoard) {
+        int x = onBoard.x;
+        int y = onBoard.y;
         Point point = new Point(
                 (int) ((x - 0.5) * cellWidth),
                 (int) ((16 - y - 0.5) * cellWidth));
@@ -279,7 +242,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
          * @Fields serialVersionUID :  
          */ 
         private static final long serialVersionUID = 1L;
-        public GlassPanel() {
+        GlassPanel() {
             super();
             this.setPreferredSize(new Dimension(pieceFieldWidth, pieceFieldWidth));
             this.setBackground(new Color(0, 0, 0, 0));
@@ -304,7 +267,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
          */
         private static final long serialVersionUID = 1L;
         private double starRatio = 0.08;
-        public NetPanel() {
+        NetPanel() {
             super();
             int w = cellWidth * (lineNumber + 1);
             setPreferredSize(new Dimension(w, w));
@@ -365,7 +328,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
          * @Fields serialVersionUID :
          */
         private static final long serialVersionUID = 1L;
-        public HorizontalAxesPanel() {
+        HorizontalAxesPanel() {
             setBackground(axesColor);
             setPreferredSize(new Dimension(cellWidth * (lineNumber + 1), cellWidth));
         }
@@ -396,7 +359,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
          * @Fields serialVersionUID :
          */
         private static final long serialVersionUID = 1L;
-        public VerticalAxesPanel() {
+        VerticalAxesPanel() {
             setBackground(axesColor);
             setPreferredSize(new Dimension(cellWidth, cellWidth * (lineNumber + 2)));
         }
@@ -426,10 +389,10 @@ public class BoardPanel extends JPanel implements Mediator.Display {
      */
     private class ForbiddenMarkLayer extends Layer {
         private final double ratio = 0.5;
-        public ForbiddenMarkLayer(int width, int height) {
+        ForbiddenMarkLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation) {
+        void draw(Point boardLocation) {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -455,10 +418,10 @@ public class BoardPanel extends JPanel implements Mediator.Display {
      */
     private class RecordLayer extends Layer {
         private final double ratio = 0.5;
-        public RecordLayer(int width, int height) {
+        RecordLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation, int color) {
+        void draw(Point boardLocation, int color) {
             Point point= absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -482,10 +445,10 @@ public class BoardPanel extends JPanel implements Mediator.Display {
      */
     private class PieceLayer extends Layer {
         private final double ratio = 0.9;
-        public PieceLayer(int width, int height) {
+        PieceLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation, int color) {
+        void draw(Point boardLocation, int color) {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -517,10 +480,10 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     private class HighlightLayer extends Layer {
         private final double ratio = 0.9;
         private Rectangle currentHighlight;
-        public HighlightLayer(int width, int height) {
+        HighlightLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(Point boardLocation) {
+        void draw(Point boardLocation) {
             if (currentHighlight != null) {
                 erase(currentHighlight);
             }
@@ -551,10 +514,10 @@ public class BoardPanel extends JPanel implements Mediator.Display {
      */
     private class IndexLayer extends Layer {
         private final double ratio = 0.5;
-        public IndexLayer(int width, int height) {
+        IndexLayer(int width, int height) {
             super(width, height);
         }
-        public void draw(int index, Point boardLocation, int color) {
+        void draw(int index, Point boardLocation, int color) {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
@@ -570,14 +533,4 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             g2d.drawString(str, x, y);
         }
     }
-
-    public void output() {
-        try {
-            ImageIO.write(forbiddenMarkLayer, "png", new File("handcut.png"));
-            ImageIO.write(highlightLayer, "png", new File("highlight.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
 }

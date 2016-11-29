@@ -1,34 +1,27 @@
 package com.haochen.renju.storage;
 
 import com.haochen.renju.bean.Cell;
-import com.haochen.renju.bean.EmptyCell;
-import com.haochen.renju.bean.ForbiddenMove;
-import com.haochen.renju.bean.Piece;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
-public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
+public class PieceMap implements Cloneable, Serializable {
     
     private Cell[][] map;
     
-    public PieceMap() {
+    PieceMap() {
         map = new Cell[15][15];
         for (int i = 0; i < 15; ++i) {
             for (int j = 0; j < 15; ++j) {
-                map[i][j] = EmptyCell.INSTANCE;
+                map[i][j] = Cell.EMPTY_CELL;
             }
         }
     }
     
     public boolean available(Point boardLocation) {
-        if (!boardLocation.isValid()) {
-            return false;
-        }
-        return !map[boardLocation.x - 1][boardLocation.y - 1].isPiece();
+        return boardLocation.isValid() && !map[boardLocation.x - 1][boardLocation.y - 1].isPiece();
     }
     
-    public void addCell(Cell cell) {
+    void addCell(Cell cell) {
         if (cell.getType() == Cell.EMPTY) {
             return;
         }
@@ -36,39 +29,23 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
         map[point.x - 1][point.y - 1] = cell;
     }
     
-    public void addPiece(int index, Point boardLocation, int color) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = new Piece(index, boardLocation, color);
+    void removeCell(Point point) {
+        removeCell(point.x, point.y);
     }
     
-    public void addPiece(int index, int x, int y, int color) {
-        map[x - 1][y - 1] = new Piece(index, x, y, color);
+    private void removeCell(int x, int y) {
+        map[x - 1][y - 1] = Cell.EMPTY_CELL;
     }
     
-    public void addForbiddenMark(Point boardLocation) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = new ForbiddenMove(boardLocation);
-    }
-    
-    public void addForbiddenMark(int x, int y) {
-        map[x - 1][y - 1] = new ForbiddenMove(x, y);
-    }
-    
-    public void removeCell(Point boardLocation) {
-        map[boardLocation.x - 1][boardLocation.y - 1] = EmptyCell.INSTANCE;
-    }
-    
-    public void removeCell(int x, int y) {
-        map[x - 1][y - 1] = EmptyCell.INSTANCE;
-    }
-    
-    public void clear() {
+    void clear() {
         for (int i = 0; i < 15; ++i) {
             for (int j = 0; j < 15; ++j) {
-                map[i][j] = EmptyCell.INSTANCE;
+                map[i][j] = Cell.EMPTY_CELL;
             }
         }
     }
     
-    public void display() {
+    void display() {
         for (int i = 14; i >= 0; --i) {
             for (int j = 0; j < 15; ++j) {
                 if (!map[j][i].isPiece()) {
@@ -94,36 +71,7 @@ public class PieceMap implements Cloneable, Iterable<Point>, Serializable {
         return getCell(location.x, location.y);
     }
     
-    public Cell getCell(int x, int y) {
+    private Cell getCell(int x, int y) {
         return map[x - 1][y - 1];
-    }
-
-    @Override
-    public Iterator<Point> iterator() {
-        return new Iterator<Point>() {
-            int x = 1;
-            int y = 1;
-
-            @Override
-            public boolean hasNext() {
-                return x <= 15 && y <= 15;
-            }
-
-            @Override
-            public Point next() {
-                Point result = new Point(x, y);
-                if (y < 15) {
-                    ++y;
-                } else {
-                    y = 1;
-                    ++x;
-                }
-                return result;
-            }
-
-            @Override
-            public void remove() {
-            }
-        };
     }
 }

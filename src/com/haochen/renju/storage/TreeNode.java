@@ -1,20 +1,19 @@
 package com.haochen.renju.storage;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.haochen.renju.bean.Piece;
+import com.haochen.renju.bean.Cell;
 
 public class TreeNode {
 	private TreeNode parent;
 	private List<TreeNode> children;
-	private Piece piece;
+	private Cell cell;
 	
-	TreeNode(TreeNode parent, Piece piece) {
+	TreeNode(TreeNode parent, Cell cell) {
 		this.parent = parent;
 		children = new ArrayList<>();
-		this.piece = piece;
+		this.cell = cell;
 	}
 
 	public TreeNode getParent() {
@@ -25,8 +24,8 @@ public class TreeNode {
 		return children;
 	}
 
-    public Piece getPiece() {
-        return piece;
+    public Cell getCell() {
+        return cell;
     }
 	
 	@Override
@@ -38,10 +37,10 @@ public class TreeNode {
 		if (getClass() != obj.getClass())
 			return false;
 		TreeNode other = (TreeNode) obj;
-		if (piece == null) {
-			if (other.piece != null)
+		if (cell == null) {
+			if (other.cell != null)
 				return false;
-		} else if (!piece.equals(other.piece))
+		} else if (!cell.equals(other.cell))
 			return false;
 		return true;
 	}

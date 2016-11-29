@@ -16,7 +16,6 @@ import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
-import com.haochen.renju.main.Config;
 
 public class TestMenuBar extends JMenuBar {
 
@@ -40,17 +39,7 @@ public class TestMenuBar extends JMenuBar {
 
     private JMenuItem newGame;
     private JCheckBoxMenuItem black;
-    private JMenuItem find4;
-    private JMenuItem find5;
     private JMenuItem testItem;
-    private JMenuItem breakPoint;
-    private JMenuItem continueEnd;
-    private JMenuItem continueLength;
-    private JMenuItem findAliveFour;
-    private JMenuItem findAsleepFour;
-    private JMenuItem findFour;
-    private JMenuItem findAliveThree;
-    private JMenuItem findAsleepThree;
     private JMenuItem separator;
 
     private JCheckBoxMenuItem usingForbidden;
@@ -58,14 +47,16 @@ public class TestMenuBar extends JMenuBar {
     private JCheckBoxMenuItem aiBlack;
     private JCheckBoxMenuItem aiWhite;
 
-    private JCheckBoxMenuItem aiNoUsed;
-    private JCheckBoxMenuItem lvLow;
-    private JCheckBoxMenuItem lvNormal;
-    private JCheckBoxMenuItem lvHigh;
+    private JCheckBoxMenuItem bLvLow;
+    private JCheckBoxMenuItem bLvNormal;
+    private JCheckBoxMenuItem bLvHigh;
+    private JCheckBoxMenuItem wLvLow;
+    private JCheckBoxMenuItem wLvNormal;
+    private JCheckBoxMenuItem wLvHigh;
 
     private Mediator mediator;
 
-    public TestMenuBar(TestFrame frame) {
+    TestMenuBar(TestFrame frame) {
         this.mainFrame = frame;
 
         JMenu file = new JMenu("File");
@@ -74,9 +65,11 @@ public class TestMenuBar extends JMenuBar {
         JMenu test = new JMenu("Test");
         JMenu setting = new JMenu("Setting");
         JMenu aiColor = new JMenu("AI Color");
-//        ButtonGroup colorGroup = new ButtonGroup();
         JMenu aiLevel = new JMenu("AI Level");
-        ButtonGroup levelGroup = new ButtonGroup();
+        JMenu bLevel = new JMenu("Black");
+        JMenu wLevel = new JMenu("Wlack");
+        ButtonGroup bLvGroup = new ButtonGroup();
+        ButtonGroup wLvGroup = new ButtonGroup();
 
         newFile = new JMenuItem("New");
         save = new JMenuItem("Save");
@@ -102,73 +95,47 @@ public class TestMenuBar extends JMenuBar {
 
         newGame = new JMenuItem("New Game");
         black = new JCheckBoxMenuItem("black");
-        find4 = new JMenuItem("find 4");
-        find5 = new JMenuItem("find 5");
         testItem = new JMenuItem("Test");
-        breakPoint = new JMenuItem("Break Point");
-        continueEnd = new JMenuItem("Continue End");
-        continueLength = new JMenuItem("Continue Length");
-        findAliveFour = new JMenuItem("Find alive Four");
-        findAsleepFour = new JMenuItem("Find asleep Four");
-        findAliveThree = new JMenuItem("Find alive Three");
-        findAsleepThree = new JMenuItem("Find asleep Three");
-        findFour = new JMenuItem("Find Four");
         separator = new JMenuItem("separator");
 
         test.add(newGame);
         test.addSeparator();
         test.add(black);
-        test.add(find4);
-        test.add(find5);
         test.add(testItem);
-        test.addSeparator();
-        test.add(breakPoint);
-        test.add(continueEnd);
-        test.add(continueLength);
-        test.addSeparator();
-        test.add(findAliveFour);
-        test.add(findAsleepFour);
-        test.add(findFour);
-        test.addSeparator();
-        test.add(findAliveThree);
-        test.add(findAsleepThree);
         test.addSeparator();
         test.add(separator);
 
         usingForbidden = new JCheckBoxMenuItem("Using Forbidden");
-//        usingForbidden.addItemListener(new ItemListener() {
-//            
-//            @Override
-//            public void itemStateChanged(ItemEvent arg0) {
-//                boolean isUsingForbidden = TestMenuBar.this.usingForbidden.getState();
-//                mainFrame.setUsingForbidden(isUsingForbidden);
-//                mainFrame.chessForm.setUsingForbidden(isUsingForbidden);
-//                mainFrame.updateForbiddenMarks();
-//            }
-//        });
         usingForbidden.setState(AI.usingForbiddenMove);
-//        mainFrame.setUsingForbidden(true);
-//        mainFrame.chessForm.setUsingForbidden(true);
         aiBlack = new JCheckBoxMenuItem("AI Uses Black");
+//        aiBlack.setState(true);
         aiWhite = new JCheckBoxMenuItem("AI Uses White");
-        aiNoUsed = new JCheckBoxMenuItem("No AI");
-        lvLow = new JCheckBoxMenuItem("Low");
-        lvNormal = new JCheckBoxMenuItem("Normal");
-        lvHigh = new JCheckBoxMenuItem("High");
+        bLvLow = new JCheckBoxMenuItem("Low");
+        bLvNormal = new JCheckBoxMenuItem("Normal");
+        bLvHigh = new JCheckBoxMenuItem("High");
+        wLvLow = new JCheckBoxMenuItem("Low");
+        wLvNormal = new JCheckBoxMenuItem("Normal");
+        wLvHigh = new JCheckBoxMenuItem("High");
 
         aiColor.add(aiBlack);
         aiColor.add(aiWhite);
-//        colorGroup.addAllChildren(aiBlack);
-//        colorGroup.addAllChildren(aiWhite);
 
-        aiLevel.add(aiNoUsed);
-        aiLevel.add(lvLow);
-        aiLevel.add(lvNormal);
-        aiLevel.add(lvHigh);
-        levelGroup.add(aiNoUsed);
-        levelGroup.add(lvLow);
-        levelGroup.add(lvNormal);
-        levelGroup.add(lvHigh);
+        bLvGroup.add(bLvLow);
+        bLvGroup.add(bLvNormal);
+        bLvGroup.add(bLvHigh);
+        bLevel.add(bLvLow);
+        bLevel.add(bLvNormal);
+        bLevel.add(bLvHigh);
+
+        wLvGroup.add(wLvLow);
+        wLvGroup.add(wLvNormal);
+        wLvGroup.add(wLvHigh);
+        wLevel.add(wLvLow);
+        wLevel.add(wLvNormal);
+        wLevel.add(wLvHigh);
+
+        aiLevel.add(bLevel);
+        aiLevel.add(wLevel);
 
         setting.add(usingForbidden);
         setting.add(aiColor);
@@ -180,43 +147,19 @@ public class TestMenuBar extends JMenuBar {
         this.add(test);
         this.add(setting);
 
-        eventPerform();
+        eventPerformed();
     }
 
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
     }
 
-    private void eventPerform() {
+    private void eventPerformed() {
         exit.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
-            }
-        });
-
-        findAliveFour.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Test------Find Alive Four");
-                mediator.getOperator().showAliveFour();
-            }
-        });
-
-        findAsleepFour.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Test------Find Asleep Four");
-                mediator.getOperator().showAsleepFour();
-            }
-        });
-
-        findFour.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Find Four");
-
             }
         });
 
@@ -259,104 +202,14 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
-        black.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Config.Test.color = black.getState() ? Cell.BLACK : Cell.WHITE;
-            }
-        });
-        black.setState(true);
-
-        find4.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mediator.getOperator().findAllFourPoints();
-                    }
-                }).start();
-            }
-        });
-
-        find5.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mediator.getOperator().findAllFivePoints();
-                    }
-                }).start();
-            }
-        });
-
         testItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Mediator.Operator operator = mediator.getOperator();
-//                        mediator.response("show five", null);
-//                        mediator.response("show alive four", null);
-//                        mediator.response("show asleep four", null);
-//                        mediator.response("show alive three", null);
-//                        mediator.response("show asleep three", null);
-//                        mediator.response("show long continue", null);
-//                        mediator.response("is it double four", null);
-//                        mediator.response("is it double three", null);
-
-//                        mediator.getOperator().launch();
-//                        mediator.getOperator().getContinueTypes();
-//                        mediator.getOperator().findAllFourPoints();
-//                        mediator.getOperator().findAllFivePoints();
                     }
                 }).start();
-            }
-        });
-
-        breakPoint.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Test------Break Point");
-//                Point[] side = new Point[2];
-//                side = mainFrame.chessForm.getContinueAttribute(mainFrame.chessForm.getLastChess().getType(),
-//                        mainFrame.chessForm.getLastChess().getPoint(), Direction.horizontal).getContinue(Direction.horizontal).getBreakPoint();
-//                System.out.println("side[0] = " + side[0]);
-//                System.out.println("side[1] = " + side[1]);
-                mediator.getOperator().showBreakPoint();
-            }
-        });
-
-        continueEnd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        continueLength.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        findAliveThree.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Test------Find Alive Three");
-                mediator.getOperator().showAliveThree();
-            }
-        });
-
-        findAsleepThree.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Test------Find Asleep Three");
-                mediator.getOperator().showAsleepThree();
             }
         });
 
@@ -368,7 +221,6 @@ public class TestMenuBar extends JMenuBar {
             }
         });
 
-        aiBlack.setState(true);
         aiBlack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

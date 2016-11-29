@@ -1,10 +1,9 @@
 package com.haochen.renju.storage;
 
-import java.util.Currency;
 import java.util.List;
 import java.util.Stack;
 
-import com.haochen.renju.bean.Piece;
+import com.haochen.renju.bean.Cell;
 
 public class PieceTree {
     private TreeNode root;
@@ -45,7 +44,7 @@ public class PieceTree {
 //        
 //        ChessMap chessMap = new ChessMap();
 //        while (nodes.size() > 0) {
-//            Point chessLocation = nodes.get(nodes.size() - 1).getPiece().getPoint();
+//            Point chessLocation = nodes.get(nodes.size() - 1).getCell().getPoint();
 //            chessMap.addChess(chessLocation);
 //            nodes.remove(nodes.size() - 1);
 //        }
@@ -70,12 +69,12 @@ public class PieceTree {
 //        return null;
 //    }
 
-    public void addPiece(int index, Point boardLocation, int color) {
-        addPiece(new Piece(index, boardLocation, color));
+    public void addCell(int index, Point point, int color) {
+        addCell(new Cell(index, point, color));
     }
     
-    public void addPiece(Piece piece) {
-        TreeNode treeNode = new TreeNode(current, piece);
+    public void addCell(Cell cell) {
+        TreeNode treeNode = new TreeNode(current, cell);
         if (current.getChildren().contains(treeNode)) {
             current = current.getChildren().get(current.getChildren().indexOf(treeNode));
         } else {
@@ -94,10 +93,10 @@ public class PieceTree {
     }
     
     public void display() {
-        Stack<Piece> stack = new Stack<>();
+        Stack<Cell> stack = new Stack<>();
         TreeNode temp = current;
         while (temp.getParent() != null) {
-            stack.push(temp.getPiece());
+            stack.push(temp.getCell());
             temp = temp.getParent();
         }
         while (!stack.isEmpty()) {

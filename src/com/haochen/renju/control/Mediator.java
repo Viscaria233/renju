@@ -4,40 +4,35 @@ import java.io.*;
 import java.util.*;
 
 import com.haochen.renju.bean.Cell;
-import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.control.ai.AI;
-import com.haochen.renju.bean.Piece;
-import com.haochen.renju.control.ai.TTT;
-import com.haochen.renju.control.player.AIPlayer;
+import com.haochen.renju.control.ai.Chess5;
 import com.haochen.renju.control.wintree.WinTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.*;
-import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
 import com.haochen.renju.ui.Dialogs;
-import com.haochen.renju.util.PointUtils;
 
 public class Mediator {
-    private AI ai;
+    private Calculate calculate;
     private Display display;
-    private Board board;
+    private Storage storage;
 //    protected TestMenuBar menuBar;
 
-    private TTT tttBlack = new TTT(Cell.BLACK);
-    private TTT tttWhite = new TTT(Cell.WHITE);
+    private Chess5 chess5Black = new Chess5(Cell.BLACK);
+    private Chess5 chess5White = new Chess5(Cell.WHITE);
 
     private PlayerSet playerSet;
 
     private Operator operator = new Operator();
 
     public Mediator(Display display) {
-        ai = new AI();
-        board = new Board();
+        calculate = new AI();
+        storage = new Board();
         this.display = display;
-        ai.setMediator(this);
-        board.setMediator(this);
+        calculate.setMediator(this);
+        storage.setMediator(this);
         display.setMediator(this);
 
         initPlayerSet();
@@ -46,25 +41,23 @@ public class Mediator {
     private void initPlayerSet() {
         playerSet = new PlayerSet();
 
-//        Player player = new HumanPlayer("Human_01", Cell.BLACK);
+        Player player = new HumanPlayer("Human_01", Cell.BLACK);
 //        Player player = new AIPlayer("Computer_01", Cell.BLACK);
-        Player player = new AIPlayer("Computer", Cell.BLACK);
         player.setMediator(this);
         playerSet.addPlayer(player);
 
-        player = new HumanPlayer("You", Cell.WHITE);
-//        player = new HumanPlayer("Human_02", Cell.WHITE);
+        player = new HumanPlayer("Human_02", Cell.WHITE);
 //        player = new AIPlayer("Computer_02", Cell.WHITE);
         player.setMediator(this);
         playerSet.addPlayer(player);
     }
 
-    public AI getAi() {
-        return ai;
+    public Calculate getCalculate() {
+        return calculate;
     }
 
-    public Board getBoard() {
-        return board;
+    public Storage getStorage() {
+        return storage;
     }
 
     public PlayerSet getPlayerSet() {
@@ -78,7 +71,7 @@ public class Mediator {
     public interface Display {
         void setMediator(Mediator mediator);
 
-        void drawPiece(Piece piece);
+        void drawPiece(Cell cell);
 
         void removePiece(Point currentLocation, Point lastLocation);
 
@@ -98,32 +91,76 @@ public class Mediator {
 
         void commit();
     }
+    
+    public interface Storage extends Iterable<Point>, Serializable {
+        void setMediator(Mediator mediator);
+
+        int getNumber();
+
+        boolean available(Point boardLocation);
+
+        Cell getCell(Point point);
+
+        void addCell(Cell cell);
+
+        void removeCell(Point point);
+
+        void removeCurrentCell();
+
+        Cell getCurrentCell();
+
+        /**
+         * @return  当前局面下，对方曾经出现过的落子记录
+         */
+        List<Cell> getRecords();
+
+        void clear();
+
+        void display();
+    }
+
+    public interface Calculate {
+        void setMediator(Mediator mediator);
+        Point getMove(Storage storage, int color);
+        WinTree findVCF(Storage storage, int color);
+        WinTree findVCT(Storage storage, int color);
+        void stopAndReturn();
+        int findWinner(Storage storage, Point lastMove, int color);
+        boolean isForbiddenMove(Storage storage, Point point, Direction direction);
+    }
 
     public class Operator {
         public void move(Point point) {
-            if (!point.isValid() || !board.available(point)) {
+            if (!point.isValid() || !storage.available(point)) {
                 return;
             }
-            int index = board.getNumber() + 1;
+            int index = storage.getNumber() + 1;
             int color = playerSet.getMovingPlayer().getColor();
-            Piece piece = new Piece(index, point, color);
+            Cell piece = new Cell(index, point, color);
             //先判断这个棋子是否能使某一方胜利
-            int winner = ai.findWinner(board, PointUtils.parse(point), color);
+            int winner = calculate.findWinner(storage, point, color);
             //然后落子
 
 
             /**
              *
              */
-            if (playerSet.getMovingPlayer().getColor() == Cell.WHITE) {
-                tttBlack.humanMove(piece.getPoint());
+            Player moving = playerSet.getMovingPlayer();
+            if (moving instanceof HumanPlayer) {
+                chess5Black.humanMove(piece.getPoint());
+                chess5White.humanMove(piece.getPoint());
             } else {
-                tttWhite.humanMove(piece.getPoint());
+                if (moving.getColor() == Cell.WHITE) {
+                    chess5Black.humanMove(piece.getPoint());
+                } else {
+                    chess5White.humanMove(piece.getPoint());
+                }
             }
-            tttBlack.drawchess();
+            System.out.println("------------------------------------");
+            chess5Black.drawchess();
 
 
-            board.addPiece(piece);
+            storage.addCell(piece);
             display.drawPiece(piece);
             drawRecords();
             display.commit();
@@ -141,7 +178,7 @@ public class Mediator {
                 showWinMessage(player);
                 Config.GAME_OVER = true;
             } else {
-                if (board.getNumber() < 225) {
+                if (storage.getNumber() < 225) {
                     if (AI.usingForbiddenMove) {
                         drawForbiddenMark();
                     }
@@ -159,7 +196,7 @@ public class Mediator {
         }
 
         public void withdraw() {
-            Piece current = board.getCurrentPiece();
+            Cell current = storage.getCurrentCell();
             if (current == null) {
                 return;
             }
@@ -168,13 +205,14 @@ public class Mediator {
             /**
              *
              */
-            tttBlack.withdraw();
-            tttWhite.withdraw();
-            tttBlack.drawchess();
+            chess5Black.withdraw();
+            chess5White.withdraw();
+            System.out.println("------------------------------------");
+            chess5Black.drawchess();
 
 
-            board.removeCurrentPiece();
-            Piece last = board.getCurrentPiece();
+            storage.removeCurrentCell();
+            Cell last = storage.getCurrentCell();
             display.removePiece(current.getPoint(), last == null ? null : last.getPoint());
             drawRecords();
             display.commit();
@@ -197,157 +235,23 @@ public class Mediator {
         }
 
         public void newGame() {
-            board.clear();
-            tttBlack = new TTT(Cell.BLACK);
-            tttWhite = new TTT(Cell.WHITE);
+            storage.clear();
+            chess5Black = new Chess5(Cell.BLACK);
+            chess5White = new Chess5(Cell.WHITE);
             Config.GAME_OVER = false;
-            initPlayerSet();
-            board.display();
+//            initPlayerSet();
+            playerSet.newGame();
+            storage.display();
             launch();
         }
 
-        public void showBreakPoint() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute c = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction[] d = Direction.createDirectionArray();
-            for (int i = 0; i < 4; ++i) {
-                int[] temp = c.getContinue(d[i]).getBreakPoint();
-                for (int j = 0; j < temp.length; ++j) {
-                    System.out.print(" " + PointUtils.build(temp[j]).toString());
-                }
-                System.out.println(" : " + d[i]);
-            }
-            System.out.println();
-        }
-
-        public void showFive() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findFive(attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void showAliveFour() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findAliveFour(board, attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void showAsleepFour() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findAsleepFour(board, attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void showAliveThree() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findAliveThree(board, attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void showAsleepThree() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findAsleepThree(board, attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void showLongContinue() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-            Direction d = ai.findLongContinue(attribute, Direction.all);
-            System.out.println(d);
-        }
-
-        public void isItDoubleFour() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            boolean n = ai.isDoubleFour(board, piece.getPoint());
-            System.out.println(n);
-        }
-
-        public void isItDoubleThree() {
-            Piece piece = board.getCurrentPiece();
-            if (piece == null) {
-                return;
-            }
-            boolean n = ai.isDoubleThree(board, piece.getPoint());
-            System.out.println(n);
-        }
-
-        public void isItForbiddenMove(Point point) {
-            if (!point.isValid()) {
-                return;
-            }
-            if (!board.available(point)) {
-                return;
-            }
-            ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
-            boolean n = ai.isForbiddenMove(board, attribute, Direction.all);
-            System.out.println(n);
-        }
-
         public void drawForbiddenMark() {
-            board.clearForbiddenMark();
             display.clearForbiddenMark();
-            PieceMap map = board.pieceMap();
-//                Point point;
 
-//                for (Point point : map) {
-////                    point = cell.getPoint();
-//                    boolean imaginary = false;
-//                    if (map.available(point)) {
-//                        map.addPiece(-1, point, Cell.BLACK);
-//                        imaginary = true;
-//                    }
-//                    ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
-//                    boolean n = ai.isForbiddenMove(board, attribute, Direction.all);
-//                    if (imaginary) {
-//                        map.removeCell(point);
-//                    }
-//                    if (n) {
-//                        board.addForbiddenMark(point);
-//                        display.drawForbiddenMark(point);
-//                    }
-//                }
-
-            for (Point point : map) {
-//                    point = cell.getPoint();
-                if (map.available(point)) {
-                    map.addPiece(-1, point, Cell.BLACK);
-                    ContinueAttribute attribute = ai.getContinueAttribute(board, point, Direction.all);
-                    map.removeCell(point);
-
-                    if (ai.isForbiddenMove(board, attribute, Direction.all)) {
-                        board.addForbiddenMark(point);
-                        display.drawForbiddenMark(point);
-                    }
+            for (Point point : storage) {
+                if (storage.available(point)
+                        && calculate.isForbiddenMove(Mediator.this.storage, point, Direction.all)) {
+                    display.drawForbiddenMark(point);
                 }
             }
             display.commit();
@@ -366,15 +270,15 @@ public class Mediator {
             long start = new Date().getTime();
             try {
                 Thread.sleep(800 + (int) (Math.random() * 400));
-//                PieceMap map = board.pieceMap();
+//                PieceMap map = storage.pieceMap();
 //                int color = playerSet.getMovingPlayer().getColor();
-//                Point point = ai.getCloseMove(map, type, board.getCurrentPiece());
-//                Point point = ai.getMove(board, color);
+//                Point point = calculate.getCloseMove(map, type, storage.getCurrentCell());
+//                Point point = calculate.getMove(storage, color);
                 Point point;
                 if (playerSet.getMovingPlayer().getColor() == Cell.BLACK) {
-                    point = tttBlack.aiMove();
+                    point = chess5Black.aiMove();
                 } else {
-                    point = tttWhite.aiMove();
+                    point = chess5White.aiMove();
                 }
                 String s = playerSet.getMovingPlayer().getColorString();
                 System.out.println(s + " AI moved. Think time = "
@@ -396,48 +300,14 @@ public class Mediator {
             if (AI.usingForbiddenMove) {
                 drawForbiddenMark();
             } else {
-                board.clearForbiddenMark();
                 display.clearForbiddenMark();
                 display.commit();
             }
         }
 
-        public void getContinueTypes() {
-            Piece piece = board.getCurrentPiece();
-            if (piece != null) {
-                ContinueAttribute attribute = ai.getContinueAttribute(board, piece.getPoint(), Direction.all);
-                Map<Direction, ContinueType> map = ai.getContinueTypes(board, attribute);
-                Set<Map.Entry<Direction, ContinueType>> set = map.entrySet();
-                for (Map.Entry<Direction, ContinueType> entry : set) {
-                    System.out.println(entry.getKey() + "    " + entry.getValue());
-                }
-            }
-        }
-
-        public void findAllFourPoints() {
-            List<Point> fourPoints = ai.findPoints(board, Config.Test.color,
-                    Arrays.asList(ContinueType.ASLEEP_FOUR, ContinueType.ALIVE_FOUR),
-                    Arrays.asList(ContinueType.FIVE));
-
-            System.out.println("----findAllFourPoints----");
-            for (Point point : fourPoints) {
-                System.out.println(point);
-            }
-        }
-
-        public void findAllFivePoints() {
-            List<Point> fivePoints = ai.findPoints(board, Config.Test.color,
-                    Arrays.asList(ContinueType.FIVE), null);
-
-            System.out.println("----findAllFivePoints----");
-            for (Point point : fivePoints) {
-                System.out.println(point);
-            }
-        }
-
         public void findVCF() {
             Date begin = new Date();
-            WinTree vcf = ai.findVCF(board, playerSet.getMovingPlayer().getColor());
+            WinTree vcf = calculate.findVCF(storage, playerSet.getMovingPlayer().getColor());
             Date end = new Date();
 
             System.out.println("----findVCF----");
@@ -461,7 +331,7 @@ public class Mediator {
                     file.createNewFile();
                 }
                 qS = new ObjectOutputStream(new FileOutputStream(file));
-                qS.writeObject(board.pieceMap());
+                qS.writeObject(storage);
                 qS.flush();
 
                 file = new File(Config.Test.Path.VCF, "vcf_answer_" + Config.Test.QuesCount.vcf + ".ans");
@@ -508,7 +378,7 @@ public class Mediator {
         public void findVCT() {
 
             Date begin = new Date();
-            WinTree vct = ai.findVCT(board, playerSet.getMovingPlayer().getColor());
+            WinTree vct = calculate.findVCT(storage, playerSet.getMovingPlayer().getColor());
             Date end = new Date();
 
             System.out.println("----findVCT----");
@@ -526,9 +396,9 @@ public class Mediator {
 
     private void drawRecords() {
         display.removeRecord();
-        List<Piece> records = board.getRecords();
-        for (Piece p : records) {
-            display.drawRecord(p.getPoint(), p.getType());
+        List<Cell> records = storage.getRecords();
+        for (Cell c : records) {
+            display.drawRecord(c.getPoint(), c.getType());
         }
     }
 

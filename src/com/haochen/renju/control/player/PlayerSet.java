@@ -29,4 +29,8 @@ public class PlayerSet {
     public void exchangePlayer() {
         moving = 1 - moving;
     }
+
+    public void newGame() {
+        moving = BLACK;
+    }
 }

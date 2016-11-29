@@ -5,12 +5,13 @@ import com.haochen.renju.storage.Point;
 import com.haochen.renju.util.PointUtils;
 
 import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
  * Created by Haochen on 2016/11/21.
  */
-public class TTT {
+public class Chess5 {
 
     Scanner scanner = new Scanner(System.in);
 
@@ -52,7 +53,7 @@ public class TTT {
     int[][] score = new int[15][15];//空格分值
     int[][] move = new int[15][15];
 
-    public TTT() {
+    public Chess5() {
         for (int i = 0; i < chessxy.length; ++i) {
             chessxy[i] = new xy();
         }
@@ -63,7 +64,7 @@ public class TTT {
         }
     }
 
-    public TTT(int color) {
+    public Chess5(int color) {
         if (color == Cell.BLACK) {
             cpt = Cell.BLACK;
             hum = Cell.WHITE;
@@ -556,6 +557,16 @@ public class TTT {
         if (step == 0) {
             BestMove.x = 7;
             BestMove.y = 7;
+            return BestMove;
+        } else if (step == 1) {
+            Random rand = new Random();
+            do {
+                int dx = Math.abs(rand.nextInt() % 3);
+                int dy = Math.abs(rand.nextInt() % 3);
+                System.out.println(dx + "----" + dy);
+                BestMove.x = chessxy[step].x + (dx) - 1;
+                BestMove.y = chessxy[step].y + (dy) - 1;
+            } while (CheckXy(BestMove.x, BestMove.y) == 0);
             return BestMove;
         }
         //从深度2开始，不断加大深度搜索

@@ -1,7 +1,6 @@
 package com.haochen.renju.control.ai;
 
 import com.haochen.renju.bean.Cell;
-import com.haochen.renju.bean.Piece;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
@@ -15,48 +14,35 @@ import com.haochen.renju.util.PointUtils;
 
 import java.util.*;
 
-public class AI {
+public class AI implements Mediator.Calculate {
 
     public static boolean usingForbiddenMove = false;
     private Mediator mediator;
 
+    @Override
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
     }
 
-    public int findWinner(Board board, int point, int color) {
-        return findWinner(board.bitPieceMap(), point, color);
-    }
-
     private int findWinner(BitPieceMap map, int point, int color) {
-        if (color == Cell.BLACK) {
-            if (usingForbiddenMove && map.getCell(point) == 3) {
-                return Cell.WHITE;
-            }
+        //插入假想棋子
+        map.addPiece(point, color);
+
+        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
+        if (usingForbiddenMove
+                && color == Cell.BLACK
+                && isForbiddenMove(map, attribute, Direction.all)) {
+            return Cell.WHITE;
         }
 
         int winner = 0;
-        boolean isImaginary = false;
-        //插入假想棋子
-        if (map.available(point)) {
-            map.addPiece(point, color);
-            isImaginary = true;
-        }
-
-        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
         if (findFive(attribute, Direction.all).getQuantity() > 0) {
             winner = color;
         }
 
         //删除假想棋子
-        if (isImaginary) {
-            map.removeCell(point);
-        }
+        map.removeCell(point);
         return winner;
-    }
-
-    public ContinueAttribute getContinueAttribute(Board board, Point point, Direction direction) {
-        return getContinueAttribute(board.bitPieceMap(), PointUtils.parse(point), direction);
     }
 
     private ContinueAttribute getContinueAttribute(BitPieceMap map, int point, Direction direction) {
@@ -184,10 +170,6 @@ public class AI {
         return result;
     }
 
-    public Direction findAliveFour(Board board, ContinueAttribute attribute, Direction direction) {
-        return findAliveFour(board.bitPieceMap(), attribute, direction);
-    }
-
     private Direction findAliveFour(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
@@ -235,10 +217,6 @@ public class AI {
             result.add(direction);
         }
         return result;
-    }
-
-    public Direction findAsleepFour(Board board, ContinueAttribute attribute, Direction direction) {
-        return findAsleepFour(board.bitPieceMap(), attribute, direction);
     }
 
     private Direction findAsleepFour(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -292,10 +270,6 @@ public class AI {
         return result;
     }
 
-    public Direction findAliveThree(Board board, ContinueAttribute attribute, Direction direction) {
-        return findAliveThree(board.bitPieceMap(), attribute, direction);
-    }
-
     private Direction findAliveThree(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
@@ -347,10 +321,6 @@ public class AI {
             result.add(direction);
         }
         return result;
-    }
-
-    public Direction findAsleepThree(Board board, ContinueAttribute attribute, Direction direction) {
-        return findAsleepThree(board.bitPieceMap(), attribute, direction);
     }
 
     private Direction findAsleepThree(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -432,10 +402,6 @@ public class AI {
         return result;
     }
 
-    public boolean isDoubleFour(Board board, Point point) {
-        return isDoubleFour(board.bitPieceMap(), PointUtils.parse(point));
-    }
-
     private boolean isDoubleFour(BitPieceMap map, int point) {
         boolean isImaginary = false;
         //插入假想棋子
@@ -453,10 +419,6 @@ public class AI {
             map.removeCell(point);
         }
         return four >= 2;
-    }
-
-    public boolean isDoubleThree(Board board, Point point) {
-        return isDoubleThree(board.bitPieceMap(), PointUtils.parse(point));
     }
 
     private boolean isDoubleThree(BitPieceMap map, int point) {
@@ -477,8 +439,16 @@ public class AI {
         return three >= 2;
     }
 
-    public boolean isForbiddenMove(Board board, ContinueAttribute attribute, Direction direction) {
-        return isForbiddenMove(board.bitPieceMap(), attribute, direction);
+    @Override
+    public boolean isForbiddenMove(Mediator.Storage storage, Point point, Direction direction) {
+        if (storage.available(point)) {
+            storage.addCell(new Cell(-1, point, Cell.BLACK));
+            ContinueAttribute attribute = getContinueAttribute(bitPieceMap(storage), PointUtils.parse(point), Direction.all);
+            storage.removeCell(point);
+            return isForbiddenMove(bitPieceMap(storage), attribute, direction);
+        } else {
+            return false;
+        }
     }
 
     private boolean isForbiddenMove(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -562,10 +532,6 @@ public class AI {
         return forbidden;
     }
 
-    public Map<Direction, ContinueType> getContinueTypes(Board board, ContinueAttribute attribute) {
-        return getContinueTypes(board.bitPieceMap(), attribute);
-    }
-
     private Map<Direction, ContinueType> getContinueTypes(BitPieceMap map, ContinueAttribute attribute) {
         Map<Direction, ContinueType> result = new HashMap<>();
         Direction[] directions = Direction.createDirectionArray();
@@ -602,32 +568,6 @@ public class AI {
         } else {
             return ContinueType.NONE;
         }
-    }
-
-    public Point getCloseMove(Board board, Piece lastPiece) {
-        return PointUtils.build(
-                getCloseMove(board.bitPieceMap(), PointUtils.parse(lastPiece.getPoint())));
-    }
-
-    private int getCloseMove(BitPieceMap map, int point) {
-        int x = PointUtils.getX(point);
-        int y = PointUtils.getY(point);
-        int result;
-        do {
-            result = PointUtils.parse((int) (Math.random() * 3) - 1 + x, (int) (Math.random() * 3) - 1 + y);
-        } while (!map.available(result));
-        return result;
-    }
-
-    public Point getMove(Board board, int color) {
-        BitPieceMap map = board.bitPieceMap();
-        Map<Integer, Integer> scores = getAllScore(map, color);
-        Set<Map.Entry<Integer, Integer>> set = scores.entrySet();
-
-        Map.Entry<Integer, Integer>[] entries = set.toArray(new Map.Entry[1]);
-        int[] highScore = getHighScorePoints(entries, 1);
-
-        return PointUtils.build(highScore[0]);
     }
 
     private int[] getHighScorePoints(Map.Entry<Integer, Integer>[] entries, int size) {
@@ -709,8 +649,9 @@ public class AI {
         return five;
     }
 
-    public WinTree findVCF(Board board, int color) {
-        return findVCF(board.bitPieceMap(), color);
+    @Override
+    public WinTree findVCF(Mediator.Storage storage, int color) {
+        return findVCF(bitPieceMap(storage), color);
     }
 
     private WinTree findVCF(BitPieceMap map, int color) {
@@ -758,8 +699,19 @@ public class AI {
         return result;
     }
 
-    public WinTree findVCT(Board board, int color) {
-        return findVCT(board.bitPieceMap(), color);
+    @Override
+    public WinTree findVCT(Mediator.Storage storage, int color) {
+        return findVCT(bitPieceMap(storage), color);
+    }
+
+    @Override
+    public void stopAndReturn() {
+
+    }
+
+    @Override
+    public int findWinner(Mediator.Storage storage, Point lastMove, int color) {
+        return findWinner(bitPieceMap(storage), PointUtils.parse(lastMove), color);
     }
 
     private WinTree findVCT(BitPieceMap map, int color) {
@@ -813,16 +765,6 @@ public class AI {
         return result;
     }
 
-    public List<Point> findPoints(Board board, int color,
-                                     Collection<ContinueType> contains, Collection<ContinueType> excludes) {
-        List<Integer> temp = findPoints(board.bitPieceMap(), color, contains, excludes);
-        List<Point> result = new ArrayList<>();
-        for (int i : temp) {
-            result.add(PointUtils.build(i));
-        }
-        return result;
-    }
-
     private List<Integer> findPoints(BitPieceMap map, int color,
                                      Collection<ContinueType> contains, Collection<ContinueType> excludes) {
         List<Integer> result = new ArrayList<>();
@@ -867,5 +809,25 @@ public class AI {
             }
         }
         return true;
+    }
+
+    @Override
+    public Point getMove(Mediator.Storage storage, int color) {
+        BitPieceMap map = bitPieceMap(storage);
+        Map<Integer, Integer> scores = getAllScore(map, color);
+        Set<Map.Entry<Integer, Integer>> set = scores.entrySet();
+
+        Map.Entry<Integer, Integer>[] entries = set.toArray(new Map.Entry[1]);
+        int[] highScore = getHighScorePoints(entries, 1);
+
+        return PointUtils.build(highScore[0]);
+    }
+
+    private BitPieceMap bitPieceMap(Mediator.Storage storage) {
+        BitPieceMap result = new BitPieceMap();
+        for (Point p : storage) {
+            result.addPiece(PointUtils.parse(p), storage.getCell(p).getType());
+        }
+        return result;
     }
 }

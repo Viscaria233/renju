@@ -1,12 +1,9 @@
 package com.haochen.renju.main;
 
-import com.haochen.renju.bean.Piece;
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.control.ai.TTT;
-import com.haochen.renju.exception.ReadFileException;
 import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
-import com.haochen.renju.ui.Dialogs;
 import com.haochen.renju.ui.TestFrame;
 
 import java.io.*;
@@ -19,89 +16,57 @@ public class Client {
 
     private static TestFrame frame;
 
-    public static void launch() {
+    private static void launch() {
         frame = new TestFrame();
         frame.setVisible(true);
         frame.launch();
     }
 
-    public static void showPieceMap() {
-        List<PieceMap> ques = new ArrayList<>();
-
-        ObjectInputStream ois = null;
-        try {
-            for (int i = 1; i <= Config.Test.QuesCount.vcf; ++i) {
-                ois = Config.Test.createVCFStream("vcf_question_" + i + ".pm");
-                ques.add((PieceMap) ois.readObject());
-                ois.close();
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+    private static void drawPieceMap(Mediator mediator, List<Cell> pieces) {
+        for (Cell c : pieces) {
+            mediator.getOperator().move(c.getPoint());
         }
+    }
 
-        List<List<Piece>> pieces = new ArrayList<>();
-        for (final PieceMap map : ques) {
-            List<Piece> pts = new ArrayList<>();
-            for (Point p : map) {
-                if (!map.available(p)) {
-                    Piece piece = (Piece) map.getCell(p);
-                    pts.add(piece);
+    private static void saveList(Mediator.Storage storage) {
+        ObjectOutputStream oos = null;
+        try {
+            int count = Config.Test.QuesCount.vcf;
+            oos = new ObjectOutputStream(
+                    new FileOutputStream(
+                            new File(Config.Test.Path.VCF, "list_" + count + ".list")));
+            List<Cell> cells = new ArrayList<>();
+            for (Point p : storage) {
+                if (!storage.available(p)) {
+                    cells.add(storage.getCell(p));
                 }
             }
-            Piece[] sorted = pts.toArray(new Piece[1]);
-            Arrays.sort(sorted, new Comparator<Piece>() {
+
+            Cell[] sorted = cells.toArray(new Cell[1]);
+            Arrays.sort(sorted, new Comparator<Cell>() {
                 @Override
-                public int compare(Piece o1, Piece o2) {
+                public int compare(Cell o1, Cell o2) {
                     return o1.getIndex() - o2.getIndex();
                 }
             });
-            pieces.add(Arrays.asList(sorted));
-        }
 
-        Mediator mediator = frame.getMediator();
-
-        drawPieceMap(mediator, pieces.get(5));
-    }
-
-    private static void drawPieceMap(Mediator mediator, List<Piece> pieces) {
-        for (Piece p : pieces) {
-            mediator.getOperator().move(p.getPoint());
-        }
-    }
-
-    private static void saveList(List<PieceMap> maps) {
-        ObjectOutputStream oos = null;
-        try {
-            for (int i = 0; i < maps.size(); ++i) {
-                oos = new ObjectOutputStream(
-                        new FileOutputStream(new File(Config.Test.Path.VCF, "list_" + i + ".list")));
-                PieceMap map = maps.get(i);
-                List<Piece> pieces = new ArrayList<>();
-                for (Point p : map) {
-                    if (!map.available(p)) {
-                        pieces.add((Piece) map.getCell(p));
-                    }
-                }
-
-                Piece[] sorted = pieces.toArray(new Piece[1]);
-                Arrays.sort(sorted, new Comparator<Piece>() {
-                    @Override
-                    public int compare(Piece o1, Piece o2) {
-                        return o1.getIndex() - o2.getIndex();
-                    }
-                });
-
-                List<Point> points = new ArrayList<>();
-                for (Piece p : sorted) {
-                    points.add(p.getPoint());
-                }
-
-                oos.writeObject(points);
-                oos.flush();
-                oos.close();
+            List<Point> points = new ArrayList<>();
+            for (Cell p : sorted) {
+                points.add(p.getPoint());
             }
+
+            oos.writeObject(points);
+            oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (oos != null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -135,7 +100,7 @@ public class Client {
             launch();
 //            showList();
 
-//        new TTT().launch();
+//        new Chess5().launch();
     }
 
 }
