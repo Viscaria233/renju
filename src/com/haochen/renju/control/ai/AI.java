@@ -8,7 +8,9 @@ import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
 import com.haochen.renju.control.ai.WinTreeFinder.WinMethod;
 import com.haochen.renju.control.wintree.WinTree;
-import com.haochen.renju.storage.*;
+import com.haochen.renju.storage.BitPieceMap;
+import com.haochen.renju.storage.Direction;
+import com.haochen.renju.storage.Point;
 import com.haochen.renju.util.CellUtils;
 import com.haochen.renju.util.PointUtils;
 
@@ -22,6 +24,48 @@ public class AI implements Mediator.Calculate {
     @Override
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
+    }
+
+    @Override
+    public Point getMove(Mediator.Storage storage, int color) {
+        BitPieceMap map = bitPieceMap(storage);
+        Map<Integer, Integer> scores = getAllScore(map, color);
+        Set<Map.Entry<Integer, Integer>> set = scores.entrySet();
+
+        Map.Entry<Integer, Integer>[] entries = set.toArray(new Map.Entry[1]);
+        int[] highScore = getHighScorePoints(entries, 1);
+
+        return PointUtils.build(highScore[0]);
+    }
+
+    @Override
+    public WinTree findVCF(Mediator.Storage storage, int color) {
+        return findVCF(bitPieceMap(storage), color);
+    }
+
+    @Override
+    public WinTree findVCT(Mediator.Storage storage, int color) {
+        return findVCT(bitPieceMap(storage), color);
+    }
+
+    @Override
+    public void stopAndReturn() {}
+
+    @Override
+    public int findWinner(Mediator.Storage storage, Point lastMove, int color) {
+        return findWinner(bitPieceMap(storage), PointUtils.parse(lastMove), color);
+    }
+
+    @Override
+    public boolean isForbiddenMove(Mediator.Storage storage, Point point, Direction direction) {
+        if (storage.available(point)) {
+            storage.addCell(new Cell(-1, point, Cell.BLACK));
+            ContinueAttribute attribute = getContinueAttribute(bitPieceMap(storage), PointUtils.parse(point), Direction.all);
+            storage.removeCell(point);
+            return isForbiddenMove(bitPieceMap(storage), attribute, direction);
+        } else {
+            return false;
+        }
     }
 
     private int findWinner(BitPieceMap map, int point, int color) {
@@ -135,7 +179,7 @@ public class AI implements Mediator.Calculate {
         return attribute;
     }
 
-    public Direction findFive(ContinueAttribute attribute, Direction direction) {
+    private Direction findFive(ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -379,7 +423,7 @@ public class AI implements Mediator.Calculate {
         return result;
     }
 
-    public Direction findLongContinue(ContinueAttribute attribute, Direction direction) {
+    private Direction findLongContinue(ContinueAttribute attribute, Direction direction) {
         Direction result = new Direction();
         if (attribute == null) {
             return result;
@@ -437,18 +481,6 @@ public class AI implements Mediator.Calculate {
             map.removeCell(point);
         }
         return three >= 2;
-    }
-
-    @Override
-    public boolean isForbiddenMove(Mediator.Storage storage, Point point, Direction direction) {
-        if (storage.available(point)) {
-            storage.addCell(new Cell(-1, point, Cell.BLACK));
-            ContinueAttribute attribute = getContinueAttribute(bitPieceMap(storage), PointUtils.parse(point), Direction.all);
-            storage.removeCell(point);
-            return isForbiddenMove(bitPieceMap(storage), attribute, direction);
-        } else {
-            return false;
-        }
     }
 
     private boolean isForbiddenMove(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -649,11 +681,6 @@ public class AI implements Mediator.Calculate {
         return five;
     }
 
-    @Override
-    public WinTree findVCF(Mediator.Storage storage, int color) {
-        return findVCF(bitPieceMap(storage), color);
-    }
-
     private WinTree findVCF(BitPieceMap map, int color) {
         WinMethod winMethod = null;
         MoveSetGetter moveSetGetter = null;
@@ -697,21 +724,6 @@ public class AI implements Mediator.Calculate {
         result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, 0, color);
 
         return result;
-    }
-
-    @Override
-    public WinTree findVCT(Mediator.Storage storage, int color) {
-        return findVCT(bitPieceMap(storage), color);
-    }
-
-    @Override
-    public void stopAndReturn() {
-
-    }
-
-    @Override
-    public int findWinner(Mediator.Storage storage, Point lastMove, int color) {
-        return findWinner(bitPieceMap(storage), PointUtils.parse(lastMove), color);
     }
 
     private WinTree findVCT(BitPieceMap map, int color) {
@@ -809,18 +821,6 @@ public class AI implements Mediator.Calculate {
             }
         }
         return true;
-    }
-
-    @Override
-    public Point getMove(Mediator.Storage storage, int color) {
-        BitPieceMap map = bitPieceMap(storage);
-        Map<Integer, Integer> scores = getAllScore(map, color);
-        Set<Map.Entry<Integer, Integer>> set = scores.entrySet();
-
-        Map.Entry<Integer, Integer>[] entries = set.toArray(new Map.Entry[1]);
-        int[] highScore = getHighScorePoints(entries, 1);
-
-        return PointUtils.build(highScore[0]);
     }
 
     private BitPieceMap bitPieceMap(Mediator.Storage storage) {
