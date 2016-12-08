@@ -628,19 +628,19 @@ public class AI implements Mediator.Calculate {
     private Map<Integer, Integer> getAllScore(BitPieceMap map, int color) {
         Map<Integer, Integer> result = new HashMap<>();
         ContinueAttribute current;
-        ContinueAttribute other;
+        ContinueAttribute foe;
 
         for (int p : map) {
             if (map.available(p)) {
                 current = getContinueAttribute(map, p, Direction.all);
-                other = getContinueAttribute(map, p, Direction.all);
-                result.put(p, getScore(map, current, other));
+                foe = getContinueAttribute(map, p, Direction.all);
+                result.put(p, getScore(map, current, foe));
             }
         }
         return result;
     }
 
-    private int getScore(BitPieceMap map, ContinueAttribute currentPlayer, ContinueAttribute otherPlayer) {
+    private int getScore(BitPieceMap map, ContinueAttribute current, ContinueAttribute foe) {
         return new Random().nextInt();
     }
 
