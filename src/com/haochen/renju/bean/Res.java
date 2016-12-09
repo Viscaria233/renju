@@ -1,5 +1,6 @@
 package com.haochen.renju.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,23 +22,25 @@ public class Res {
     private int color;
     private int type;
     private int direction;
-//    private List<Integer> points;
-//    private List<Integer> attacks;
+    private List<Integer> points;
+    private List<Integer> attacks;
 
     public Res() {}
 
-//    public Res(int type, int type, int direction, List<Integer> points, List<Integer> attacks) {
-//        this.type = type;
-//        this.type = type;
-//        this.direction = direction;
-//        this.points = points;
-//        this.attacks = attacks;
-//    }
+    public Res(int color, int type, int direction, List<Integer> points, List<Integer> attacks) {
+        this.color = color;
+        this.type = type;
+        this.direction = direction;
+        this.points = points;
+        this.attacks = attacks;
+    }
 
     public Res(int color, int type, int direction) {
         this.color = color;
         this.type = type;
         this.direction = direction;
+        this.points = new ArrayList<>();
+        this.attacks = new ArrayList<>();
     }
 
     public int getColor() {
@@ -64,46 +67,21 @@ public class Res {
         this.direction = direction;
     }
 
-//    public List<Integer> getPoints() {
-//        return points;
-//    }
-//
-//    public void setPoints(List<Integer> points) {
-//        this.points = points;
-//    }
-//
-//    public List<Integer> getAttacks() {
-//        return attacks;
-//    }
-//
-//    public void setAttacks(List<Integer> attacks) {
-//        this.attacks = attacks;
-//    }
+    public List<Integer> getPoints() {
+        return points;
+    }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        Res res = (Res) o;
-//
-//        if (type != res.type) return false;
-//        if (type != res.type) return false;
-//        if (direction != res.direction) return false;
-//        if (points != null ? !points.equals(res.points) : res.points != null) return false;
-//        return attacks != null ? attacks.equals(res.attacks) : res.attacks == null;
-//
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result = type;
-//        result = 31 * result + type;
-//        result = 31 * result + direction;
-//        result = 31 * result + (points != null ? points.hashCode() : 0);
-//        result = 31 * result + (attacks != null ? attacks.hashCode() : 0);
-//        return result;
-//    }
+    public void setPoints(List<Integer> points) {
+        this.points = points;
+    }
+
+    public List<Integer> getAttacks() {
+        return attacks;
+    }
+
+    public void setAttacks(List<Integer> attacks) {
+        this.attacks = attacks;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -114,7 +92,9 @@ public class Res {
 
         if (color != res.color) return false;
         if (type != res.type) return false;
-        return direction == res.direction;
+        if (direction != res.direction) return false;
+        if (points != null ? !points.equals(res.points) : res.points != null) return false;
+        return attacks != null ? attacks.equals(res.attacks) : res.attacks == null;
 
     }
 
@@ -123,6 +103,8 @@ public class Res {
         int result = color;
         result = 31 * result + type;
         result = 31 * result + direction;
+        result = 31 * result + (points != null ? points.hashCode() : 0);
+        result = 31 * result + (attacks != null ? attacks.hashCode() : 0);
         return result;
     }
 }
