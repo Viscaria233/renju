@@ -1,6 +1,7 @@
 package com.haochen.renju.control.ai;
 
 import com.haochen.renju.bean.Cell;
+import com.haochen.renju.bean.Res;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.SingleContinue;
@@ -8,6 +9,7 @@ import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
 import com.haochen.renju.control.ai.WinTreeFinder.WinMethod;
 import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.resources.Resource;
 import com.haochen.renju.storage.BitPieceMap;
 import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.Point;
@@ -568,7 +570,7 @@ public class AI implements Mediator.Calculate {
         Map<Direction, ContinueType> result = new HashMap<>();
         Direction[] directions = Direction.createDirectionArray();
         for (Direction direction : directions) {
-            ContinueType type = getContinueType(map, attribute, direction);
+            ContinueType type = getType(map, attribute, direction);
             if (type != null) {
                 result.put(direction, type);
             }
@@ -576,7 +578,7 @@ public class AI implements Mediator.Calculate {
         return result;
     }
 
-    private ContinueType getContinueType(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
+    private ContinueType getType(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         SingleContinue single = attribute.getContinue(direction);
         if (single == null) {
             return null;
@@ -600,6 +602,14 @@ public class AI implements Mediator.Calculate {
         } else {
             return ContinueType.NONE;
         }
+    }
+
+    private Resource getResource(BitPieceMap map, int color) {
+        return null;
+    }
+
+    private Res getRes(BitPieceMap map, int color, int point, int direction) {
+        return null;
     }
 
     private int[] getHighScorePoints(Map.Entry<Integer, Integer>[] entries, int size) {
