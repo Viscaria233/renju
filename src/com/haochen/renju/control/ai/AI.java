@@ -4,6 +4,7 @@ import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.Res;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
+import com.haochen.renju.calculate.Resources;
 import com.haochen.renju.calculate.SingleContinue;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
@@ -485,6 +486,10 @@ public class AI implements Mediator.Calculate {
         return three >= 2;
     }
 
+    private boolean isForbiddenMove(BitPieceMap map, int point, Direction direction) {
+        return isForbiddenMove(map, getContinueAttribute(map, point, Direction.all), Direction.all);
+    }
+
     private boolean isForbiddenMove(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
         boolean forbidden = false;
         int color = Cell.BLACK;
@@ -566,6 +571,10 @@ public class AI implements Mediator.Calculate {
         return forbidden;
     }
 
+    private Map<Direction, ContinueType> getContinueTypes(BitPieceMap map, int point) {
+        return getContinueTypes(map, getContinueAttribute(map, point, Direction.all));
+    }
+
     private Map<Direction, ContinueType> getContinueTypes(BitPieceMap map, ContinueAttribute attribute) {
         Map<Direction, ContinueType> result = new HashMap<>();
         Direction[] directions = Direction.createDirectionArray();
@@ -604,12 +613,46 @@ public class AI implements Mediator.Calculate {
         }
     }
 
-    private Resource getResource(BitPieceMap map, int color) {
-        return null;
+    private boolean allowMovingAt(BitPieceMap map, int point, int color) {
+        return color == Cell.WHITE || !isForbiddenMove(map, point, Direction.all);
     }
 
-    private Res getRes(BitPieceMap map, int color, int point, int direction) {
-        return null;
+    private Resources getResource(BitPieceMap map) {
+        Resources result = new Resources();
+        for (int point : map) {
+            int color = map.getCell(point);
+            if (color != Cell.EMPTY) {
+                List<Res> list = getRes(map, point);
+                for (Res res : list) {
+                    List<Integer> points = res.getPoints();
+                    for (int i : points) {
+                        result.add(i, color, res);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<Res> getRes(BitPieceMap map, int point) {
+        int color = map.getCell(point);
+        if (color == Cell.EMPTY) {
+            return null;
+        }
+        List<Res> result = new ArrayList<>();
+        int[] dx = {1, 0, 1, 1};
+        int[] dy = {0, 1, 1, -1};
+        for (int i = 0; i < 4; ++i) {   //4¸ö·½Ïò
+            int[] p = {point, point};
+            int[] sides = new int[2];
+            for (int j = 0; j < 2; ++j) {
+                do {
+                    p[j] = PointUtils.move(p[j], (1 - 2 * j) * dx[i], (1 - 2 * j) * dy[i]);
+                    //1-2*j: j=0 => 1, j=1 => -1
+                } while (map.getCell(p[j]) == color);
+            }
+        }
+        return result;
     }
 
     private int[] getHighScorePoints(Map.Entry<Integer, Integer>[] entries, int size) {
