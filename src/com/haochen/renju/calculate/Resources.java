@@ -1,40 +1,45 @@
 package com.haochen.renju.calculate;
 
+import com.haochen.renju.bean.Cell;
 import com.haochen.renju.bean.Res;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Haochen on 2016/11/8.
  */
 public class Resources {
-    private List<Res> resources = new ArrayList<>();
+    private Map<Integer, List<Res>> black = new HashMap<>();
+    private Map<Integer, List<Res>> white = new HashMap<>();
 
-    public Resources() {}
-
-    public void add(Res res) {
-        resources.add(res);
+    public Map<Integer, List<Res>> of(int color) {
+        switch (color) {
+            case Cell.BLACK:
+                return black;
+            case Cell.WHITE:
+                return white;
+        }
+        return null;
     }
 
-    public void remove(Res res) {
-        resources.remove(res);
+    public void add(int point, int color, Res res) {
+        of(color).get(point).add(res);
     }
 
-    public void remove(int index) {
-        resources.remove(index);
+    public void remove(int point, int color, Res res) {
+        of(color).get(point).remove(res);
     }
 
-    public int size() {
-        return resources.size();
+    public void remove(int point, int color, int index) {
+        of(color).get(point).remove(index);
     }
 
-    public Resources search(int direction) {
-        Resources result = new Resources();
-        for (Res res : resources) {
-            if (res.getDirection() == direction) {
-                result.add(res);
-            }
+    public int size(int color) {
+        int result = 0;
+        for (Map.Entry<Integer, List<Res>> entry : of(color).entrySet()) {
+            result += entry.getValue().size();
         }
         return result;
     }
