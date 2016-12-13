@@ -636,6 +636,7 @@ public class AI implements Mediator.Calculate {
 
     private List<Res> getRes(BitPieceMap map, int point) {
         int color = map.getCell(point);
+        int foe = CellUtils.foeColor(color);
         if (color == Cell.EMPTY) {
             return null;
         }
@@ -646,10 +647,18 @@ public class AI implements Mediator.Calculate {
             int[] p = {point, point};
             int[] sides = new int[2];
             for (int j = 0; j < 2; ++j) {
+                int moves = 0;
                 do {
+                    moves++;
                     p[j] = PointUtils.move(p[j], (1 - 2 * j) * dx[i], (1 - 2 * j) * dy[i]);
                     //1-2*j: j=0 => 1, j=1 => -1
-                } while (map.getCell(p[j]) == color);
+                    if (map.getCell(p[j]) == foe) {
+                        sides[j] = p[j];
+                    }
+                } while (map.getCell(p[j]) != foe && moves < 5);
+                if (moves == 5) {
+                    sides[j] = p[j];
+                }
             }
         }
         return result;
