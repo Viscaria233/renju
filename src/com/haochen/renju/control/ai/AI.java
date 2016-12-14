@@ -10,7 +10,6 @@ import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
 import com.haochen.renju.control.ai.WinTreeFinder.WinMethod;
 import com.haochen.renju.control.wintree.WinTree;
-import com.haochen.renju.resources.Resource;
 import com.haochen.renju.storage.BitPieceMap;
 import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.Point;
@@ -646,6 +645,7 @@ public class AI implements Mediator.Calculate {
         for (int i = 0; i < 4; ++i) {   //4¸ö·½Ïò
             int[] p = {point, point};
             int[] sides = new int[2];
+            int sameColor = 0;
             for (int j = 0; j < 2; ++j) {
                 int moves = 0;
                 do {
@@ -654,11 +654,20 @@ public class AI implements Mediator.Calculate {
                     //1-2*j: j=0 => 1, j=1 => -1
                     if (map.getCell(p[j]) == foe) {
                         sides[j] = p[j];
+                    } else if (map.getCell(p[j]) == color) {
+                        sameColor++;
                     }
                 } while (map.getCell(p[j]) != foe && moves < 5);
                 if (moves == 5) {
                     sides[j] = p[j];
                 }
+            }
+            int space = 0;
+            if (i % 2 == 0) {
+                space = Math.abs(PointUtils.getX(sides[0]) - PointUtils.getX(sides[1])) - 2;
+            }
+            if (space == 5) {
+
             }
         }
         return result;
