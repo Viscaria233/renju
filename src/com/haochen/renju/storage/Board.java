@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.haochen.renju.bean.Cell;
 import com.haochen.renju.control.Mediator;
 
 public class Board implements Mediator.Storage {

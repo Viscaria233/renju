@@ -1,7 +1,5 @@
 package com.haochen.renju.storage;
 
-import com.haochen.renju.bean.Cell;
-import com.haochen.renju.util.CellUtils;
 import com.haochen.renju.util.PointUtils;
 
 import java.io.Serializable;
@@ -31,17 +29,23 @@ import java.util.Iterator;
  */
 public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
 
+    public static final int CELL_TYPE_EMPTY = 0;
+    public static final int CELL_TYPE_BLACK = 1;
+    public static final int CELL_TYPE_WHITE = 2;
+    public static final int CELL_TYPE_FORBIDDEN_MOVE = 3;
+
+    private static final int BINARY_11 = 3;
+
     /**
      * 表示棋盘的一维数组
      */
-    private int[] map;
+    private MyInteger[] map;
 
     public BitPieceMap() {
-        map = new int[15];
-    }
-
-    public void setMap(int[] map) {
-        this.map = map;
+        map = new MyInteger[15];
+        for (int i = 0; i < map.length; ++i) {
+            map[i] = new MyInteger();
+        }
     }
 
     /**
@@ -50,12 +54,8 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
      * @return true: 空  false: 不空
      */
     public boolean available(int point) {
-        int x = PointUtils.getX(point);
-        int y = PointUtils.getY(point);
-
-        //最后3的意义是二进制数11
-        int cell = (map[15 - y] >> (x * 2)) & 3;
-        return cell == 0 || cell == 3;
+        int cell = getCell(point);
+        return cell == CELL_TYPE_EMPTY || cell == CELL_TYPE_FORBIDDEN_MOVE;
     }
 
     /**
@@ -66,8 +66,12 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
     private void setCell(int point, int type) {
         int y = PointUtils.getY(point);
         int move = PointUtils.getX(point) * 2;
-        map[15 - y] &= ~(3 << move);
-        map[15 - y] |= type << move;
+        getRow(y).integer &= ~(BINARY_11 << move);
+        getRow(y).integer |= type << move;
+    }
+
+    private MyInteger getRow(int rowNum) {
+        return map[15 - rowNum];
     }
 
     public void addCell(Cell cell) {
@@ -79,38 +83,38 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
     }
 
     public void addForbiddenMark(int point) {
-        setCell(point, 3);
+        setCell(point, CELL_TYPE_FORBIDDEN_MOVE);
     }
 
     public void removeCell(int point) {
-        setCell(point, 0);
+        setCell(point, CELL_TYPE_EMPTY);
     }
 
     public void removeCell(int x, int y) {
-        setCell(PointUtils.parse(x, y), 0);
+        setCell(PointUtils.parse(x, y), CELL_TYPE_EMPTY);
     }
 
     public void clear() {
         for (int i = 0; i < 15; ++i) {
-            map[i] = 0;
+            map[i].integer = CELL_TYPE_EMPTY;
         }
     }
 
     public void display() {
         for (int i = 0; i < 15; ++i) {
             for (int j = 2; j <= 30; j += 2) {
-                int cell = (map[i] >> j) & 3;
+                int cell = (map[i].integer >> j) & BINARY_11;
                 switch (cell) {
-                    case 0:
+                    case CELL_TYPE_EMPTY:
                         System.out.print("┼");
                         break;
-                    case 1:
+                    case CELL_TYPE_BLACK:
                         System.out.print("●");
                         break;
-                    case 2:
+                    case CELL_TYPE_WHITE:
                         System.out.print("○");
                         break;
-                    case 3:
+                    case CELL_TYPE_FORBIDDEN_MOVE:
                         System.out.print("×");
                         break;
                 }
@@ -127,7 +131,7 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
     public int getCell(int point) {
         int x = PointUtils.getX(point);
         int y = PointUtils.getY(point);
-        return (map[15 - y] >> (x * 2)) & 3;
+        return (getRow(y).integer >> (x * 2)) & BINARY_11;
     }
 
     public int getCell(int x, int y) {
@@ -137,7 +141,7 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
     @Override
     public Iterator<Integer> iterator() {
         return new Iterator<Integer>() {
-            int value = 0x10;
+            int value = 0x11;
 
             @Override
             public boolean hasNext() {
@@ -146,14 +150,13 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
 
             @Override
             public Integer next() {
-                ++value;
                 if (value >> 4 == 0) {
                     value |= 0x10;
                 }
                 if ((value & 0xf) == 0) {
                     value |= 1;
                 }
-                return value;
+                return value++;
             }
 
             @Override
@@ -162,13 +165,54 @@ public class BitPieceMap implements Cloneable, Iterable<Integer>, Serializable {
         };
     }
 
-    public BitPieceMap clone() {
-        BitPieceMap o = null;
+    public BitPieceMap another() {
         try {
-            o = (BitPieceMap) super.clone();
+            return (BitPieceMap) this.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
-        return o;
+        return null;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        BitPieceMap clone = (BitPieceMap) super.clone();
+        clone.map = map.clone();
+        for (int i = 0; i < map.length; ++i) {
+            clone.map[i] = (MyInteger) map[i].clone();
+        }
+        return clone;
+    }
+
+    private static class MyInteger implements Cloneable {
+        Integer integer = 0;
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 1; i <= 15; ++i) {
+                int cell = integer >> (i * 2) & BINARY_11;
+                switch (cell) {
+                    case CELL_TYPE_EMPTY:
+                        builder.append("┼");
+                        break;
+                    case CELL_TYPE_BLACK:
+                        builder.append("●");
+                        break;
+                    case CELL_TYPE_WHITE:
+                        builder.append("○");
+                        break;
+                    case CELL_TYPE_FORBIDDEN_MOVE:
+                        builder.append("×");
+                        break;
+                }
+            }
+            return builder.toString();
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
     }
 }

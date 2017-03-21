@@ -1,15 +1,14 @@
-package com.haochen.renju.control.ai;
+package com.haochen.renju.calculate.ai;
 
-import com.haochen.renju.bean.Cell;
-import com.haochen.renju.bean.Res;
+import com.haochen.renju.storage.Cell;
+import com.haochen.renju.storage.Res;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.Resources;
 import com.haochen.renju.calculate.SingleContinue;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.control.ai.WinTreeFinder.MoveSetGetter;
-import com.haochen.renju.control.ai.WinTreeFinder.WinMethod;
-import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.calculate.ai.GameTreeFinder.MoveSetGetter;
+import com.haochen.renju.calculate.ai.GameTreeFinder.FinishCondition;
 import com.haochen.renju.storage.BitPieceMap;
 import com.haochen.renju.storage.Direction;
 import com.haochen.renju.storage.Point;
@@ -41,12 +40,12 @@ public class AI implements Mediator.Calculate {
     }
 
     @Override
-    public WinTree findVCF(Mediator.Storage storage, int color) {
+    public GameTree findVCF(Mediator.Storage storage, int color) {
         return findVCF(bitPieceMap(storage), color);
     }
 
     @Override
-    public WinTree findVCT(Mediator.Storage storage, int color) {
+    public GameTree findVCT(Mediator.Storage storage, int color) {
         return findVCT(bitPieceMap(storage), color);
     }
 
@@ -60,11 +59,13 @@ public class AI implements Mediator.Calculate {
 
     @Override
     public boolean isForbiddenMove(Mediator.Storage storage, Point point, Direction direction) {
-        if (storage.available(point)) {
-            storage.addCell(new Cell(-1, point, Cell.BLACK));
-            ContinueAttribute attribute = getContinueAttribute(bitPieceMap(storage), PointUtils.parse(point), Direction.all);
-            storage.removeCell(point);
-            return isForbiddenMove(bitPieceMap(storage), attribute, direction);
+        BitPieceMap map = bitPieceMap(storage);
+        int p = PointUtils.parse(point);
+        if (map.available(p)) {
+            map.addPiece(p, BitPieceMap.CELL_TYPE_BLACK);
+            ContinueAttribute attribute = getContinueAttribute(map, p, Direction.all);
+            map.removeCell(p);
+            return isForbiddenMove(map, attribute, direction);
         } else {
             return false;
         }
@@ -78,6 +79,8 @@ public class AI implements Mediator.Calculate {
         if (usingForbiddenMove
                 && color == Cell.BLACK
                 && isForbiddenMove(map, attribute, Direction.all)) {
+            //删除假想棋子
+            map.removeCell(point);
             return Cell.WHITE;
         }
 
@@ -239,6 +242,14 @@ public class AI implements Mediator.Calculate {
         }
         int[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
+        fivePoint = getFivePoint(map, direction, color, breakPoint, fivePoint);
+        if (fivePoint == 2) {
+            result.add(direction);
+        }
+        return result;
+    }
+
+    private int getFivePoint(BitPieceMap map, Direction direction, int color, int[] breakPoint, int fivePoint) {
         for (int p : breakPoint) {
             if (p != 0) {
                 boolean isImaginary = false;
@@ -259,10 +270,7 @@ public class AI implements Mediator.Calculate {
                 }
             }
         }
-        if (fivePoint == 2) {
-            result.add(direction);
-        }
-        return result;
+        return fivePoint;
     }
 
     private Direction findAsleepFour(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -288,26 +296,7 @@ public class AI implements Mediator.Calculate {
         }
         int[] breakPoint = single.getBreakPoint();
         int fivePoint = 0;
-        for (int p : breakPoint) {
-            if (p != 0) {
-                boolean isImaginary = false;
-                if (map.available(p)) {
-                    //插入假想棋子
-                    map.addPiece(p, color);
-                    isImaginary = true;
-                }
-
-                ContinueAttribute breakAttr = getContinueAttribute(map, p, direction);
-                if (findFive(breakAttr, direction).getQuantity() > 0) {
-                    fivePoint++;
-                }
-
-                //删除假想棋子
-                if (isImaginary) {
-                    map.removeCell(p);
-                }
-            }
-        }
+        fivePoint = getFivePoint(map, direction, color, breakPoint, fivePoint);
         if (fivePoint == 1) {
             result.add(direction);
         } else if (fivePoint == 2 && single.getLength() != 4) {
@@ -448,45 +437,45 @@ public class AI implements Mediator.Calculate {
         return result;
     }
 
-    private boolean isDoubleFour(BitPieceMap map, int point) {
-        boolean isImaginary = false;
-        //插入假想棋子
-        if (map.available(point)) {
-            map.addPiece(point, Cell.BLACK);
-            isImaginary = true;
-        }
-
-        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
-        int four = findAliveFour(map, attribute, Direction.all).getQuantity()
-                + findAsleepFour(map, attribute, Direction.all).getQuantity();
-
-        //删除假想棋子
-        if (isImaginary) {
-            map.removeCell(point);
-        }
-        return four >= 2;
-    }
-
-    private boolean isDoubleThree(BitPieceMap map, int point) {
-        boolean isImaginary = false;
-        //插入假想棋子
-        if (map.available(point)) {
-            map.addPiece(point, Cell.BLACK);
-            isImaginary = true;
-        }
-
-        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
-        int three = findAliveThree(map, attribute, Direction.all).getQuantity();
-
-        //删除假想棋子
-        if (isImaginary) {
-            map.removeCell(point);
-        }
-        return three >= 2;
-    }
+//    private boolean isDoubleFour(BitPieceMap map, int point) {
+//        boolean isImaginary = false;
+//        //插入假想棋子
+//        if (map.available(point)) {
+//            map.addPiece(point, Cell.BLACK);
+//            isImaginary = true;
+//        }
+//
+//        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
+//        int four = findAliveFour(map, attribute, Direction.all).getQuantity()
+//                + findAsleepFour(map, attribute, Direction.all).getQuantity();
+//
+//        //删除假想棋子
+//        if (isImaginary) {
+//            map.removeCell(point);
+//        }
+//        return four >= 2;
+//    }
+//
+//    private boolean isDoubleThree(BitPieceMap map, int point) {
+//        boolean isImaginary = false;
+//        //插入假想棋子
+//        if (map.available(point)) {
+//            map.addPiece(point, Cell.BLACK);
+//            isImaginary = true;
+//        }
+//
+//        ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
+//        int three = findAliveThree(map, attribute, Direction.all).getQuantity();
+//
+//        //删除假想棋子
+//        if (isImaginary) {
+//            map.removeCell(point);
+//        }
+//        return three >= 2;
+//    }
 
     private boolean isForbiddenMove(BitPieceMap map, int point, Direction direction) {
-        return isForbiddenMove(map, getContinueAttribute(map, point, Direction.all), Direction.all);
+        return isForbiddenMove(map, getContinueAttribute(map, point, Direction.all), direction);
     }
 
     private boolean isForbiddenMove(BitPieceMap map, ContinueAttribute attribute, Direction direction) {
@@ -752,70 +741,68 @@ public class AI implements Mediator.Calculate {
         return five;
     }
 
-    private WinTree findVCF(BitPieceMap map, int color) {
-        WinMethod winMethod = null;
-        MoveSetGetter moveSetGetter = null;
-        WinTree result = null;
-
-        winMethod = new WinTreeFinder.WinMethod() {
+    private GameTree findVCF(BitPieceMap map, int color) {
+        final FinishCondition finishCondition = new FinishCondition() {
             @Override
-            public boolean isWin(BitPieceMap map, int point, int color) {
+            public boolean isFinish(BitPieceMap map, int point, int color) {
                 return findWinner(map, point, color) == color;
             }
         };
 
         final int c = color;
-        moveSetGetter = new WinTreeFinder.MoveSetGetter() {
+        final MoveSetGetter moveSetGetter = new GameTreeFinder.MoveSetGetter() {
             @Override
             public List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
                 List<Integer> result = new ArrayList<>();
                 if (color == c) {
-                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null);
+                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE,
+                            ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null);
                 } else if (color == CellUtils.foeColor(c)) {
-                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE), null);
+                    result = findPoints(map, color, Collections.singletonList(ContinueType.FIVE), null);
                     ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
                     Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
                     for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
                         if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
                                 || entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
-                            int[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
+                            int[] points = new int[0];
+                            if (attribute != null) {
+                                points = attribute.getContinue(entry.getKey()).getBreakPoint();
+                            }
                             for (int p : points) {
-                                if (p != 0 && c == findWinner(map, p, c)) {
+                                if (p != 0 && map.available(p) && finishCondition.isFinish(map, p, c)) {
                                     result.add(p);
                                 }
                             }
                         }
                     }
-//                    result.addAll(findPoints(map, type.foeColor(), Arrays.asList(ContinueType.FIVE), null));
+//                    if (result.isEmpty()) {
+//                        result = findPoints(map, c,
+//                                Collections.singletonList(ContinueType.FIVE), null);
+//                    }
                 }
                 return result;
             }
         };
-
-        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, 0, color);
-
-        return result;
+        return new GameTreeFinder(finishCondition, moveSetGetter).getGameTree(map, 0, color);
     }
 
-    private WinTree findVCT(BitPieceMap map, int color) {
+    private GameTree findVCT(BitPieceMap map, int color) {
         System.out.println("findVCT");
-        WinMethod winMethod = null;
-        MoveSetGetter moveSetGetter = null;
-        WinTree result = null;
 
-        winMethod = new WinMethod() {
+        FinishCondition finishCondition = new FinishCondition() {
             @Override
-            public boolean isWin(BitPieceMap map, int point, int color) {
-                return (findWinner(map, point, color) == color)
-                        || !findVCF(map, color).isEmpty();
+            public boolean isFinish(BitPieceMap map, int point, int color) {
+//                return (findWinner(map, point, color) == color)
+//                        || findVCF(map, color) != null;
+                return findWinner(map, point, color) == color;
             }
         };
 
         final int c = color;
-        moveSetGetter = new MoveSetGetter() {
+        MoveSetGetter moveSetGetter = new MoveSetGetter() {
             @Override
             public List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
-                System.out.println("getMoveSet");
+//                System.out.println("getMoveSet");
                 List<Integer> result = new ArrayList<>();
                 if (color == c) {
                     result = findPoints(map, color, Arrays.asList(
@@ -824,28 +811,32 @@ public class AI implements Mediator.Calculate {
                 } else if (color == CellUtils.foeColor(c)) {
                     result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
                             ContinueType.ASLEEP_FOUR), null);
-                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
-                    Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
-                    for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
-
-                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
-                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)
-                                || entry.getValue().equals(ContinueType.ALIVE_THREE)
-                                || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
-                            int[] points = attribute.getContinue(entry.getKey()).getBreakPoint();
-                            for (int p : points) {
-                                if (p != 0 && map.available(p)) {
-                                    result.add(p);
-                                }
-                            }
-                        }
-                    }
+//                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
+//                    Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
+//                    for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
+//
+//                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
+//                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)
+//                                || entry.getValue().equals(ContinueType.ALIVE_THREE)
+//                                || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
+//                            int[] points = new int[0];
+//                            if (attribute != null) {
+//                                points = attribute.getContinue(entry.getKey()).getBreakPoint();
+//                            }
+//                            for (int p : points) {
+//                                if (p != 0 && map.available(p)) {
+//                                    result.add(p);
+//                                }
+//                            }
+//                        }
+//                    }
+                    result.addAll(findPoints(map, c, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
+                            ContinueType.ASLEEP_FOUR), null));
                 }
                 return result;
             }
         };
-        result = new WinTreeFinder(winMethod, moveSetGetter).getWinTree(map, 0, color);
-        return result;
+        return new GameTreeFinder(finishCondition, moveSetGetter).getGameTree(map, 0, color);
     }
 
     private List<Integer> findPoints(BitPieceMap map, int color,
@@ -860,7 +851,7 @@ public class AI implements Mediator.Calculate {
                 attribute = getContinueAttribute(map, p, Direction.all);
                 types = getContinueTypes(map, attribute);
 
-                if (containsAType(types, contains) && excludesAllTypes(types, excludes)) {
+                if (containsOneType(types, contains) && excludesAllTypes(types, excludes)) {
                     result.add(p);
                 }
 
@@ -870,7 +861,7 @@ public class AI implements Mediator.Calculate {
         return result;
     }
 
-    private boolean containsAType(Map<Direction, ContinueType> map, Collection<ContinueType> types) {
+    private boolean containsOneType(Map<Direction, ContinueType> map, Collection<ContinueType> types) {
         if (types == null) {
             return true;
         }

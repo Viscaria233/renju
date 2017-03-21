@@ -1,8 +1,7 @@
 package com.haochen.renju.main;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.storage.PieceMap;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.TestFrame;
 
@@ -86,7 +85,7 @@ public class Client {
 
         Mediator mediator = frame.getMediator();
 
-        drawList(mediator, ques.get(5));
+        drawList(mediator, ques.get(0));
     }
 
     private static void drawList(Mediator mediator, List<Point> points) {
@@ -98,7 +97,7 @@ public class Client {
     public static void main(String[] args) {
             Config.init();
             launch();
-//            showList();
+            showList();
 
 //        new Chess5().launch();
     }

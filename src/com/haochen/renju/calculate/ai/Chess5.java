@@ -1,6 +1,6 @@
-package com.haochen.renju.control.ai;
+package com.haochen.renju.calculate.ai;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.util.PointUtils;
 

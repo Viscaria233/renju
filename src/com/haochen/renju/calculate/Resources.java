@@ -1,7 +1,7 @@
 package com.haochen.renju.calculate;
 
-import com.haochen.renju.bean.Cell;
-import com.haochen.renju.bean.Res;
+import com.haochen.renju.storage.Cell;
+import com.haochen.renju.storage.Res;
 
 import java.util.HashMap;
 import java.util.List;

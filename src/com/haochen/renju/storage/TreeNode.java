@@ -3,8 +3,6 @@ package com.haochen.renju.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.haochen.renju.bean.Cell;
-
 public class TreeNode {
 	private TreeNode parent;
 	private List<TreeNode> children;
@@ -43,5 +41,13 @@ public class TreeNode {
 		} else if (!cell.equals(other.cell))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = parent != null ? parent.hashCode() : 0;
+		result = 31 * result + (children != null ? children.hashCode() : 0);
+		result = 31 * result + (cell != null ? cell.hashCode() : 0);
+		return result;
 	}
 }

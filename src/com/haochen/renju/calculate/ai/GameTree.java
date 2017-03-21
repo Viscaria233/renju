@@ -1,4 +1,7 @@
-package com.haochen.renju.control.wintree;
+package com.haochen.renju.calculate.ai;
+
+import com.haochen.renju.util.CellUtils;
+import com.haochen.renju.util.PointUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,41 +11,41 @@ import java.util.List;
 /**
  * Created by Haochen on 2016/10/24.
  */
-public class WinTree implements Iterable<WinTree>, Serializable {
-    private WinTree parent;
-    private List<WinTree> children = new ArrayList<>();
+public class GameTree implements Iterable<GameTree>, Serializable {
+    private GameTree parent;
+    private List<GameTree> children = new ArrayList<>();
     private int point;
     private int color;
 
-    public void add(WinTree tree) {
+    public void add(GameTree tree) {
         tree.setParent(this);
         children.add(tree);
     }
 
-    public void addAllChildren(WinTree tree) {
-        for (WinTree t : tree.children) {
+    public void addAllChildren(GameTree tree) {
+        for (GameTree t : tree.children) {
             t.setParent(this);
             children.add(t);
         }
     }
 
     public void add(List<Integer> points, int color) {
-        WinTree winTree;
+        GameTree gameTree;
         for (int p : points) {
-            winTree = new WinTree();
-            winTree.setParent(this);
-            winTree.setPoint(p);
-            winTree.setColor(color);
-            children.add(winTree);
+            gameTree = new GameTree();
+            gameTree.setParent(this);
+            gameTree.setPoint(p);
+            gameTree.setColor(color);
+            children.add(gameTree);
         }
     }
 
-    public void remove(WinTree tree) {
+    public void remove(GameTree tree) {
         children.remove(tree);
     }
 
     public void remove(int point) {
-        for (WinTree n : children) {
+        for (GameTree n : children) {
             if (n.getPoint() != point) {
                 children.remove(n);
             }
@@ -61,15 +64,15 @@ public class WinTree implements Iterable<WinTree>, Serializable {
         children.clear();
     }
 
-    public WinTree getParent() {
+    public GameTree getParent() {
         return parent;
     }
 
-    public void setParent(WinTree parent) {
+    public void setParent(GameTree parent) {
         this.parent = parent;
     }
 
-    public WinTree getChild(int index) {
+    public GameTree getChild(int index) {
         return children.get(index);
     }
 
@@ -90,8 +93,8 @@ public class WinTree implements Iterable<WinTree>, Serializable {
     }
 
     @Override
-    public Iterator<WinTree> iterator() {
-        return new Iterator<WinTree>() {
+    public Iterator<GameTree> iterator() {
+        return new Iterator<GameTree>() {
 
             private int index = 0;
 
@@ -101,12 +104,13 @@ public class WinTree implements Iterable<WinTree>, Serializable {
             }
 
             @Override
-            public WinTree next() {
+            public GameTree next() {
                 return children.get(index++);
             }
 
             @Override
             public void remove() {
+                children.remove(--index);
             }
         };
     }
@@ -116,19 +120,23 @@ public class WinTree implements Iterable<WinTree>, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        WinTree winTree = (WinTree) o;
+        GameTree gameTree = (GameTree) o;
 
-        if (point != winTree.point) return false;
-        if (color != winTree.color) return false;
-        return children != null ? children.equals(winTree.children) : winTree.children == null;
-
+        return point == gameTree.point && color == gameTree.color;
     }
 
     @Override
     public int hashCode() {
-        int result = children != null ? children.hashCode() : 0;
-        result = 31 * result + point;
+        int result = point;
         result = 31 * result + color;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "GameTree{" +
+                PointUtils.toString(point) +
+                CellUtils.toString(color) +
+                " children: " + children.size() + '}';
     }
 }

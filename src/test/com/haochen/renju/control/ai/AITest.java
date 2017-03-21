@@ -1,8 +1,8 @@
 package test.com.haochen.renju.control.ai;
 
-import com.haochen.renju.bean.Cell;
-import com.haochen.renju.control.ai.AI;
-import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.storage.Cell;
+import com.haochen.renju.calculate.ai.AI;
+import com.haochen.renju.calculate.ai.GameTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.Board;
 import com.haochen.renju.storage.PieceMap;
@@ -163,8 +163,8 @@ public class AITest {
 //TODO: Test goes here...
 
         List<PieceMap> ques = new ArrayList<>();
-        List<WinTree> ans = new ArrayList<>();
-        List<WinTree> found = new ArrayList<>();
+        List<GameTree> ans = new ArrayList<>();
+        List<GameTree> found = new ArrayList<>();
         int[] colors = {
                 Cell.BLACK,
                 Cell.BLACK,
@@ -180,7 +180,7 @@ public class AITest {
             ques.add((PieceMap) ois.readObject());
             ois.close();
             ois = Config.Test.createVCFStream("vcf_answer_" + i + ".ans");
-            ans.add((WinTree) ois.readObject());
+            ans.add((GameTree) ois.readObject());
             ois.close();
         }
 

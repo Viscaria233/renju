@@ -9,15 +9,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.control.ai.AI;
+import com.haochen.renju.calculate.ai.AI;
 import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
 
-public class TestMenuBar extends JMenuBar {
+class TestMenuBar extends JMenuBar {
 
     /**
      *
@@ -34,6 +34,7 @@ public class TestMenuBar extends JMenuBar {
     private JMenuItem findVCT;
     private JMenuItem findVCF;
     private JMenuItem stopFinding;
+    private JMenuItem hideFindingResult;
 
     private JMenuItem about;
 
@@ -82,13 +83,15 @@ public class TestMenuBar extends JMenuBar {
         file.addSeparator();
         file.add(exit);
 
-        findVCT = new JMenuItem("Find VCT");
-        findVCF = new JMenuItem("Find VCF");
+        findVCT = new NewThreadJMenuItem("Find VCT");
+        findVCF = new NewThreadJMenuItem("Find VCF");
         stopFinding = new JMenuItem("Stop finding");
+        hideFindingResult = new JMenuItem("Hide finding result");
 
         edit.add(findVCT);
         edit.add(findVCF);
         edit.add(stopFinding);
+        edit.add(hideFindingResult);
 
         about = new JMenuItem("About");
         help.add(about);
@@ -108,7 +111,7 @@ public class TestMenuBar extends JMenuBar {
         usingForbidden = new JCheckBoxMenuItem("Using Forbidden");
         usingForbidden.setState(AI.usingForbiddenMove);
         aiBlack = new JCheckBoxMenuItem("AI Uses Black");
-//        aiBlack.setState(true);
+//        aiBlack.setPrinter(true);
         aiWhite = new JCheckBoxMenuItem("AI Uses White");
         bLvLow = new JCheckBoxMenuItem("Low");
         bLvNormal = new JCheckBoxMenuItem("Normal");
@@ -189,6 +192,13 @@ public class TestMenuBar extends JMenuBar {
                 }
         );
 
+        hideFindingResult.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mediator.getOperator().hideFindingResult();
+            }
+        });
+
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -266,6 +276,27 @@ public class TestMenuBar extends JMenuBar {
                 }
             }
         });
+    }
+
+    private static class NewThreadJMenuItem extends JMenuItem {
+        public NewThreadJMenuItem(String text) {
+            super(text);
+        }
+
+        @Override
+        public void addActionListener(final ActionListener l) {
+            super.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            l.actionPerformed(e);
+                        }
+                    }).start();
+                }
+            });
+        }
     }
 }
 
