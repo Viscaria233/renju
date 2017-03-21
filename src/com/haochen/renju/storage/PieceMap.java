@@ -1,10 +1,8 @@
 package com.haochen.renju.storage;
 
-import com.haochen.renju.bean.Cell;
-
 import java.io.Serializable;
 
-public class PieceMap implements Cloneable, Serializable {
+public class PieceMap implements Serializable {
     
     private Cell[][] map;
     
@@ -56,15 +54,6 @@ public class PieceMap implements Cloneable, Serializable {
             }
             System.out.println();
         }
-    }
-
-    public PieceMap clone() throws CloneNotSupportedException {
-        PieceMap pieceMap = (PieceMap) super.clone();
-        pieceMap.map = this.map.clone();
-        for (int i = 0; i < 15; ++i) {
-            pieceMap.map[i] = this.map[i].clone();
-        }
-        return pieceMap;
     }
     
     public Cell getCell(Point location) {

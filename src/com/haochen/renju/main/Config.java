@@ -1,6 +1,6 @@
 package com.haochen.renju.main;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 
 import java.io.*;
 

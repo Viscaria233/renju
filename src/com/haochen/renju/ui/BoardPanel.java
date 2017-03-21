@@ -8,7 +8,8 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.calculate.ai.GameTree;
+import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.main.Config;
@@ -17,26 +18,31 @@ import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.draw.Layer;
 import com.haochen.renju.ui.draw.LayerManager;
 import com.haochen.renju.util.CellUtils;
+import com.haochen.renju.util.PointUtils;
 
-public class BoardPanel extends JPanel implements Mediator.Display {
+class BoardPanel extends JPanel implements Mediator.Display {
 
     private final int cellWidth = 30;
+    private final int cellHeight = 30;
+
     private final int lineNumber = 15;
+
     private final int pieceFieldWidth = cellWidth * lineNumber;
+    private final int pieceFieldHeight = cellWidth * lineNumber;
+
     private Image backgroundImage;
     private Image blackPiece;
     private Image whitePiece;
-    private final Color axesColor = new Color(0xbbbbbb);
-    private final Color forbiddenMarkColor = Color.red;
 
-    private final Color highlightColor = Color.red;
+    private final Color axesColor = Color.LIGHT_GRAY;
+    private final Color forbiddenMarkColor = Color.RED;
+    private final Color highlightColor = Color.RED;
+
     private GridBagLayout gridBag = new GridBagLayout();
-    
-    private JPanel background;
+
     private JPanel net;
-    private JPanel hAxes;
-    private JPanel vAxes;
-    
+
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private LayerManager lm;
 
     private ForbiddenMarkLayer forbiddenMarkLayer;
@@ -44,20 +50,16 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     private PieceLayer pieceLayer;
     private HighlightLayer highlightLayer;
     private IndexLayer indexLayer;
-    
+    private GameTreeLayer gameTreeLayer;
+
     private Mediator mediator;
     
     BoardPanel() {
-        super();
         setLayout(gridBag);
         initial();
         eventPerform();
     }
 
-    /**  
-     * @Title: initial  
-     * @Description: TODO
-     */
     private void initial() {
         try {
             backgroundImage = ImageIO.read(Resource.get("marble.png"));
@@ -66,12 +68,12 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        background = new NetPanel();
+
+        JPanel background = new NetPanel();
         net = new GlassPanel();
 
-        hAxes = new HorizontalAxesPanel();
-        vAxes = new VerticalAxesPanel();
+        JPanel hAxes = new HorizontalAxesPanel();
+        JPanel vAxes = new VerticalAxesPanel();
         add(net);
         add(background);
         add(hAxes);
@@ -84,13 +86,15 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         gridBag.setConstraints(vAxes, new GBC(0, 0, 1, 2));
 
         lm = new LayerManager(net);
-        forbiddenMarkLayer = new ForbiddenMarkLayer(pieceFieldWidth, pieceFieldWidth);
-        recordLayer = new RecordLayer(pieceFieldWidth, pieceFieldWidth);
-        pieceLayer = new PieceLayer(pieceFieldWidth, pieceFieldWidth);
-        highlightLayer = new HighlightLayer(pieceFieldWidth, pieceFieldWidth);
-        indexLayer = new IndexLayer(pieceFieldWidth, pieceFieldWidth);
+        forbiddenMarkLayer = new ForbiddenMarkLayer(pieceFieldWidth, pieceFieldHeight);
+        recordLayer = new RecordLayer(pieceFieldWidth, pieceFieldHeight);
+        pieceLayer = new PieceLayer(pieceFieldWidth, pieceFieldHeight);
+        highlightLayer = new HighlightLayer(pieceFieldWidth, pieceFieldHeight);
+        indexLayer = new IndexLayer(pieceFieldWidth, pieceFieldHeight);
+        gameTreeLayer = new GameTreeLayer(pieceFieldWidth, pieceFieldHeight);
         lm.add(forbiddenMarkLayer);
         lm.add(recordLayer);
+        lm.add(gameTreeLayer);
         lm.add(pieceLayer);
         lm.add(highlightLayer);
         lm.add(indexLayer);
@@ -158,7 +162,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     @Override
     public void removeRecord(Point onBoard) {
         Point absolutely = absolutelyLocation(onBoard);
-        recordLayer.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
+        recordLayer.erase(absolutely.x, absolutely.y, cellWidth, cellHeight);
     }
 
     @Override
@@ -177,9 +181,27 @@ public class BoardPanel extends JPanel implements Mediator.Display {
     }
 
     @Override
+    public void drawGameTree(GameTree tree) {
+        GameTree node = tree;
+        int count = 0;
+        do {
+            node = node.getChild(0);
+            if (node.getColor() == tree.getColor()) {
+                count++;
+                gameTreeLayer.draw(count, PointUtils.build(node.getPoint()), node.getColor());
+            }
+        } while (node.getColor() == tree.getColor() ? node.size() == 1 : node.size() > 0);
+    }
+
+    @Override
+    public void clearGameTree() {
+        gameTreeLayer.erase();
+    }
+
+    @Override
     public void clear(Point onBoard) {
         Point absolutely = absolutelyLocation(onBoard);
-        lm.erase(absolutely.x, absolutely.y, cellWidth, cellWidth);
+        lm.erase(absolutely.x, absolutely.y, cellWidth, cellHeight);
     }
 
     @Override
@@ -203,49 +225,38 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         int y = absolutelyLocation.y;
         x -= cellWidth / 2;
         y -= cellWidth / 2;
-        lm.erase(x, y, cellWidth, cellWidth);
+        lm.erase(x, y, cellWidth, cellHeight);
     }
     
     private Point boardLocation(Point absolutely) {
         int x = absolutely.x;
         int y = absolutely.y;
-        Point point = new Point(
+        return new Point(
                 x / cellWidth + 1,
                 15 - y  / cellWidth);
-        return point;
     }
 
     /**
      *
-     * @param onBoard
+     * @param onBoard 棋盘上的坐标
      * @return  这个格子左上角的绝对坐标
      */
      private Point absolutelyLocation(Point onBoard) {
         int x = onBoard.x;
         int y = onBoard.y;
-        Point point = new Point(
-                (int) ((x - 0.5) * cellWidth),
-                (int) ((16 - y - 0.5) * cellWidth));
-        return point;
+        return new Point(
+                 (int) ((x - 0.5) * cellWidth),
+                 (int) ((16 - y - 0.5) * cellWidth));
     }
-    
-    /**  
-     * @ClassName: GlassPanel  
-     * @Description: TODO   
-     * @author HaoChen  
-     * @date 2016年4月30日 下午4:22:47  
-     *    
-     *    透明面板，用来接收鼠标事件
+
+    /**
+     * 透明面板，用来接收鼠标事件
      */
     private class GlassPanel extends JPanel {
-        /**  
-         * @Fields serialVersionUID :  
-         */ 
-        private static final long serialVersionUID = 1L;
         GlassPanel() {
             super();
-            this.setPreferredSize(new Dimension(pieceFieldWidth, pieceFieldWidth));
-            this.setBackground(new Color(0, 0, 0, 0));
+            this.setPreferredSize(new Dimension(pieceFieldWidth, pieceFieldHeight));
+            this.setBackground(new Color(0,true));
         }
         @Override
         public void paint(Graphics g) {
@@ -253,19 +264,11 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             lm.restore(g);
         }
     }
-    
-    /**  
-     * @ClassName: NetPanel  
-     * @Description: TODO   棋盘网格，落子区域
-     * @author HaoChen  
-     * @date 2016年4月17日 下午3:36:29  
-     *    
+
+    /**
+     * 棋盘网格，落子区域
      */
     private class NetPanel extends JPanel {
-        /**
-         * @Fields serialVersionUID :
-         */
-        private static final long serialVersionUID = 1L;
         private double starRatio = 0.08;
         NetPanel() {
             super();
@@ -281,7 +284,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
         }
         private void drawBoardNet(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(Color.black);
+            g2d.setColor(Color.BLACK);
             
             //绘制外边框
             g2d.setStroke(new BasicStroke(4.0f));
@@ -310,24 +313,16 @@ public class BoardPanel extends JPanel implements Mediator.Display {
 
         private void drawStarPoint(Point p, Graphics g) {
             int starWidth = (int) (cellWidth * starRatio);
-            g.setColor(Color.black);
+            g.setColor(Color.BLACK);
             g.fillRect(p.x * cellWidth - starWidth, p.y * cellWidth - starWidth,
                     2 * starWidth + 1, 2 * starWidth + 1);
         }
     }
-    
-    /**  
-     * @ClassName: HorizontalAxesPanel  
-     * @Description: TODO   
-     * @author HaoChen  
-     * @date 2016年4月30日 下午4:36:21  
-     *    
+
+    /**
+     * 横坐标轴
      */
     private class HorizontalAxesPanel extends JPanel {
-        /**
-         * @Fields serialVersionUID :
-         */
-        private static final long serialVersionUID = 1L;
         HorizontalAxesPanel() {
             setBackground(axesColor);
             setPreferredSize(new Dimension(cellWidth * (lineNumber + 1), cellWidth));
@@ -340,25 +335,18 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             g.setFont(new Font("Arial", Font.BOLD, cellWidth / 2));
             FontMetrics m = g.getFontMetrics();
             int strHeight = m.getHeight();
-            int strWidth = 0;
+            int strWidth;
             for (int i = 0; i < 15; i++) {
                 strWidth = m.stringWidth(letter[i]);
                 g.drawString(letter[i], (i + 1) * cellWidth - strWidth / 2, lineNumber + strHeight / 3);
             }
         }
     }
-    /**  
-     * @ClassName: VerticalAxesPanel  
-     * @Description: TODO   
-     * @author HaoChen  
-     * @date 2016年4月30日 下午4:36:38  
-     *    
+
+    /**
+     * 纵坐标轴
      */
     private class VerticalAxesPanel extends JPanel {
-        /**
-         * @Fields serialVersionUID :
-         */
-        private static final long serialVersionUID = 1L;
         VerticalAxesPanel() {
             setBackground(axesColor);
             setPreferredSize(new Dimension(cellWidth, cellWidth * (lineNumber + 2)));
@@ -370,8 +358,8 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             g.setFont(new Font("Arail", Font.BOLD, cellWidth / 2));
             FontMetrics m = g.getFontMetrics();
             int strHeight = m.getHeight();
-            int strWidth = 0;
-            int n = 0;
+            int strWidth;
+            int n;
             for (int i = 0; i < lineNumber; i++) {
                 n = lineNumber - i;
                 strWidth = m.stringWidth(n + "");
@@ -379,16 +367,12 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             }
         }
     }
-    
-    /**  
-     * @ClassName: ForbiddenMarkLayer
-     * @Description: TODO   显示禁手标记的图层
-     * @author HaoChen  
-     * @date 2016年4月17日 上午10:02:46  
-     *    
+
+    /**
+     * 显示禁手标记的图层
      */
     private class ForbiddenMarkLayer extends Layer {
-        private final double ratio = 0.5;
+        private static final double RATIO = 0.5;
         ForbiddenMarkLayer(int width, int height) {
             super(width, height);
         }
@@ -396,7 +380,7 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
-            int w = (int) (cellWidth * ratio);
+            int w = (int) (cellWidth * RATIO);
             if (w % 2 == 1) {
                 --w;
             }
@@ -408,16 +392,12 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             g2d.drawLine(x + w, y, x, y + w);
         }
     }
-    
-    /**  
-     * @ClassName: RecordLayer  
-     * @Description: TODO   显示历史落子记录的图层
-     * @author HaoChen  
-     * @date 2016年4月17日 上午10:23:08  
-     *    
+
+    /**
+     * 显示历史落子记录的图层
      */
     private class RecordLayer extends Layer {
-        private final double ratio = 0.5;
+        private static final double RATIO = 0.5;
         RecordLayer(int width, int height) {
             super(width, height);
         }
@@ -425,26 +405,22 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             Point point= absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
-            int w = (int) (cellWidth * ratio);
+            int w = (int) (cellWidth * RATIO);
             if (w % 2 == 1) {
                 --w;
             }
             x -= w / 2;
             y -= w / 2;
-            g2d.setColor(CellUtils.getAwtColor(color));
+            g2d.setColor(CellUtils.awtColor(color));
             g2d.fillOval(x, y, w, w);
         }
     }
-    
-    /**  
-     * @ClassName: PieceLayer  
-     * @Description: TODO   显示棋子的图层
-     * @author HaoChen  
-     * @date 2016年4月16日 下午11:01:49  
-     *    
+
+    /**
+     * 显示棋子的图层
      */
     private class PieceLayer extends Layer {
-        private final double ratio = 0.9;
+        private static final double RATIO = 0.9;
         PieceLayer(int width, int height) {
             super(width, height);
         }
@@ -452,33 +428,22 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
-            int w = (int) (cellWidth * ratio);
+            int w = (int) (cellWidth * RATIO);
             if (w % 2 == 1) {
                 --w;
             }
             x -= w / 2;
             y -= w / 2;
-//            g2d.setColor(type);
-//            g2d.fillOval(x, y, w, w);
-            Image image = null;
-            if (color == Cell.BLACK) {
-                image = blackPiece;
-            } else {
-                image = whitePiece;
-            }
+            Image image = color == Cell.BLACK ? blackPiece : whitePiece;
             g2d.drawImage(image, x, y, w, w, null);
         }
     }
-    
-    /**  
-     * @ClassName: HighlightLayer  
-     * @Description: TODO   显示最后一手高亮的图层
-     * @author HaoChen  
-     * @date 2016年4月16日 下午11:01:33  
-     *    
+
+    /**
+     * 显示最后一手高亮的图层
      */
     private class HighlightLayer extends Layer {
-        private final double ratio = 0.9;
+        private static final double RATIO = 0.9;
         private Rectangle currentHighlight;
         HighlightLayer(int width, int height) {
             super(width, height);
@@ -490,30 +455,26 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             Point point = absolutelyLocation(boardLocation);
             int x = point.x;
             int y = point.y;
-            int w = cellWidth;
-            currentHighlight = new Rectangle(x - w / 2, y - w / 2, w, w);
-            w = (int) (w * ratio);
-            if (w % 2 == 1) {
-                --w;
+            int r = cellWidth;
+            currentHighlight = new Rectangle(x - r / 2, y - r / 2, r, r);
+            r = (int) (r * RATIO);
+            if (r % 2 == 1) {
+                --r;
             }
-            x -= w / 2 - 2;
-            y -= w / 2 - 2;
-            w -= 4;
+            x -= r / 2 - 2;
+            y -= r / 2 - 2;
+            r -= 4;
             g2d.setColor(highlightColor);
             g2d.setStroke(new BasicStroke(2.0f));
-            g2d.drawOval(x, y, w, w);
+            g2d.drawOval(x, y, r, r);
         }
     }
-    
-    /**  
-     * @ClassName: IndexLayer  
-     * @Description: TODO   显示手顺的图层
-     * @author HaoChen  
-     * @date 2016年4月16日 下午11:01:16  
-     *    
+
+    /**
+     * 显示手顺的图层
      */
     private class IndexLayer extends Layer {
-        private final double ratio = 0.5;
+        private static final double RATIO = 0.5;
         IndexLayer(int width, int height) {
             super(width, height);
         }
@@ -522,15 +483,45 @@ public class BoardPanel extends JPanel implements Mediator.Display {
             int x = point.x;
             int y = point.y;
 
-            g2d.setFont(new Font("宋体", 0, (int) (cellWidth * ratio)));
+            g2d.setFont(new Font("宋体", Font.PLAIN, (int) (cellWidth * RATIO)));
             FontMetrics fm = g2d.getFontMetrics();
             String str = "" + index;
             int width = fm.stringWidth(str);
             int height = fm.getHeight();
             x -= width / 2;
             y += height / 4;
-            g2d.setColor(CellUtils.getAwtColor(color));
+            g2d.setColor(CellUtils.awtColor(color));
             g2d.drawString(str, x, y);
+        }
+    }
+
+    private class GameTreeLayer extends Layer {
+        private static final double INDEX_RATIO = 0.5;
+        private static final double CIRCLE_RATIO = 1;
+        public GameTreeLayer(int width, int height) {
+            super(width, height);
+        }
+        void draw(int index, Point boardLocation, int color) {
+            Point point = absolutelyLocation(boardLocation);
+            int x = point.x;
+            int y = point.y;
+
+            g2d.setFont(new Font("宋体", Font.PLAIN, (int) (cellWidth * INDEX_RATIO)));
+            FontMetrics fm = g2d.getFontMetrics();
+            String str = "" + index;
+            int width = fm.stringWidth(str);
+            int height = fm.getHeight();
+            int indexX = x - width / 2;
+            int indexY = y + height / 4;
+            g2d.setColor(CellUtils.awtColor(color));
+            g2d.drawString(str, indexX, indexY);
+            int r = (int) (cellWidth * CIRCLE_RATIO);
+            if (r % 2 == 1) {
+                --r;
+            }
+            int circleX = x - r / 2;
+            int circleY = y - r / 2;
+            g2d.drawOval(circleX, circleY, r, r);
         }
     }
 }

@@ -3,8 +3,6 @@ package com.haochen.renju.storage;
 import java.util.List;
 import java.util.Stack;
 
-import com.haochen.renju.bean.Cell;
-
 public class PieceTree {
     private TreeNode root;
     private TreeNode current;
@@ -34,27 +32,10 @@ public class PieceTree {
         return current.getChildren().size();
     }
     
-//    public ChessMap createChessMap() {
-//        TreeNode treeNode = current;
-//        ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
-//        while (treeNode.getParent() != null) {
-//            nodes.addAllChildren(treeNode);
-//            treeNode = treeNode.getParent();
-//        }
-//        
-//        ChessMap chessMap = new ChessMap();
-//        while (nodes.size() > 0) {
-//            Point chessLocation = nodes.get(nodes.size() - 1).getCell().getPoint();
-//            chessMap.addChess(chessLocation);
-//            nodes.remove(nodes.size() - 1);
-//        }
-//        return chessMap;
-//    }
-    
     public void clearChildren(TreeNode treeNode) {
         treeNode.getChildren().clear();
     }
-    
+
     public void back() {
         current = current.getParent();
     }

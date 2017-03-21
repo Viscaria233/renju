@@ -1,23 +1,29 @@
 package com.haochen.renju.control;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
-import com.haochen.renju.bean.Cell;
-import com.haochen.renju.control.ai.AI;
-import com.haochen.renju.control.ai.Chess5;
-import com.haochen.renju.control.wintree.WinTree;
+import com.haochen.renju.storage.Cell;
+import com.haochen.renju.calculate.ai.AI;
+import com.haochen.renju.calculate.ai.Chess5;
+import com.haochen.renju.calculate.ai.GameTree;
 import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.*;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
+import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.Dialogs;
+import com.haochen.renju.util.CellUtils;
+import com.haochen.renju.util.PointUtils;
 
 public class Mediator {
-    private Calculate calculate;
     private Display display;
+    private Printer printer;
     private Storage storage;
+    private Calculate calculate;
 //    protected TestMenuBar menuBar;
 
     private Chess5 chess5Black = new Chess5(Cell.BLACK);
@@ -27,15 +33,28 @@ public class Mediator {
 
     private Operator operator = new Operator();
 
-    public Mediator(Display display) {
-        calculate = new AI();
-        storage = new Board();
-        this.display = display;
-        calculate.setMediator(this);
-        storage.setMediator(this);
-        display.setMediator(this);
-
+    public Mediator() {
         initPlayerSet();
+    }
+
+    public void setDisplay(Display display) {
+        this.display = display;
+        display.setMediator(this);
+    }
+
+    public void setPrinter(Printer printer) {
+        this.printer = printer;
+        printer.setMediator(this);
+    }
+
+    public void setStorage(Storage storage) {
+        this.storage = storage;
+        storage.setMediator(this);
+    }
+
+    public void setCalculate(Calculate calculate) {
+        this.calculate = calculate;
+        calculate.setMediator(this);
     }
 
     private void initPlayerSet() {
@@ -52,14 +71,6 @@ public class Mediator {
         playerSet.addPlayer(player);
     }
 
-    public Calculate getCalculate() {
-        return calculate;
-    }
-
-    public Storage getStorage() {
-        return storage;
-    }
-
     public PlayerSet getPlayerSet() {
         return playerSet;
     }
@@ -70,60 +81,52 @@ public class Mediator {
 
     public interface Display {
         void setMediator(Mediator mediator);
-
         void drawPiece(Cell cell);
-
         void removePiece(Point currentLocation, Point lastLocation);
-
         void drawRecord(Point location, int color);
-
         void removeRecord(Point location);
-
         void removeRecord();
-
         void drawForbiddenMark(Point location);
-
         void clearForbiddenMark();
-
+        void drawGameTree(GameTree tree);
+        void clearGameTree();
         void clear(Point location);
-
         void clear();
-
         void commit();
+    }
+
+    public interface Printer {
+        Color LOADING = Color.RED;
+        Color READY = Color.CYAN;
+        Color MESSAGE = Color.BLUE;
+        Color BLACK = Color.BLACK;
+        Color WHITE = Color.WHITE;
+        void setMediator(Mediator mediator);
+        void setMessage(String message, Color color);
     }
     
     public interface Storage extends Iterable<Point>, Serializable {
         void setMediator(Mediator mediator);
-
         int getNumber();
-
         boolean available(Point boardLocation);
-
         Cell getCell(Point point);
-
         void addCell(Cell cell);
-
         void removeCell(Point point);
-
         void removeCurrentCell();
-
         Cell getCurrentCell();
-
         /**
          * @return  当前局面下，对方曾经出现过的落子记录
          */
         List<Cell> getRecords();
-
         void clear();
-
         void display();
     }
 
     public interface Calculate {
         void setMediator(Mediator mediator);
         Point getMove(Storage storage, int color);
-        WinTree findVCF(Storage storage, int color);
-        WinTree findVCT(Storage storage, int color);
+        GameTree findVCF(Storage storage, int color);
+        GameTree findVCT(Storage storage, int color);
         void stopAndReturn();
         int findWinner(Storage storage, Point lastMove, int color);
         boolean isForbiddenMove(Storage storage, Point point, Direction direction);
@@ -134,6 +137,9 @@ public class Mediator {
             if (!point.isValid() || !storage.available(point)) {
                 return;
             }
+
+            hideFindingResult();
+
             int index = storage.getNumber() + 1;
             int color = playerSet.getMovingPlayer().getColor();
             Cell piece = new Cell(index, point, color);
@@ -141,10 +147,6 @@ public class Mediator {
             int winner = calculate.findWinner(storage, point, color);
             //然后落子
 
-
-            /**
-             *
-             */
             Player moving = playerSet.getMovingPlayer();
             if (moving instanceof HumanPlayer) {
                 chess5Black.humanMove(piece.getPoint());
@@ -156,8 +158,8 @@ public class Mediator {
                     chess5White.humanMove(piece.getPoint());
                 }
             }
-            System.out.println("------------------------------------");
-            chess5Black.drawchess();
+//            System.out.println("------------------------------------");
+//            chess5Black.drawchess();
 
 
             storage.addCell(piece);
@@ -190,7 +192,7 @@ public class Mediator {
                         }
                     }).start();
                 } else {
-                    System.out.println("Draw game");
+                    Dialogs.messageDialog("Draw game");
                 }
             }
         }
@@ -201,14 +203,14 @@ public class Mediator {
                 return;
             }
 
-
+            hideFindingResult();
             /**
              *
              */
             chess5Black.withdraw();
             chess5White.withdraw();
-            System.out.println("------------------------------------");
-            chess5Black.drawchess();
+//            System.out.println("------------------------------------");
+//            chess5Black.drawchess();
 
 
             storage.removeCurrentCell();
@@ -262,11 +264,13 @@ public class Mediator {
         }
 
         public void humanMove() {
-            System.out.println("Please move");
+            String color = playerSet.getMovingPlayer().getColorString();
+            printer.setMessage(color + ": Please move",
+                    "black".equals(color) ? Color.BLACK : Color.WHITE);
         }
 
         public void aiMove() {
-            System.out.println("AI is thinking......");
+            printer.setMessage("AI is thinking......", Printer.LOADING);
             long start = new Date().getTime();
             try {
                 Thread.sleep(800 + (int) (Math.random() * 400));
@@ -281,9 +285,9 @@ public class Mediator {
                     point = chess5White.aiMove();
                 }
                 String s = playerSet.getMovingPlayer().getColorString();
-                System.out.println(s + " AI moved. Think time = "
-                        + (new Date().getTime() - start) + " ms.  "
-                        + point);
+//                printer.setMessage(s + " AI moved. Think time = "
+//                        + (new Date().getTime() - start) + " ms.  "
+//                        + point, Printer.READY);
                 move(point);
 
             } catch (InterruptedException e) {
@@ -292,7 +296,7 @@ public class Mediator {
         }
 
         public void showWinMessage(Player winner) {
-            System.out.println(winner.getName() + " win with " + winner.getColorString());
+//            System.out.println(winner.getName() + " win with " + winner.getColorString());
             Dialogs.messageDialog((winner.getName() + " win with " + winner.getColorString()));
         }
 
@@ -306,22 +310,27 @@ public class Mediator {
         }
 
         public void findVCF() {
+            printer.setMessage("Finding VCF......", Printer.LOADING);
             Date begin = new Date();
-            WinTree vcf = calculate.findVCF(storage, playerSet.getMovingPlayer().getColor());
+            GameTree vcf = calculate.findVCF(storage, playerSet.getMovingPlayer().getColor());
             Date end = new Date();
 
-            System.out.println("----findVCF----");
-            for (WinTree t : vcf) {
-                System.out.print(t.getColor() + ": ");
-                System.out.println(t.getPoint());
+//            System.out.println("----findVCF----");
+            String result = "Not found. ";
+            if (vcf != null) {
+//                printGameTree(vcf);
+                result = "Found. ";
+                display.drawGameTree(vcf);
+                display.commit();
             }
 
-            System.out.println((end.getTime() - begin.getTime()) + " ms");
+            printer.setMessage(result + "Think time: "
+                    + (end.getTime() - begin.getTime()) + " ms", Printer.READY);
 
 //            saveVCFInfo(vcf);
         }
 
-        public void saveVCFInfo(WinTree tree) {
+        public void saveVCFInfo(GameTree tree) {
             ObjectOutputStream qS = null;
             ObjectOutputStream aS = null;
             BufferedWriter bw = null;
@@ -376,22 +385,45 @@ public class Mediator {
         }
 
         public void findVCT() {
-
+            printer.setMessage("Finding VCT......", Printer.LOADING);
             Date begin = new Date();
-            WinTree vct = calculate.findVCT(storage, playerSet.getMovingPlayer().getColor());
+            GameTree vct = calculate.findVCT(storage, playerSet.getMovingPlayer().getColor());
             Date end = new Date();
 
-            System.out.println("----findVCT----");
-            for (WinTree t : vct) {
-                System.out.print(t.getColor() + ": ");
-                System.out.println(t.getPoint());
+//            System.out.println("----findVCT----");
+            String result = "Not found. ";
+            if (vct != null) {
+//                printGameTree(vct);
+                result = "Found. ";
+                display.drawGameTree(vct);
+                display.commit();
             }
 
-            System.out.println((end.getTime() - begin.getTime()) + " ms");
+            printer.setMessage(result + "Think time: "
+                    + (end.getTime() - begin.getTime()) + " ms", Printer.READY);
 
 //            saveVCFInfo(vct);
         }
 
+        public void hideFindingResult() {
+            display.clearGameTree();
+            display.commit();
+        }
+
+    }
+
+    private void printGameTree(GameTree tree) {
+        GameTree node = tree;
+        int count = 0;
+        do {
+            node = node.getChild(0);
+            if (node.getColor() == tree.getColor()) {
+                count++;
+                System.out.println(count + ": "
+                        + CellUtils.toString(node.getColor()) + ": "
+                        + PointUtils.toString(node.getPoint()));
+            }
+        } while (node.getColor() == tree.getColor() ? node.size() == 1 : node.size() > 0);
     }
 
     private void drawRecords() {

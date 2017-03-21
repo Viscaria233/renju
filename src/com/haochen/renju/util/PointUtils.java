@@ -10,6 +10,10 @@ public class PointUtils {
         return "[" + (char)('A' + (point >> 4) - 1) + (point & 0xf) + "]";
     }
 
+    public static String toString(Point point) {
+        return toString(parse(point));
+    }
+
     public static int parse(int x, int y) {
         return (x << 4) + y;
     }

@@ -56,5 +56,4 @@ public class Point implements Serializable {
             return false;
         return true;
     }
-
 }

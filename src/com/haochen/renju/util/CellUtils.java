@@ -1,6 +1,6 @@
 package com.haochen.renju.util;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 
 import java.awt.*;
 
@@ -34,7 +34,7 @@ public class CellUtils {
         return 0;
     }
 
-    public static Color getAwtColor(int c) {
+    public static Color awtColor(int c) {
         if (c == Cell.BLACK) {
             return Color.black;
         } else if (c == Cell.WHITE) {

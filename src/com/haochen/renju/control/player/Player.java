@@ -1,6 +1,6 @@
 package com.haochen.renju.control.player;
 
-import com.haochen.renju.bean.Cell;
+import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
 
 public abstract class Player {
