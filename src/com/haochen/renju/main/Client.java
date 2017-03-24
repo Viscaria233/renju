@@ -4,6 +4,7 @@ import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
 import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.TestFrame;
+import test.TestConfig;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,10 +31,10 @@ public class Client {
     private static void saveList(Mediator.Storage storage) {
         ObjectOutputStream oos = null;
         try {
-            int count = Config.Test.QuesCount.vcf;
+            int count = TestConfig.Test.QuesCount.vcf;
             oos = new ObjectOutputStream(
                     new FileOutputStream(
-                            new File(Config.Test.Path.VCF, "list_" + count + ".list")));
+                            new File(TestConfig.Test.Path.VCF, "list_" + count + ".list")));
             List<Cell> cells = new ArrayList<>();
             for (Point p : storage) {
                 if (!storage.available(p)) {
@@ -75,7 +76,7 @@ public class Client {
         ObjectInputStream ois = null;
         try {
             for (int i = 0; i < 6; ++i) {
-                ois = Config.Test.createVCFStream("list_" + i + ".list");
+                ois = TestConfig.Test.createVCFStream("list_" + i + ".list");
                 ques.add((List<Point>) ois.readObject());
                 ois.close();
             }
@@ -95,11 +96,9 @@ public class Client {
     }
 
     public static void main(String[] args) {
-            Config.init();
-            launch();
-            showList();
-
-//        new Chess5().launch();
+        TestConfig.init();
+        launch();
+//        showList();
     }
 
 }

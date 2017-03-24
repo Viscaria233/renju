@@ -1,4 +1,4 @@
-package com.haochen.renju.storage;
+package com.haochen.renju.calculate;
 
 import java.util.ArrayList;
 import java.util.List;

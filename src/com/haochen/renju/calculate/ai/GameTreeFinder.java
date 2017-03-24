@@ -1,9 +1,11 @@
 package com.haochen.renju.calculate.ai;
 
+import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.BitPieceMap;
 import com.haochen.renju.util.CellUtils;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Haochen on 2016/10/24.
@@ -18,8 +20,7 @@ class GameTreeFinder {
         this.moveSetGetter = moveSetGetter;
     }
 
-
-    GameTree getGameTree(final BitPieceMap map, int lastFoeMove, int color) {
+    GameTree getGameTree(final BitPieceMap map, final int lastFoeMove, int color) {
         List<Integer> moveSet = getMoveSet(map, lastFoeMove, color);
         if (moveSet.size() == 0) {
             return null;
@@ -33,88 +34,85 @@ class GameTreeFinder {
             }
         }
         tree.add(moveSet, color);
-        final int foeColor = CellUtils.foeColor(color);
 
-//        final Map<GameTree, List<Integer>> foeMoveSets = new HashMap<>();
-        final int[] complete = new int[1];
-//        for (final GameTree me : tree) {
-        for (int i = 0; i < tree.size(); ++i) {
-            final GameTree me = tree.getChild(i);
-            final BitPieceMap newMap = map.another();
-            newMap.addPiece(me.getPoint(), me.getColor());
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    List<Integer> foe = getMoveSet(newMap, me.getPoint(), foeColor);
-//                    map.addPiece(me.getPoint(), me.getColor());
-//                    List<Integer> foe = getMoveSet(map, me.getPoint(), foeColor);
-//                    map.removeCell(me.getPoint());
-                    me.add(foe, foeColor);
-                    synchronized (complete) {
-                        complete[0]++;
-                        complete.notifyAll();
-                    }
-//                    synchronized (foeMoveSets) {
-//                        foeMoveSets.put(me, foe);
-//                        foeMoveSets.notifyAll();
-//                    }
-                }
-            }).start();
+        final int foeColor = CellUtils.foeColor(color);
+        final CountDownLatch latch = new CountDownLatch(tree.size());
+        Thread[] threads = growByMultiThread(map, tree, foeColor, latch);
+        waitForComplete(latch, threads);
+
+        if (shouldStopFinding()) {
+            return null;
         }
-        try {
-            while (complete[0] < tree.size()) {
-                synchronized (complete) {
-                    if (complete[0] < tree.size()) {
-                        complete.wait();
-                    }
-                }
-            }
-//            synchronized (foeMoveSets) {
-//                while (foeMoveSets.size() < tree.size()) {
-//                    foeMoveSets.wait();
-//                }
-//            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Iterator<GameTree> iterator = tree.iterator();
-        while (iterator.hasNext()) {
-            GameTree me = iterator.next();
+
+        Iterator<GameTree> meIterator = tree.iterator();
+        while (meIterator.hasNext()) {
+            GameTree me = meIterator.next();
             if (foeFinish(map, foeColor, me)) {
-                iterator.remove();
+                meIterator.remove();
                 continue;
             }
             map.addPiece(me.getPoint(), me.getColor());
+
+            // 此处间接递归
             boolean meFinish = growGameTreeIfMeFinish(map, color, me);
+
             map.removeCell(me.getPoint());
             if (meFinish) {
                 tree.clearChildren();
                 tree.add(me);
                 return tree;
             } else {
-                iterator.remove();
+                meIterator.remove();
             }
         }
-//            if (win) {
-//                tree.clearChildren();
-//                tree.add(t);
-//                return tree;
-//            }
-//            if (!win) {
-//                tree.remove(t);
-//            }
         return tree.isEmpty() ? null : tree;
+    }
+
+    private void waitForComplete(CountDownLatch latch, Thread[] threads) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            for (Thread t : threads) {
+                if (t != null && !t.isInterrupted()) {
+                    t.interrupt();
+                }
+            }
+        }
+    }
+
+    private Thread[] growByMultiThread(BitPieceMap map, GameTree tree, final int foeColor, final CountDownLatch latch) {
+        Thread[] threads = new Thread[tree.size()];
+        for (int i = 0; i < tree.size(); ++i) {
+            final GameTree me = tree.getChild(i);
+            final BitPieceMap newMap = map.another();
+            newMap.addPiece(me.getPoint(), me.getColor());
+            threads[i] = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<Integer> foe = getMoveSet(newMap, me.getPoint(), foeColor);
+                    me.add(foe, foeColor);
+                    latch.countDown();
+                }
+            });
+            threads[i].start();
+        }
+        return threads;
+    }
+
+    private boolean shouldStopFinding() {
+        return Config.shouldStopFinding;
     }
 
     private boolean growGameTreeIfMeFinish(BitPieceMap map, int color, GameTree me) {
         for (GameTree foe : me) {
             map.addPiece(foe.getPoint(), foe.getColor());
+            // 间接递归
             GameTree result = getGameTree(map, foe.getPoint(), color);
             map.removeCell(foe.getPoint());
             if (result == null) {
                 return false;
             } else {
-                //grow game tree
+                // grow game tree
                 foe.addAllChildren(result);
             }
         }
@@ -124,15 +122,11 @@ class GameTreeFinder {
     private boolean foeFinish(BitPieceMap map, int foeColor, GameTree me) {
         for (GameTree foe : me) {
             if (isFinish(map, foe.getPoint(), foeColor)) {
-//                    tree.remove(me);
-//                    --i;
                 return true;
-//                    return null;
             }
         }
         return false;
     }
-
 
     private boolean isFinish(BitPieceMap map, int point, int color) {
         return finishCondition.isFinish(map, point, color);

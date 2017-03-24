@@ -3,13 +3,13 @@ package test.com.haochen.renju.control.ai;
 import com.haochen.renju.storage.Cell;
 import com.haochen.renju.calculate.ai.AI;
 import com.haochen.renju.calculate.ai.GameTree;
-import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.Board;
 import com.haochen.renju.storage.PieceMap;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import test.TestConfig;
 
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class AITest {
 
     @Before
     public void before() throws Exception {
-        Config.init();
+        TestConfig.init();
     }
 
     @After
@@ -175,11 +175,11 @@ public class AITest {
         };
 
         ObjectInputStream ois = null;
-        for (int i = 0; i < Config.Test.QuesCount.vcf; ++i) {
-            ois = Config.Test.createVCFStream("vcf_question_" + i + ".ques");
+        for (int i = 0; i < TestConfig.Test.QuesCount.vcf; ++i) {
+            ois = TestConfig.Test.createVCFStream("vcf_question_" + i + ".ques");
             ques.add((PieceMap) ois.readObject());
             ois.close();
-            ois = Config.Test.createVCFStream("vcf_answer_" + i + ".ans");
+            ois = TestConfig.Test.createVCFStream("vcf_answer_" + i + ".ans");
             ans.add((GameTree) ois.readObject());
             ois.close();
         }

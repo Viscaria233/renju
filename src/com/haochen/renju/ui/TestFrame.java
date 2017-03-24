@@ -30,6 +30,7 @@ public class TestFrame extends JFrame {
         mediator.setCalculate(new AI());
         mediator.setPrinter(stateBar);
         mediator.setStorage(new Board());
+        mediator.setMenu(menuBar);
 
         menuBar.setMediator(mediator);
 
