@@ -3,26 +3,22 @@ package com.haochen.renju.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.print.attribute.standard.Media;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.Cell;
 import com.haochen.renju.control.Mediator;
-import com.haochen.renju.calculate.ai.AI;
 import com.haochen.renju.control.player.AIPlayer;
 import com.haochen.renju.control.player.HumanPlayer;
 import com.haochen.renju.control.player.Player;
 import com.haochen.renju.control.player.PlayerSet;
 
-class TestMenuBar extends JMenuBar {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+class TestMenuBar extends JMenuBar implements Mediator.Menu {
 
     private TestFrame mainFrame;
 
@@ -83,10 +79,12 @@ class TestMenuBar extends JMenuBar {
         file.addSeparator();
         file.add(exit);
 
-        findVCT = new NewThreadJMenuItem("Find VCT");
-        findVCF = new NewThreadJMenuItem("Find VCF");
+        findVCT = new JMenuItem("Find VCT");
+        findVCF = new JMenuItem("Find VCF");
         stopFinding = new JMenuItem("Stop finding");
         hideFindingResult = new JMenuItem("Hide finding result");
+        stopFinding.setEnabled(false);
+        hideFindingResult.setEnabled(false);
 
         edit.add(findVCT);
         edit.add(findVCF);
@@ -109,7 +107,7 @@ class TestMenuBar extends JMenuBar {
         test.add(separator);
 
         usingForbidden = new JCheckBoxMenuItem("Using Forbidden");
-        usingForbidden.setState(AI.usingForbiddenMove);
+        usingForbidden.setState(usingForbiddenMove());
         aiBlack = new JCheckBoxMenuItem("AI Uses Black");
 //        aiBlack.setPrinter(true);
         aiWhite = new JCheckBoxMenuItem("AI Uses White");
@@ -153,6 +151,11 @@ class TestMenuBar extends JMenuBar {
         eventPerformed();
     }
 
+    private boolean usingForbiddenMove() {
+        return Config.usingForbiddenMove;
+    }
+
+    @Override
     public void setMediator(Mediator mediator) {
         this.mediator = mediator;
     }
@@ -174,23 +177,38 @@ class TestMenuBar extends JMenuBar {
             }
         });
 
-        findVCF.addActionListener(
-                new ActionListener() {
+        findVCF.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
+                    public void run() {
+                        findingStarted();
                         mediator.getOperator().findVCF();
                     }
-                }
-        );
+                }).start();
+            }
+        });
 
-        findVCT.addActionListener(
-                new ActionListener() {
+        findVCT.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
+                    public void run() {
+                        findingStarted();
                         mediator.getOperator().findVCT();
                     }
-                }
-        );
+                }).start();
+            }
+        });
+
+        stopFinding.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mediator.getOperator().stopFinding();
+            }
+        });
 
         hideFindingResult.addActionListener(new ActionListener() {
             @Override
@@ -226,7 +244,7 @@ class TestMenuBar extends JMenuBar {
         usingForbidden.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AI.usingForbiddenMove = usingForbidden.getState();
+                Config.usingForbiddenMove = usingForbidden.getState();
                 mediator.getOperator().updateConfig();
             }
         });
@@ -278,25 +296,27 @@ class TestMenuBar extends JMenuBar {
         });
     }
 
-    private static class NewThreadJMenuItem extends JMenuItem {
-        public NewThreadJMenuItem(String text) {
-            super(text);
-        }
+    private void findingStarted() {
+        findVCF.setEnabled(false);
+        findVCT.setEnabled(false);
+        stopFinding.setEnabled(true);
+        hideFindingResult.setEnabled(false);
+    }
 
-        @Override
-        public void addActionListener(final ActionListener l) {
-            super.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            l.actionPerformed(e);
-                        }
-                    }).start();
-                }
-            });
-        }
+    @Override
+    public void findingFinished() {
+        findVCF.setEnabled(true);
+        findVCT.setEnabled(true);
+        stopFinding.setEnabled(false);
+        hideFindingResult.setEnabled(true);
+    }
+
+    @Override
+    public void findingStopped() {
+        findVCF.setEnabled(true);
+        findVCT.setEnabled(true);
+        stopFinding.setEnabled(false);
+        hideFindingResult.setEnabled(false);
     }
 }
 

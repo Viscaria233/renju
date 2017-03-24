@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.List;
 
 import com.haochen.renju.storage.Cell;
-import com.haochen.renju.calculate.ai.AI;
 import com.haochen.renju.calculate.ai.Chess5;
 import com.haochen.renju.calculate.ai.GameTree;
 import com.haochen.renju.main.Config;
@@ -18,13 +17,14 @@ import com.haochen.renju.storage.Point;
 import com.haochen.renju.ui.Dialogs;
 import com.haochen.renju.util.CellUtils;
 import com.haochen.renju.util.PointUtils;
+import test.TestConfig;
 
 public class Mediator {
     private Display display;
     private Printer printer;
     private Storage storage;
     private Calculate calculate;
-//    protected TestMenuBar menuBar;
+    private Menu menu;
 
     private Chess5 chess5Black = new Chess5(Cell.BLACK);
     private Chess5 chess5White = new Chess5(Cell.WHITE);
@@ -55,6 +55,10 @@ public class Mediator {
     public void setCalculate(Calculate calculate) {
         this.calculate = calculate;
         calculate.setMediator(this);
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     private void initPlayerSet() {
@@ -132,6 +136,12 @@ public class Mediator {
         boolean isForbiddenMove(Storage storage, Point point, Direction direction);
     }
 
+    public interface Menu {
+        void setMediator(Mediator mediator);
+        void findingFinished();
+        void findingStopped();
+    }
+
     public class Operator {
         public void move(Point point) {
             if (!point.isValid() || !storage.available(point)) {
@@ -181,7 +191,7 @@ public class Mediator {
                 Config.GAME_OVER = true;
             } else {
                 if (storage.getNumber() < 225) {
-                    if (AI.usingForbiddenMove) {
+                    if (usingForbiddenMove()) {
                         drawForbiddenMark();
                     }
                     playerSet.exchangePlayer();
@@ -204,21 +214,16 @@ public class Mediator {
             }
 
             hideFindingResult();
-            /**
-             *
-             */
+
             chess5Black.withdraw();
             chess5White.withdraw();
-//            System.out.println("------------------------------------");
-//            chess5Black.drawchess();
-
 
             storage.removeCurrentCell();
             Cell last = storage.getCurrentCell();
             display.removePiece(current.getPoint(), last == null ? null : last.getPoint());
             drawRecords();
             display.commit();
-            if (AI.usingForbiddenMove) {
+            if (usingForbiddenMove()) {
                 drawForbiddenMark();
             }
 
@@ -241,22 +246,9 @@ public class Mediator {
             chess5Black = new Chess5(Cell.BLACK);
             chess5White = new Chess5(Cell.WHITE);
             Config.GAME_OVER = false;
-//            initPlayerSet();
             playerSet.newGame();
             storage.display();
             launch();
-        }
-
-        public void drawForbiddenMark() {
-            display.clearForbiddenMark();
-
-            for (Point point : storage) {
-                if (storage.available(point)
-                        && calculate.isForbiddenMove(Mediator.this.storage, point, Direction.all)) {
-                    display.drawForbiddenMark(point);
-                }
-            }
-            display.commit();
         }
 
         public void launch() {
@@ -285,7 +277,7 @@ public class Mediator {
                     point = chess5White.aiMove();
                 }
                 String s = playerSet.getMovingPlayer().getColorString();
-//                printer.setMessage(s + " AI moved. Think time = "
+//                printer.setMessage(s + " AI moved at " + PointUtils.toString(point) + ". Think time = "
 //                        + (new Date().getTime() - start) + " ms.  "
 //                        + point, Printer.READY);
                 move(point);
@@ -295,13 +287,12 @@ public class Mediator {
             }
         }
 
-        public void showWinMessage(Player winner) {
-//            System.out.println(winner.getName() + " win with " + winner.getColorString());
+        private void showWinMessage(Player winner) {
             Dialogs.messageDialog((winner.getName() + " win with " + winner.getColorString()));
         }
 
         public void updateConfig() {
-            if (AI.usingForbiddenMove) {
+            if (usingForbiddenMove()) {
                 drawForbiddenMark();
             } else {
                 display.clearForbiddenMark();
@@ -309,33 +300,13 @@ public class Mediator {
             }
         }
 
-        public void findVCF() {
-            printer.setMessage("Finding VCF......", Printer.LOADING);
-            Date begin = new Date();
-            GameTree vcf = calculate.findVCF(storage, playerSet.getMovingPlayer().getColor());
-            Date end = new Date();
-
-//            System.out.println("----findVCF----");
-            String result = "Not found. ";
-            if (vcf != null) {
-//                printGameTree(vcf);
-                result = "Found. ";
-                display.drawGameTree(vcf);
-                display.commit();
-            }
-
-            printer.setMessage(result + "Think time: "
-                    + (end.getTime() - begin.getTime()) + " ms", Printer.READY);
-
-//            saveVCFInfo(vcf);
-        }
-
         public void saveVCFInfo(GameTree tree) {
             ObjectOutputStream qS = null;
             ObjectOutputStream aS = null;
             BufferedWriter bw = null;
             try {
-                File file = new File(Config.Test.Path.VCF, "vcf_question_" + Config.Test.QuesCount.vcf + ".ques");
+                File file = new File(TestConfig.Test.Path.VCF, "vcf_question_"
+                        + TestConfig.Test.QuesCount.vcf + ".ques");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -343,7 +314,8 @@ public class Mediator {
                 qS.writeObject(storage);
                 qS.flush();
 
-                file = new File(Config.Test.Path.VCF, "vcf_answer_" + Config.Test.QuesCount.vcf + ".ans");
+                file = new File(TestConfig.Test.Path.VCF, "vcf_answer_"
+                        + TestConfig.Test.QuesCount.vcf + ".ans");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -351,11 +323,11 @@ public class Mediator {
                 aS.writeObject(tree);
                 aS.flush();
 
-                ++Config.Test.QuesCount.vcf;
+                ++TestConfig.Test.QuesCount.vcf;
                 bw = new BufferedWriter(
                         new OutputStreamWriter(
-                                new FileOutputStream(new File(Config.Test.Path.VCF, "vcf_count.txt"))));
-                bw.write(Config.Test.QuesCount.vcf + "");
+                                new FileOutputStream(new File(TestConfig.Test.Path.VCF, "vcf_count.txt"))));
+                bw.write(TestConfig.Test.QuesCount.vcf + "");
                 bw.flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -384,24 +356,49 @@ public class Mediator {
             }
         }
 
-        public void findVCT() {
-            printer.setMessage("Finding VCT......", Printer.LOADING);
+        public void findVCF() {
+            printer.setMessage("Finding VCF......", Printer.LOADING);
+            Config.shouldStopFinding = false;
             Date begin = new Date();
-            GameTree vct = calculate.findVCT(storage, playerSet.getMovingPlayer().getColor());
+            GameTree vcf = calculate.findVCF(storage, playerSet.getMovingPlayer().getColor());
+            if (shouldStopFinding()) {
+                onFindingStopped();
+                return;
+            }
             Date end = new Date();
 
-//            System.out.println("----findVCT----");
+            String result = "Not found. ";
+            if (vcf != null) {
+                result = "Found. ";
+                display.drawGameTree(vcf);
+                display.commit();
+            }
+            printer.setMessage(result + "Think time: "
+                    + (end.getTime() - begin.getTime()) + " ms", Printer.READY);
+            onFindingFinished();
+//            saveVCFInfo(vcf);
+        }
+
+        public void findVCT() {
+            printer.setMessage("Finding VCT......", Printer.LOADING);
+            Config.shouldStopFinding = false;
+            Date begin = new Date();
+            GameTree vct = calculate.findVCT(storage, playerSet.getMovingPlayer().getColor());
+            if (shouldStopFinding()) {
+                onFindingStopped();
+                return;
+            }
+            Date end = new Date();
+
             String result = "Not found. ";
             if (vct != null) {
-//                printGameTree(vct);
                 result = "Found. ";
                 display.drawGameTree(vct);
                 display.commit();
             }
-
             printer.setMessage(result + "Think time: "
                     + (end.getTime() - begin.getTime()) + " ms", Printer.READY);
-
+            onFindingFinished();
 //            saveVCFInfo(vct);
         }
 
@@ -410,6 +407,37 @@ public class Mediator {
             display.commit();
         }
 
+        public void stopFinding() {
+            calculate.stopAndReturn();
+        }
+
+        private void onFindingFinished() {
+            menu.findingFinished();
+        }
+
+        private void onFindingStopped() {
+            printer.setMessage("Stopped.", Printer.MESSAGE);
+            menu.findingStopped();
+        }
+    }
+
+    private boolean shouldStopFinding() {
+        return Config.shouldStopFinding;
+    }
+
+    private void drawForbiddenMark() {
+        display.clearForbiddenMark();
+        for (Point point : storage) {
+            if (storage.available(point)
+                    && calculate.isForbiddenMove(Mediator.this.storage, point, Direction.all)) {
+                display.drawForbiddenMark(point);
+            }
+        }
+        display.commit();
+    }
+
+    private boolean usingForbiddenMove() {
+        return Config.usingForbiddenMove;
     }
 
     private void printGameTree(GameTree tree) {
@@ -433,5 +461,4 @@ public class Mediator {
             display.drawRecord(c.getPoint(), c.getType());
         }
     }
-
 }

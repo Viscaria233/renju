@@ -1,7 +1,8 @@
 package com.haochen.renju.calculate.ai;
 
+import com.haochen.renju.main.Config;
 import com.haochen.renju.storage.Cell;
-import com.haochen.renju.storage.Res;
+import com.haochen.renju.calculate.Res;
 import com.haochen.renju.calculate.ContinueAttribute;
 import com.haochen.renju.calculate.ContinueType;
 import com.haochen.renju.calculate.Resources;
@@ -19,7 +20,6 @@ import java.util.*;
 
 public class AI implements Mediator.Calculate {
 
-    public static boolean usingForbiddenMove = false;
     private Mediator mediator;
 
     @Override
@@ -50,7 +50,9 @@ public class AI implements Mediator.Calculate {
     }
 
     @Override
-    public void stopAndReturn() {}
+    public void stopAndReturn() {
+        Config.shouldStopFinding = true;
+    }
 
     @Override
     public int findWinner(Mediator.Storage storage, Point lastMove, int color) {
@@ -76,7 +78,7 @@ public class AI implements Mediator.Calculate {
         map.addPiece(point, color);
 
         ContinueAttribute attribute = getContinueAttribute(map, point, Direction.all);
-        if (usingForbiddenMove
+        if (usingForbiddenMove()
                 && color == Cell.BLACK
                 && isForbiddenMove(map, attribute, Direction.all)) {
             //É¾³ý¼ÙÏëÆå×Ó
@@ -92,6 +94,10 @@ public class AI implements Mediator.Calculate {
         //É¾³ý¼ÙÏëÆå×Ó
         map.removeCell(point);
         return winner;
+    }
+
+    private boolean usingForbiddenMove() {
+        return Config.usingForbiddenMove;
     }
 
     private ContinueAttribute getContinueAttribute(BitPieceMap map, int point, Direction direction) {
@@ -201,7 +207,7 @@ public class AI implements Mediator.Calculate {
         }
 
         SingleContinue single = attribute.getContinue(direction);
-        if (usingForbiddenMove) {
+        if (usingForbiddenMove()) {
             if (attribute.getColor() == Cell.BLACK) {
                 if (single.getLength() == 5) {
                     result.add(direction);
@@ -580,7 +586,7 @@ public class AI implements Mediator.Calculate {
         if (single == null) {
             return null;
         }
-        if (usingForbiddenMove
+        if (usingForbiddenMove()
                 && attribute.getColor() == Cell.BLACK
                 && isForbiddenMove(map, attribute, Direction.all)) {
             return ContinueType.FORBIDDEN_MOVE;
@@ -759,26 +765,10 @@ public class AI implements Mediator.Calculate {
                             ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR), null);
                 } else if (color == CellUtils.foeColor(c)) {
                     result = findPoints(map, color, Collections.singletonList(ContinueType.FIVE), null);
-                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
-                    Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
-                    for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
-                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
-                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)) {
-                            int[] points = new int[0];
-                            if (attribute != null) {
-                                points = attribute.getContinue(entry.getKey()).getBreakPoint();
-                            }
-                            for (int p : points) {
-                                if (p != 0 && map.available(p) && finishCondition.isFinish(map, p, c)) {
-                                    result.add(p);
-                                }
-                            }
-                        }
+                    if (result.isEmpty()) {
+                        result = findPoints(map, c,
+                                Collections.singletonList(ContinueType.FIVE), null);
                     }
-//                    if (result.isEmpty()) {
-//                        result = findPoints(map, c,
-//                                Collections.singletonList(ContinueType.FIVE), null);
-//                    }
                 }
                 return result;
             }
@@ -787,13 +777,9 @@ public class AI implements Mediator.Calculate {
     }
 
     private GameTree findVCT(BitPieceMap map, int color) {
-        System.out.println("findVCT");
-
         FinishCondition finishCondition = new FinishCondition() {
             @Override
             public boolean isFinish(BitPieceMap map, int point, int color) {
-//                return (findWinner(map, point, color) == color)
-//                        || findVCF(map, color) != null;
                 return findWinner(map, point, color) == color;
             }
         };
@@ -802,36 +788,22 @@ public class AI implements Mediator.Calculate {
         MoveSetGetter moveSetGetter = new MoveSetGetter() {
             @Override
             public List<Integer> getMoveSet(BitPieceMap map, int lastFoeMove, int color) {
-//                System.out.println("getMoveSet");
                 List<Integer> result = new ArrayList<>();
                 if (color == c) {
                     result = findPoints(map, color, Arrays.asList(
                             ContinueType.FIVE, ContinueType.ALIVE_FOUR, ContinueType.ASLEEP_FOUR,
                             ContinueType.ALIVE_THREE), null);
                 } else if (color == CellUtils.foeColor(c)) {
-                    result = findPoints(map, color, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
-                            ContinueType.ASLEEP_FOUR), null);
-//                    ContinueAttribute attribute = getContinueAttribute(map, lastFoeMove, Direction.all);
-//                    Map<Direction, ContinueType> types = getContinueTypes(map, attribute);
-//                    for (Map.Entry<Direction, ContinueType> entry : types.entrySet()) {
-//
-//                        if (entry.getValue().equals(ContinueType.ALIVE_FOUR)
-//                                || entry.getValue().equals(ContinueType.ASLEEP_FOUR)
-//                                || entry.getValue().equals(ContinueType.ALIVE_THREE)
-//                                || entry.getValue().equals(ContinueType.ASLEEP_THREE)) {
-//                            int[] points = new int[0];
-//                            if (attribute != null) {
-//                                points = attribute.getContinue(entry.getKey()).getBreakPoint();
-//                            }
-//                            for (int p : points) {
-//                                if (p != 0 && map.available(p)) {
-//                                    result.add(p);
-//                                }
-//                            }
-//                        }
-//                    }
-                    result.addAll(findPoints(map, c, Arrays.asList(ContinueType.FIVE, ContinueType.ALIVE_FOUR,
-                            ContinueType.ASLEEP_FOUR), null));
+                    result = findPoints(map, color, Collections.singletonList(ContinueType.FIVE), null);
+                    if (result.isEmpty()) {
+                        result = findPoints(map, c, Collections.singletonList(ContinueType.FIVE), null);
+                        if (result.isEmpty()) {
+                            result = findPoints(map, color, Arrays.asList(ContinueType.ALIVE_FOUR,
+                                    ContinueType.ASLEEP_FOUR), null);
+                            result.addAll(findPoints(map, c, Arrays.asList(ContinueType.ALIVE_FOUR,
+                                    ContinueType.ASLEEP_FOUR), null));
+                        }
+                    }
                 }
                 return result;
             }
@@ -847,15 +819,13 @@ public class AI implements Mediator.Calculate {
         for (int p : map) {
             if (map.available(p)) {
                 map.addPiece(p, color);
-
                 attribute = getContinueAttribute(map, p, Direction.all);
                 types = getContinueTypes(map, attribute);
+                map.removeCell(p);
 
                 if (containsOneType(types, contains) && excludesAllTypes(types, excludes)) {
                     result.add(p);
                 }
-
-                map.removeCell(p);
             }
         }
         return result;
